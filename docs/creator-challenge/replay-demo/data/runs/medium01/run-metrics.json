@@ -1,0 +1,88 @@
+{
+  "trace_id": "creator-medium01",
+  "metrics": [
+    {
+      "name": "mcp_factory.pipeline.stage_span.duration",
+      "value": 472.52,
+      "unit": "sec",
+      "status": "pass",
+      "why": "Shows where time is spent so expensive reruns are not used blindly.",
+      "labels": {
+        "run": "medium01",
+        "span": "target_runs"
+      }
+    },
+    {
+      "name": "mcp_factory.run.status_staleness",
+      "value": 0,
+      "unit": "sec",
+      "status": "pass",
+      "why": "Tells an operator whether a run is alive, stale, or misleading.",
+      "labels": {
+        "terminal": "true"
+      }
+    },
+    {
+      "name": "mcp_factory.artifacts.required_emission_lag.duration",
+      "value": 0,
+      "unit": "sec",
+      "status": "pass",
+      "why": "Separates a completed stage from evidence that is actually readable.",
+      "labels": {
+        "source": "pinned_baseline_artifacts"
+      }
+    },
+    {
+      "name": "first_failed_boundary",
+      "value": "none",
+      "unit": "boundary",
+      "status": "pass",
+      "why": "Prevents downstream missing artifacts from being mistaken for the root cause.",
+      "labels": {
+        "semantic_gap_count": "0",
+        "embodiment_gap_count": "0"
+      }
+    },
+    {
+      "name": "root_blocker",
+      "value": "none",
+      "unit": "blocker",
+      "status": "pass",
+      "why": "Names the owning layer for the next bounded fix.",
+      "labels": {
+        "case_id": "medium-01-product-route"
+      }
+    },
+    {
+      "name": "candidate_comparability_state",
+      "value": "comparable",
+      "unit": "state",
+      "status": "pass",
+      "why": "Distinguishes diagnostic output from evidence that can support comparison.",
+      "labels": {
+        "authoritative_proving": "true"
+      }
+    },
+    {
+      "name": "safe_to_compare",
+      "value": true,
+      "unit": "bool",
+      "status": "pass",
+      "why": "Protects against false benchmark or regression claims.",
+      "labels": {
+        "green_contract_level": "product_green"
+      }
+    },
+    {
+      "name": "next_action_confidence",
+      "value": "high",
+      "unit": "confidence",
+      "status": "pass",
+      "why": "Tells the operator whether to fix, rerun, inspect, or stop.",
+      "labels": {
+        "next_action": "compare/replay evidence"
+      }
+    }
+  ],
+  "claim_ceiling": "telemetry is diagnostic evidence only"
+}

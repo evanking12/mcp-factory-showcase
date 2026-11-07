@@ -1,0 +1,234 @@
+openapi: "3.0.3"
+info:
+  title: "Contoso Customer Service API"
+  description: >
+    RESTful API for the Contoso automated customer service platform.
+    Manages customer records, orders, and support tickets.
+  version: "1.2.0"
+  contact:
+    name: "Contoso API Team"
+
+servers:
+  - url: "https://api.contoso.com/v1"
+    description: "Production server"
+  - url: "https://staging.api.contoso.com/v1"
+    description: "Staging server"
+
+paths:
+  /customers:
+    get:
+      operationId: listCustomers
+      summary: List all customers with optional filters
+      tags: [Customers]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+          description: Number of results per page
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, suspended]
+          description: Filter by account status
+      responses:
+        "200":
+          description: Paginated list of customer records
+        "400":
+          description: Invalid query parameters
+
+    post:
+      operationId: createCustomer
+      summary: Create a new customer record
+      tags: [Customers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email]
+              properties:
+                name:
+                  type: string
+                  description: Customer full name
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                tier:
+                  type: string
+                  enum: [standard, premium, enterprise]
+      responses:
+        "201":
+          description: Created customer object with assigned ID
+        "409":
+          description: Email address already registered
+
+  /customers/{customerId}:
+    get:
+      operationId: getCustomerById
+      summary: Retrieve a single customer record by ID
+      tags: [Customers]
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Unique numeric customer identifier
+      responses:
+        "200":
+          description: Full customer record
+        "404":
+          description: Customer not found
+
+    put:
+      operationId: updateCustomer
+      summary: Update an existing customer record
+      tags: [Customers]
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Customer ID to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                tier:
+                  type: string
+      responses:
+        "200":
+          description: Updated customer record
+
+    delete:
+      operationId: deleteCustomer
+      summary: Permanently delete a customer record
+      tags: [Customers]
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Customer ID to delete
+      responses:
+        "204":
+          description: Customer deleted successfully
+        "404":
+          description: Customer not found
+
+  /orders:
+    get:
+      operationId: listOrders
+      summary: List orders with optional customer and status filters
+      tags: [Orders]
+      parameters:
+        - name: customerId
+          in: query
+          schema:
+            type: integer
+          description: Filter orders by customer ID
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, processing, shipped, delivered, cancelled]
+          description: Filter by order status
+        - name: after
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Return orders placed after this date (ISO 8601)
+      responses:
+        "200":
+          description: List of matching order records
+
+    post:
+      operationId: placeOrder
+      summary: Place a new order for a customer
+      tags: [Orders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customerId, items]
+              properties:
+                customerId:
+                  type: integer
+                items:
+                  type: array
+                  description: List of product SKUs and quantities
+                shippingAddress:
+                  type: string
+                couponCode:
+                  type: string
+      responses:
+        "201":
+          description: Newly created order object with tracking number
+
+  /support/tickets:
+    post:
+      operationId: createSupportTicket
+      summary: Submit a new customer support ticket
+      tags: [Support]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customerId, subject, body]
+              properties:
+                customerId:
+                  type: integer
+                subject:
+                  type: string
+                body:
+                  type: string
+                priority:
+                  type: string
+                  enum: [low, normal, high, critical]
+      responses:
+        "201":
+          description: Created ticket with assigned ticket ID and SLA timestamp
+
+  /analytics/summary:
+    get:
+      operationId: getAnalyticsSummary
+      summary: Retrieve aggregated customer and order analytics
+      tags: [Analytics]
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month, quarter, year]
+          description: Aggregation period
+      responses:
+        "200":
+          description: Analytics summary with totals and trends

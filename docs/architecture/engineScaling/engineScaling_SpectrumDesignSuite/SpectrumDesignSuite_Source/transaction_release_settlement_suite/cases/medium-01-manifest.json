@@ -1,0 +1,34 @@
+{
+  "case_id": "medium-01",
+  "case_name": "reservation_fanout_lineage",
+  "band": "medium",
+  "primary_blocker_family": "lineage_materialization",
+  "active_modules": [
+    "session_bootstrap",
+    "reservation_stage",
+    "dispatch_preview",
+    "fee_quote",
+    "settlement_reconcile"
+  ],
+  "entry_surface": "session_bootstrap.open_operator_session",
+  "execution_flow": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "dispatch_preview.prepare_release_preview",
+    "fee_quote.stage_release_fee_quote",
+    "settlement_reconcile.verify_reserved_release"
+  ],
+  "shared_state": [
+    "operator_token",
+    "reservation_handle",
+    "hold_token"
+  ],
+  "wrong_split": "detach first validator from the reservation-producing unit",
+  "right_split": "keep the reservation producer, first fanout consumer, and first validator in one reasoning unit",
+  "bounded_unlock_targets": [
+    "dispatch_preview.prepare_release_preview",
+    "fee_quote.stage_release_fee_quote"
+  ],
+  "product_lesson_if_green": "bounded unlocks can coexist with honest lineage diagnosis",
+  "product_lesson_if_red": "lineage materialization or consumer reuse evidence is still too weak"
+}

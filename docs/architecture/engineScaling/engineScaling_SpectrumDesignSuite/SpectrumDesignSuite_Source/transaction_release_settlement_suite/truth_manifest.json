@@ -1,0 +1,53 @@
+{
+  "suite_id": "spectrum_transaction_release_settlement_suite",
+  "suite_name": "Spectrum Transaction Release Settlement Suite",
+  "suite_kind": "spectrum_design_suite",
+  "schema_version": "1.0.0",
+  "family_contract": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SPECTRUM-FAMILY-CONTRACT.md",
+  "split_observer_contract": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SPECTRUM-SPLIT-AND-OBSERVER-CONTRACT.md",
+  "active_modules": [
+    "session_bootstrap",
+    "reservation_stage",
+    "dispatch_preview",
+    "fee_quote",
+    "attestation_stage",
+    "invoice_sync",
+    "entitlement_sync",
+    "release_commit",
+    "replay_branch",
+    "settlement_reconcile",
+    "audit_trace"
+  ],
+  "preferred_expansion_order": [
+    "easy-01",
+    "medium-01",
+    "medium-02",
+    "hard-01",
+    "hard-02"
+  ],
+  "module_sources": {
+    "session_bootstrap": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/src/session_bootstrap.py",
+    "reservation_stage": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/src/reservation_stage.py",
+    "dispatch_preview": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/src/dispatch_preview.py",
+    "fee_quote": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/src/fee_quote.py",
+    "attestation_stage": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/src/attestation_stage.py",
+    "invoice_sync": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/src/invoice_sync.py",
+    "entitlement_sync": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/src/entitlement_sync.py",
+    "release_commit": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/src/release_commit.py",
+    "replay_branch": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/src/replay_branch.py",
+    "settlement_reconcile": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/src/settlement_reconcile.py",
+    "audit_trace": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/src/audit_trace.py"
+  },
+  "execution_inputs": {
+    "operator_id": "operator-001",
+    "order_id": "order-001",
+    "amount_cents": 2750
+  },
+  "case_manifests": {
+    "easy-01": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/cases/easy-01-manifest.json",
+    "medium-01": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/cases/medium-01-manifest.json",
+    "medium-02": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/cases/medium-02-manifest.json",
+    "hard-01": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/cases/hard-01-manifest.json",
+    "hard-02": "docs/architecture/engineScaling/engineScaling_SpectrumDesignSuite/SpectrumDesignSuite_Source/transaction_release_settlement_suite/cases/hard-02-manifest.json"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "artifact_type": "design-suite-real-campaign-contract.json",
+  "schema_version": "1.0.0",
+  "contract_name": "Design Suite Real Campaign Contract",
+  "owner_module": "api/pipeline/core/design_suite_real_campaign_runtime.py",
+  "entry_runner": "scripts/runs/run_design_suite_real_campaign.py",
+  "campaign_surface": "design_suite_bounded_campaign",
+  "compare_ready": false,
+  "promotion_ready": false,
+  "inherited_artifacts": [
+    "campaign/campaign.json",
+    "campaign/campaign-truth.json",
+    "audits/campaign-cohesion-report.json",
+    "audits/design-suite-campaign-attribution-review.json",
+    "design-suite-reusable-campaign-seam.json"
+  ],
+  "suite_specific_wrapper_role": [
+    "suite selection and default mode",
+    "suite-specific attribution alias naming",
+    "suite-specific readiness artifact alias naming"
+  ],
+  "still_not_generic": [
+    "compare or promotion policy",
+    "collector or ledger integration",
+    "multi-suite orchestration"
+  ]
+}

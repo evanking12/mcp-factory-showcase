@@ -1,0 +1,22 @@
+{
+  "id": "RB-2026-04-11-spectrum-session-bootstrap-safe-entry-contract",
+  "title": "Compiled session bootstrap root call collapses the SP_OpenOperatorSession contract",
+  "class": "contract",
+  "layer": "compiled bootstrap discovery / execution contract",
+  "status": "resolved",
+  "symptom": "The targeted compiled session_bootstrap lane no longer kills the bridge, but every SP_OpenOperatorSession attempt crashes inside the contained worker with exit_code=3221225477 while the analyzed invocable remains argless.",
+  "smallest_reproducer": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\medium-01\\bridge-stability-between-analyze-and-execute\\20260411-101951 plus source/header surfaces in tests/fixtures/spectrum_transaction_release_settlement_suite/include/spectrum_suite.h and src/spectrum_session_bootstrap.c.",
+  "trust_impact": "Root bootstrap semantics are still untrustworthy until the compiled entry surface for SP_OpenOperatorSession reflects a real callable contract instead of an argless crash shape.",
+  "allowed_next_actions": [
+    "inspect the owning contract source for why compiled discovery emits zero parameters for SP_OpenOperatorSession",
+    "make one bounded repair or truthful fixture-local override for this one bootstrap entrypoint",
+    "rerun only the targeted session_bootstrap proof after the contract repair"
+  ],
+  "disallowed_next_actions": [
+    "resume medium-wide continuation work",
+    "broaden to medium-02, hard-01, or hard-02",
+    "treat the contained worker crash as a semantic prerequisite result without repairing the root call contract"
+  ],
+  "exit_criteria": "The compiled SP_OpenOperatorSession call surface is no longer argless and the targeted bootstrap rerun yields a non-crashing semantic or sentinel result.",
+  "next_move": "resolved"
+}

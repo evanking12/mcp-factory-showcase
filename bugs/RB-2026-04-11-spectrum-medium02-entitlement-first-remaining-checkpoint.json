@@ -1,0 +1,22 @@
+{
+  "id": "RB-2026-04-11-spectrum-medium02-entitlement-first-remaining-checkpoint",
+  "title": "Compiled medium-02 entitlement checkpoint still collapses after attestation and invoice repair",
+  "class": "contract",
+  "layer": "compiled medium-02 entitlement-stage owner seam",
+  "status": "resolved",
+  "symptom": "After Prompt 16 repaired the invoice checkpoint, the original medium-02 entitlement artifact still showed SP_StageCustomerEntitlementUpdate as an argless stdcall export with zero parameter coverage and unknown sentinel outcomes. Prompt 17 repaired that entitlement contract/spec surface.",
+  "smallest_reproducer": "Original reproducer: sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-02/20260411-125905/runs/07-entitlement_sync. Resolved by adding tests/fixtures/spectrum_transaction_release_settlement_suite/entitlement_sync_contract_overlay/truth_manifest.json and rerunning the entitlement seam at sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-02/entitlement-first-remaining-checkpoint/20260411-135131.",
+  "trust_impact": "Treating confirmation as the next blocker before entitlement was narrowed would have broken first-remaining-checkpoint discipline and spent proving budget on potentially inherited downstream failures. That risk is now removed for the entitlement seam.",
+  "allowed_next_actions": [
+    "inspect only the entitlement-stage run artifact and the smallest likely contract/spec owner seam",
+    "patch only the owner seam justified by evidence",
+    "rerun only the entitlement checkpoint with the repaired attestation predecessor"
+  ],
+  "disallowed_next_actions": [
+    "treat confirmation as the next blocker before entitlement is narrowed",
+    "spend a broader medium-02 rerun before the entitlement checkpoint is locally trustworthy",
+    "jump to hard-01 or hard-02 while the next remaining medium-02 checkpoint is still unresolved"
+  ],
+  "exit_criteria": "Satisfied on 2026-04-11: the entitlement checkpoint was narrowed to the compiled contract/spec owner seam, a targeted entitlement proof surface was executed, and the branch now advances from truthful entitlement evidence.",
+  "next_move": "advance"
+}

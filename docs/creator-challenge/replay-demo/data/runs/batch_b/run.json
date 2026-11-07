@@ -1,0 +1,259 @@
+{
+  "schema_version": "creator_replay_run_v1",
+  "id": "batch_b",
+  "label": "Batch B",
+  "family": "contoso_business_suite",
+  "tier": "package-scale",
+  "difficulty": "Package realism and blocker harvest",
+  "why_it_matters": "Shows the next product problem: broad install-folder intake, dependencies, noise, target selection, and package-scale triage.",
+  "source_root": "docs/creator-challenge/replay-demo/inputs/contoso-batch-b-manifest.json",
+  "generated_from": "fixture package manifest",
+  "claim_ceiling": "package-scale diagnostic replay",
+  "green_contract_level": "diagnostic_package_replay",
+  "safe_to_compare": false,
+  "route_authority_present": false,
+  "next_action": "use as package-scale intake pressure, not product-green proof",
+  "summary": {
+    "suite_id": "contoso-business-suite",
+    "case_id": "contoso-business-suite-batch-b",
+    "entry_surface": "package_manifest",
+    "green_contract_level": "diagnostic_package_replay",
+    "product_green_eligible": false,
+    "route_authority_present": false,
+    "safe_to_compare": false,
+    "semantic_proof_satisfied": false,
+    "authoritative_proving": false,
+    "blocking_signal": "not_a_product_green_baseline",
+    "target_count": 8,
+    "total_duration_sec": 0,
+    "verified_total": 0,
+    "discovered_total": 10,
+    "first_failed_boundary": "not_applicable",
+    "bundled_dll_count": 10,
+    "dependency_only_count": 2,
+    "runtime_target_count": 8
+  },
+  "targets": [
+    {
+      "target": "contoso_cs",
+      "role": "dependency_only",
+      "dependency_confidence": "high",
+      "selection_reason": "",
+      "source_path": "tests/fixtures/contoso_legacy/contoso_cs"
+    },
+    {
+      "target": "contoso_payments",
+      "role": "dependency_only",
+      "dependency_confidence": "high",
+      "selection_reason": "",
+      "source_path": "tests/fixtures/contoso_legacy/contoso_payments"
+    },
+    {
+      "target": "contoso_config",
+      "role": "runtime_target",
+      "dependency_confidence": "high",
+      "selection_reason": "environment_gate_canary",
+      "source_path": "tests/fixtures/contoso_events/contoso_config"
+    },
+    {
+      "target": "contoso_transport",
+      "role": "runtime_target",
+      "dependency_confidence": "high",
+      "selection_reason": "struct_handle_canary",
+      "source_path": "tests/fixtures/contoso_events/contoso_transport"
+    },
+    {
+      "target": "contoso_workflow",
+      "role": "runtime_target",
+      "dependency_confidence": "high",
+      "selection_reason": "state_sequence_canary",
+      "source_path": "tests/fixtures/contoso_workflow/contoso_workflow"
+    },
+    {
+      "target": "contoso_reporting",
+      "role": "runtime_target",
+      "dependency_confidence": "medium",
+      "selection_reason": "readback_artifact_canary",
+      "source_path": "tests/fixtures/contoso_reporting/contoso_reporting_live"
+    },
+    {
+      "target": "contoso_pricing",
+      "role": "runtime_target",
+      "dependency_confidence": "high",
+      "selection_reason": "business_rule_canary",
+      "source_path": "tests/fixtures/contoso_pricing/contoso_pricing"
+    },
+    {
+      "target": "contoso_gateway",
+      "role": "runtime_target",
+      "dependency_confidence": "high",
+      "selection_reason": "wide_string_gateway_canary",
+      "source_path": "tests/fixtures/contoso_gateway/contoso_gateway"
+    },
+    {
+      "target": "contoso_events",
+      "role": "runtime_target",
+      "dependency_confidence": "high",
+      "selection_reason": "callback_flag_canary",
+      "source_path": "tests/fixtures/contoso_events/contoso_events"
+    },
+    {
+      "target": "contoso_cs_interwoven",
+      "role": "runtime_target",
+      "dependency_confidence": "high",
+      "selection_reason": "interwoven_state_canary",
+      "source_path": "tests/fixtures/contoso_interwoven/contoso_cs_interwoven"
+    }
+  ],
+  "selected_runtime_targets": [
+    {
+      "target": "contoso_config",
+      "selection_reason": "environment_gate_canary",
+      "dependency_confidence": "high",
+      "lane_id": "lane-1"
+    },
+    {
+      "target": "contoso_transport",
+      "selection_reason": "struct_handle_canary",
+      "dependency_confidence": "high",
+      "lane_id": "lane-1"
+    },
+    {
+      "target": "contoso_workflow",
+      "selection_reason": "state_sequence_canary",
+      "dependency_confidence": "high",
+      "lane_id": "lane-1"
+    },
+    {
+      "target": "contoso_reporting",
+      "selection_reason": "readback_artifact_canary",
+      "dependency_confidence": "medium",
+      "lane_id": "lane-1"
+    },
+    {
+      "target": "contoso_pricing",
+      "selection_reason": "business_rule_canary",
+      "dependency_confidence": "high",
+      "lane_id": "lane-1"
+    },
+    {
+      "target": "contoso_gateway",
+      "selection_reason": "wide_string_gateway_canary",
+      "dependency_confidence": "high",
+      "lane_id": "lane-1"
+    },
+    {
+      "target": "contoso_events",
+      "selection_reason": "callback_flag_canary",
+      "dependency_confidence": "high",
+      "lane_id": "lane-1"
+    },
+    {
+      "target": "contoso_cs_interwoven",
+      "selection_reason": "interwoven_state_canary",
+      "dependency_confidence": "high",
+      "lane_id": "lane-1"
+    }
+  ],
+  "artifact_summary": [
+    {
+      "name": "package-manifest.json",
+      "kind": "package metadata",
+      "path": "docs/creator-challenge/replay-demo/inputs/contoso-batch-b-manifest.json",
+      "included": "derived fields only",
+      "bytes": 6060
+    }
+  ],
+  "ground_truth_note": "Batch B is a package-scale planning replay. It demonstrates intake pressure and target selection, not product-green proof.",
+  "otel": {
+    "trace_id": "creator-batch-b",
+    "claim_ceiling": "telemetry is diagnostic evidence only",
+    "spans": [
+      {
+        "span_id": "package_admission",
+        "name": "Package admission",
+        "stage": "Floor 0",
+        "duration_sec": 0,
+        "status": "pass",
+        "message": "Package metadata preserves bundled binary roles before runtime probing."
+      },
+      {
+        "span_id": "target_selection",
+        "name": "Runtime target selection",
+        "stage": "Floor 1",
+        "duration_sec": 0,
+        "status": "pass",
+        "message": "8 runtime targets selected from 10 bundled binaries."
+      },
+      {
+        "span_id": "blocker_harvest",
+        "name": "Package-scale blocker harvest",
+        "stage": "Floor 2",
+        "duration_sec": 0,
+        "status": "diagnostic",
+        "message": "This card shows package realism and target planning, not Spectrum product-green proof."
+      }
+    ],
+    "metrics": [
+      {
+        "name": "bundled_dll_count",
+        "value": 10,
+        "unit": "count",
+        "status": "pass",
+        "why": "Shows package-scale intake breadth before expensive deep analysis.",
+        "labels": {
+          "dependency_only": 2,
+          "runtime_target": 8
+        }
+      },
+      {
+        "name": "runtime_target_count",
+        "value": 8,
+        "unit": "count",
+        "status": "pass",
+        "why": "Shows selective activation: not every DLL is deeply probed immediately.",
+        "labels": {
+          "selected_policy": "curated_runtime_subset"
+        }
+      },
+      {
+        "name": "dependency_confidence_counts",
+        "value": {
+          "high": 9,
+          "medium": 1
+        },
+        "unit": "counts",
+        "status": "pass",
+        "why": "Shows that package intake preserves confidence, dependency, and role labels.",
+        "labels": {
+          "source": "package_manifest"
+        }
+      },
+      {
+        "name": "candidate_comparability_state",
+        "value": "diagnostic_package_replay",
+        "unit": "state",
+        "status": "warn",
+        "why": "Distinguishes diagnostic output from evidence that can support comparison.",
+        "labels": {
+          "not_substitute_for": "Spectrum product-green proof"
+        }
+      },
+      {
+        "name": "next_action_confidence",
+        "value": "medium",
+        "unit": "confidence",
+        "status": "pass",
+        "why": "Tells the operator whether to fix, rerun, inspect, or stop.",
+        "labels": {
+          "next_action": "use as package-scale intake pressure, not product-green proof"
+        }
+      }
+    ]
+  },
+  "links": {
+    "run_trace": "data/runs/batch_b/run-trace.json",
+    "run_metrics": "data/runs/batch_b/run-metrics.json",
+    "run_trace_md": "data/runs/batch_b/run-trace.md"
+  }
+}

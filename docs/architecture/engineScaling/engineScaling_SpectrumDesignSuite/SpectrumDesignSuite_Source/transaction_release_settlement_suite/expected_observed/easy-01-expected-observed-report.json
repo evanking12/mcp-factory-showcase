@@ -1,0 +1,74 @@
+{
+  "artifact_type": "spectrum-expected-observed-report.json",
+  "contract_version": "1.0.0",
+  "case_id": "easy-01",
+  "slice_id": "spectrum:easy-01",
+  "module_family": [
+    "session_bootstrap",
+    "reservation_stage",
+    "release_commit",
+    "audit_trace"
+  ],
+  "expected_blockers": [
+    "setup_gate"
+  ],
+  "expected_producers": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "release_commit.commit_release"
+  ],
+  "expected_consumers": [
+    "reservation_stage.issue_release_hold",
+    "release_commit.commit_release",
+    "audit_trace.record_release_receipt"
+  ],
+  "expected_shared_state": [
+    "operator_token",
+    "reservation_handle",
+    "hold_token"
+  ],
+  "expected_family_groups": [
+    "setup_gate"
+  ],
+  "expected_confirmation_sites": [
+    "audit_trace.record_release_receipt"
+  ],
+  "expected_lineage_branches": [],
+  "expected_accepted_branches": [],
+  "observed_blockers": [
+    "setup_gate"
+  ],
+  "observed_producers": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "release_commit.commit_release"
+  ],
+  "observed_consumers": [
+    "reservation_stage.issue_release_hold",
+    "release_commit.commit_release",
+    "audit_trace.record_release_receipt"
+  ],
+  "observed_shared_state": [
+    "operator_token",
+    "reservation_handle",
+    "hold_token"
+  ],
+  "observed_family_groups": [
+    "setup_gate"
+  ],
+  "observed_confirmation_sites": [
+    "audit_trace.record_release_receipt"
+  ],
+  "observed_lineage_branches": [],
+  "observed_accepted_branches": [],
+  "mismatches": [],
+  "overclaims": [],
+  "underclaims": [],
+  "misgroups": [],
+  "deferred": [],
+  "notes": [
+    "expected_authored_from_spectrum_contract",
+    "easy_anchor_expected",
+    "observed_side_now_models_nominal_anchor_behavior"
+  ]
+}

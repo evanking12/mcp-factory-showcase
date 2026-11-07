@@ -1,0 +1,843 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCP Factory</title>
+  <link rel="stylesheet" href="/static/app.css" />
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+</head>
+<body>
+
+<header>
+  <span class="logo">⚙ MCP Factory</span>
+  <span class="tagline">Evidence-driven DLL recovery, verification, and MCP packaging</span>
+</header>
+
+<!-- Step indicator -->
+<div class="step-bar">
+  <div class="step-item active" id="step1-item">
+    <div class="step-dot">1</div>
+    <span>Analyze</span>
+  </div>
+  <div class="step-connector" id="conn12"></div>
+  <div class="step-item" id="step2-item">
+    <div class="step-dot">2</div>
+    <span>Scope</span>
+  </div>
+  <div class="step-connector" id="conn23"></div>
+  <div class="step-item" id="step3-item">
+    <div class="step-dot">3</div>
+    <span>Verify</span>
+  </div>
+  <div class="step-connector" id="conn34"></div>
+  <div class="step-item" id="step4-item">
+    <div class="step-dot">4</div>
+    <span>Outputs</span>
+  </div>
+</div>
+
+<main>
+  <div class="top-stack">
+    <div class="card hero-shell">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow" id="hero-eyebrow">Codex Showcase</div>
+          <div class="hero-title" id="hero-title">Turn an opaque DLL into a legible integration surface.</div>
+          <div class="hero-copy" id="hero-copy">
+            Analyze a binary, verify callable behavior, explain prerequisite chains, and package the
+            recovered surface into reports and MCP-ready outputs.
+          </div>
+          <div class="hero-metrics">
+            <div class="hero-metric">
+              <strong id="hero-verified-metric">0/0</strong>
+              <span>Verified on the featured package checkpoint</span>
+            </div>
+            <div class="hero-metric">
+              <strong id="hero-overlap-metric">0</strong>
+              <span>Overlap delta versus the trusted Batch B control surface</span>
+            </div>
+            <div class="hero-metric">
+              <strong id="hero-frontier-metric">0</strong>
+              <span>Remaining overlap regressions in the honest product frontier</span>
+            </div>
+          </div>
+          <div class="graph-actions">
+            <button class="btn btn-secondary" id="campaign-expand-btn">Open Campaign View</button>
+          </div>
+        </div>
+        <div class="story-panel">
+          <h3 id="story-title">What this demo shows</h3>
+          <div class="story-pill-grid">
+            <div class="story-pill">
+              <strong>What did it find?</strong>
+              <span id="story-find">Discovered exports, recovered signatures, and generated tool surfaces.</span>
+            </div>
+            <div class="story-pill">
+              <strong>What did it verify?</strong>
+              <span id="story-verify">Working calls, verified counts, and run-level coverage with evidence.</span>
+            </div>
+            <div class="story-pill">
+              <strong>What depended on what?</strong>
+              <span id="story-dependencies">Prerequisite chains, artifact lineage, and short state-machine transitions.</span>
+            </div>
+            <div class="story-pill">
+              <strong>What is still blocked?</strong>
+              <span id="story-frontier">Explicit unresolved functions and honest blocker boundaries.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="lab-status-panel">
+      <div class="lab-header">
+        <div>
+          <div class="lab-title-row">
+            <span class="badge">Lab</span>
+            <span style="font-size:1.05rem;font-weight:600">Lab Status</span>
+            <span class="lab-overall status-unknown" id="lab-overall">checking</span>
+          </div>
+          <div class="lab-subtitle">
+            Check API, bridge, model, storage, and the active run lane before trusting a serious benchmark.
+            This panel is the human-readable lab preflight.
+          </div>
+        </div>
+        <button class="btn btn-secondary" id="lab-refresh-btn" style="padding:8px 14px;font-size:.82rem">Refresh Lab</button>
+      </div>
+
+      <div class="lab-grid">
+        <div class="lab-metric">
+          <span class="lab-metric-label">API</span>
+          <span class="lab-metric-status" id="lab-api-status">Checking…</span>
+          <span class="lab-metric-detail" id="lab-api-detail">Waiting for first probe.</span>
+        </div>
+        <div class="lab-metric">
+          <span class="lab-metric-label">Bridge</span>
+          <span class="lab-metric-status" id="lab-bridge-status">Checking…</span>
+          <span class="lab-metric-detail" id="lab-bridge-detail">Waiting for first probe.</span>
+        </div>
+        <div class="lab-metric">
+          <span class="lab-metric-label">Model</span>
+          <span class="lab-metric-status" id="lab-model-status">Checking…</span>
+          <span class="lab-metric-detail" id="lab-model-detail">Waiting for first probe.</span>
+        </div>
+        <div class="lab-metric">
+          <span class="lab-metric-label">Storage</span>
+          <span class="lab-metric-status" id="lab-storage-status">Checking…</span>
+          <span class="lab-metric-detail" id="lab-storage-detail">Waiting for first probe.</span>
+        </div>
+        <div class="lab-metric">
+          <span class="lab-metric-label">Lane Validity</span>
+          <span class="lab-metric-status" id="lab-lane-status">Checking…</span>
+          <span class="lab-metric-detail" id="lab-lane-detail">Waiting for first probe.</span>
+        </div>
+        <div class="lab-metric">
+          <span class="lab-metric-label">Active Run</span>
+          <span class="lab-metric-status" id="lab-run-status">No active run</span>
+          <span class="lab-metric-detail" id="lab-run-detail">Recent job data will appear here.</span>
+        </div>
+      </div>
+
+      <div class="lab-notes" id="lab-notes" style="display:none">
+        <strong style="font-size:.82rem">Warnings</strong>
+        <ul id="lab-notes-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Section 2 – Upload ═══════════════════════════════════════════ -->
+  <section id="sec-upload">
+    <div class="card">
+      <div class="card-title">
+        <span class="badge">Step 1</span>
+        Analyze A Binary
+      </div>
+      <p class="card-copy">
+        The goal is to show a bounded recovery story quickly: analyze a DLL, verify meaningful calls,
+        inspect dependencies, and export a legible report.
+      </p>
+      <div class="demo-intent">
+        <div class="demo-intent-card">
+          <strong>Clean start</strong>
+          <span>Show upload, analysis, and one trustworthy verified function without overexplaining internals.</span>
+        </div>
+        <div class="demo-intent-card">
+          <strong>Stateful proof</strong>
+          <span>Show one run where prerequisite chains and artifact lineage visibly matter.</span>
+        </div>
+        <div class="demo-intent-card">
+          <strong>Honest frontier</strong>
+          <span>End with what the system verified, what it inferred, and what still remains blocked.</span>
+        </div>
+      </div>
+
+      <div class="previous-scans-wrap" id="previous-scans-wrap" style="display:none">
+        <div class="previous-scans-label">Previously scanned (last 5 jobs)</div>
+        <div class="previous-scans-chips" id="previous-scans-chips"></div>
+        <div class="previous-scans-empty" id="previous-scans-empty" style="display:none;font-size:.8rem;color:var(--muted);margin-top:6px">
+          No recent jobs on this server yet — run an analysis to see them here.
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Binary file (EXE, DLL, SO, PY, …)</label>
+        <div class="file-drop" id="file-drop">
+          <input type="file" id="file-input"
+            accept=".dll,.exe,.py,.js,.rb,.php,.so,.jar,.sql,.ps1,.cmd,.bat,.bin" />
+          <div class="drop-icon">📦</div>
+          <div class="drop-text">Drag & drop a file here, or click to browse</div>
+          <div class="file-name" id="file-name"></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin:4px 0 4px">
+        <hr style="flex:1;border:none;border-top:1px solid var(--border)" />
+        <span style="font-size:.78rem;color:var(--muted);white-space:nowrap">OR — already installed</span>
+        <hr style="flex:1;border:none;border-top:1px solid var(--border)" />
+      </div>
+
+      <div class="form-row">
+        <label>Installed path on the server (e.g. C:\Program Files\AppD\)</label>
+        <input class="input" id="dir-path" type="text"
+          placeholder="C:\Windows\System32\notepad.exe  or  C:\Program Files\AppD\"
+          autocomplete="off" />
+        <div style="font-size:.75rem;color:var(--muted);margin-top:4px">
+          ⚠ Path must be accessible from the pipeline server. Use file upload for cloud deployments.
+        </div>
+      </div>
+      <details class="context-details">
+        <summary>Optional operator context</summary>
+        <div class="context-details-body">
+          <div class="form-row">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <label style="margin:0">Hints / description (optional)</label>
+              <button class="btn btn-secondary" id="autofill-hints-btn" type="button"
+                style="padding:5px 10px;font-size:.76rem">Autofill</button>
+            </div>
+            <textarea id="hints" placeholder="Optional context that sharpens ID formats, domain nouns, or likely usage."></textarea>
+          </div>
+          <div class="form-row">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <label style="margin:0">Use cases (optional)</label>
+              <button class="btn btn-secondary" id="autofill-use-cases-btn" type="button"
+                style="padding:5px 10px;font-size:.76rem">Autofill</button>
+            </div>
+            <textarea id="use-cases" placeholder="Optional operator context about how the binary is used in practice."></textarea>
+          </div>
+        </div>
+      </details>
+
+      <div class="alert alert-error" id="upload-error"></div>
+
+      <!-- Discovery cache prompt -->
+      <div class="alert alert-info" id="cache-banner" style="display:none">
+        <div style="margin-bottom:8px">
+          <strong>📦 Cached discovery found!</strong> This binary was previously analyzed.
+        </div>
+        <div id="cache-details" style="font-size:.82rem;margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" id="cache-reuse-btn" style="padding:5px 16px;font-size:.85rem">
+            ✅ Reuse Cached Results
+          </button>
+          <button class="btn btn-secondary" id="cache-fresh-btn" style="padding:5px 16px;font-size:.85rem">
+            🔄 Run Fresh Analysis
+          </button>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="analyze-btn" disabled>
+          Analyze Binary
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Section 3 – Invocables ════════════════════════════════════ -->
+  <section id="sec-invocables" class="hidden">
+    <div class="card">
+      <div class="card-title">
+        <span class="badge">Step 2</span>
+        Scope The Verification Surface
+      </div>
+      <p class="card-copy">
+        Decide which exports become the verification target. For a strong showcase, keep the bundle bounded and
+        legible rather than selecting everything just because it exists.
+      </p>
+
+      <div class="inv-toolbar">
+        <button class="btn btn-secondary" style="padding:5px 12px;font-size:.8rem" id="sel-all-btn">Select all</button>
+        <button class="btn btn-secondary" style="padding:5px 12px;font-size:.8rem" id="sel-none-btn">None</button>
+        <span class="count" id="sel-count">0 selected</span>
+      </div>
+
+      <div class="inv-list" id="inv-list"></div>
+
+      <div class="form-row" style="margin-top:18px">
+        <label>Component name</label>
+        <input class="input" id="component-name" type="text" placeholder="my-mcp-component" />
+      </div>
+
+      <div class="alert alert-error" id="inv-error"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="back1-btn">← Back</button>
+        <button class="btn btn-primary" id="generate-btn">Generate MCP Schema</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Section 4 – Generate ══════════════════════════════════════ -->
+  <section id="sec-generate" class="hidden">
+    <div class="card">
+      <div class="card-title">
+        <span class="badge">Step 3</span>
+        Verification Report And Evidence
+      </div>
+
+      <p style="font-size:.86rem;color:var(--muted);margin-bottom:12px">
+        This is the operator view: verified coverage, prerequisite graph, evidence drill-down, and the generated
+        surfaces tied to what the run actually proved.
+      </p>
+
+      <!-- Discover settings panel (shown when schema has only generic param names) -->
+      <div id="discover-bar" style="display:none">
+
+        <!-- Status row -->
+        <div class="explore-status-row">
+          <span class="amber-badge">⚠ Recommended</span>
+          <span class="mode-badge" id="mode-badge" style="display:none">Mode: dev</span>
+          <span class="explore-progress" id="discover-bar-msg">
+            Schema has limited information — run Discover to learn parameter semantics automatically.
+          </span>
+          <span id="last-run-time" style="display:none;font-size:.78rem;color:var(--muted)"></span>
+        </div>
+
+        <!-- Preset + action row -->
+        <div class="explore-action-row">
+          <span style="font-size:.78rem;color:var(--muted);flex-shrink:0">Preset:</span>
+          <div class="preset-btns">
+            <button class="btn btn-secondary preset-btn active" data-preset="fast-triage">Fast Triage</button>
+            <button class="btn btn-secondary preset-btn" data-preset="balanced">Balanced</button>
+            <button class="btn btn-secondary preset-btn" data-preset="deep">Deep</button>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px;flex-shrink:0">
+            <button class="btn btn-primary" id="discover-btn">🔍 Discover</button>
+            <button class="btn btn-danger" id="cancel-explore-btn" style="display:none">⏹ Cancel</button>
+          </div>
+        </div>
+
+        <!-- Pipeline stage progress stepper -->
+        <div class="stage-stepper" id="stage-stepper" style="display:none">
+          <div class="stage-step" data-stage="s00">
+            <div class="stage-dot">0</div>
+            <span class="stage-label">Setup</span>
+            <div class="stage-meta-popup" id="stage-meta-s00">Sentinel calibration, vocab seed, static analysis</div>
+          </div>
+          <div class="stage-conn" data-conn="s00"></div>
+          <div class="stage-step" data-stage="s01">
+            <div class="stage-dot">1</div>
+            <span class="stage-label">Unlock</span>
+            <div class="stage-meta-popup" id="stage-meta-s01">Write-unlock probe via code reasoning</div>
+          </div>
+          <div class="stage-conn" data-conn="s01"></div>
+          <div class="stage-step" data-stage="s02">
+            <div class="stage-dot">2</div>
+            <span class="stage-label">Probe</span>
+            <div class="stage-meta-popup" id="stage-meta-s02">Per-function LLM probe loop</div>
+          </div>
+          <div class="stage-conn" data-conn="s02"></div>
+          <div class="stage-step" data-stage="s03">
+            <div class="stage-dot">3</div>
+            <span class="stage-label">Reconcile</span>
+            <div class="stage-meta-popup" id="stage-meta-s03">Result reconciliation + MC-3</div>
+          </div>
+          <div class="stage-conn" data-conn="s03"></div>
+          <div class="stage-step" data-stage="s04">
+            <div class="stage-dot">4</div>
+            <span class="stage-label">Synthesis</span>
+            <div class="stage-meta-popup" id="stage-meta-s04">API reference synthesis + MC-4</div>
+          </div>
+          <div class="stage-conn" data-conn="s04"></div>
+          <div class="stage-step" data-stage="s05">
+            <div class="stage-dot">5</div>
+            <span class="stage-label">Enrich</span>
+            <div class="stage-meta-popup" id="stage-meta-s05">Schema backfill + verification + MC-5</div>
+          </div>
+          <div class="stage-conn" data-conn="s05"></div>
+          <div class="stage-step" data-stage="s06">
+            <div class="stage-dot">6</div>
+            <span class="stage-label">Gaps</span>
+            <div class="stage-meta-popup" id="stage-meta-s06">Gap resolution + MC-6 final unlock</div>
+          </div>
+          <div class="stage-conn" data-conn="s06"></div>
+          <div class="stage-step" data-stage="s07">
+            <div class="stage-dot">7</div>
+            <span class="stage-label">Finalize</span>
+            <div class="stage-meta-popup" id="stage-meta-s07">Harmonize + behavioral spec + verdict</div>
+          </div>
+        </div>
+
+        <!-- Macro coordinator verdict panel -->
+        <div class="verdict-panel verdict-done" id="verdict-panel" style="display:none">
+          <div class="verdict-title" id="verdict-title"></div>
+          <div class="verdict-stats" id="verdict-stats"></div>
+          <div id="verdict-reasoning" style="font-size:.82rem;color:inherit;margin:4px 0"></div>
+          <div class="verdict-suggestions" id="verdict-suggestions" style="display:none">
+            <strong style="font-size:.82rem">Suggested adjustments for next run:</strong>
+            <ul id="verdict-adj-list" style="margin:4px 0 0;padding-left:18px;font-size:.8rem"></ul>
+          </div>
+          <button class="btn btn-primary verdict-btn" id="verdict-rerun-btn" style="display:none">
+            Re-run with suggestions
+          </button>
+        </div>
+
+        <!-- MC decision viewer -->
+        <details class="mc-viewer" id="mc-viewer" style="display:none">
+          <summary>Micro Coordinator Decisions (MC-3 through MC-6)</summary>
+          <div id="mc-viewer-body"></div>
+        </details>
+
+        <!-- Checkpoint / Resume controls -->
+        <div class="settings-grid" style="border:1px solid var(--border);border-radius:7px;background:var(--surface2);padding:14px 16px;margin-bottom:6px">
+          <div class="setting-item">
+            <div class="setting-label-row">
+              <label for="recent-jobs-select">Resume from recent job</label>
+              <details class="why-details"><summary>why?</summary><p>Load invocables and context from a previous job so you don't have to re-upload and re-analyze. Select a job to pre-fill the checkpoint ID and reload its invocables.</p></details>
+            </div>
+            <select id="recent-jobs-select" class="input">
+              <option value="">— new run —</option>
+            </select>
+            <div class="chain-info" id="chain-info" style="display:none"></div>
+          </div>
+          <div class="setting-item">
+            <div class="setting-label-row">
+              <label for="checkpoint-id">Checkpoint ID</label>
+              <details class="why-details"><summary>why?</summary><p>Seeds this run from a prior checkpoint. Successful functions are skipped, context is carried forward. Use a job ID from a previous run, or leave blank for a fresh start.</p></details>
+            </div>
+            <input class="input" type="text" id="checkpoint-id" placeholder="e.g. abc123-def456 (job ID of prior run)" />
+          </div>
+          <div class="setting-item setting-item-full">
+            <div class="setting-label-row">
+              <label for="focus-functions">Focus functions (comma-separated)</label>
+              <details class="why-details"><summary>why?</summary><p>Only probe these functions — skip everything else. Use with a checkpoint to iterate on specific failures without re-running the full pipeline. Leave blank to probe all.</p></details>
+            </div>
+            <input class="input" type="text" id="focus-functions" placeholder="e.g. CS_ProcessPayment, CS_RedeemLoyaltyPoints" />
+          </div>
+          <div class="setting-item">
+            <div class="setting-label-row">
+              <label for="skip-to-stage">Skip to stage</label>
+              <details class="why-details"><summary>why?</summary><p>Jump directly to a pipeline stage. Requires a checkpoint or prior context. Use this to re-run only gap resolution or finalization without repeating earlier stages.</p></details>
+            </div>
+            <select id="skip-to-stage" class="input">
+              <option value="">— run all stages —</option>
+              <option value="s00">S-00: Setup (sentinel calibration, vocab)</option>
+              <option value="s01">S-01: Write-Unlock Probe</option>
+              <option value="s02">S-02: Probe Loop</option>
+              <option value="s03">S-03: Reconcile + MC-3</option>
+              <option value="s04">S-04: Synthesis + MC-4</option>
+              <option value="s05">S-05: Enrichment + MC-5</option>
+              <option value="s06">S-06: Gap Resolution + MC-6</option>
+              <option value="s07">S-07: Finalize</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Collapsible settings grid -->
+        <details class="explore-settings-details" id="explore-settings-details">
+          <summary>⚙ Explore Settings</summary>
+          <div class="settings-grid">
+
+            <!-- Run mode -->
+            <div class="setting-item">
+              <div class="setting-label-row">
+                <label for="explore-mode">Run mode</label>
+                <details class="why-details"><summary>why?</summary><p>Sets the default budget profile. <code>dev</code> runs quickly (max_rounds=2, max_tool_calls=5) for smoke checks. <code>normal</code> is the daily operational mode. <code>extended</code> maximizes coverage for release-candidate baselines. Selecting a Preset above will set this automatically.</p></details>
+              </div>
+              <select id="explore-mode" class="input">
+                <option value="dev">dev — fast / smoke</option>
+                <option value="normal">normal — daily quality</option>
+                <option value="extended">extended — deep coverage</option>
+              </select>
+            </div>
+
+            <!-- Cap profile -->
+            <div class="setting-item">
+              <div class="setting-label-row">
+                <label for="cap-profile">Cap profile</label>
+                <details class="why-details"><summary>why?</summary><p>Overrides per-function call-budget caps derived from <code>mode</code>. <code>dev</code> is low for speed. <code>stabilize</code> runs at medium depth for repeatable smoke checks. <code>deploy</code> runs at maximum depth for schema artifacts that will be published or compared against baselines.</p></details>
+              </div>
+              <select id="cap-profile" class="input">
+                <option value="dev">dev</option>
+                <option value="stabilize">stabilize</option>
+                <option value="deploy">deploy</option>
+              </select>
+            </div>
+
+            <!-- Max rounds -->
+            <div class="setting-item">
+              <div class="setting-label-row">
+                <label for="max-rounds">Max rounds per function</label>
+                <details class="why-details"><summary>why?</summary><p>How many chat rounds the model gets per function before it must finalize. Each round may include multiple tool calls. Higher values improve coverage on complex functions but increase runtime and token cost significantly.</p></details>
+              </div>
+              <input class="input" type="number" id="max-rounds" min="1" max="12" value="2" style="max-width:90px" />
+              <span class="setting-hint">1 – 12</span>
+            </div>
+
+            <!-- Max tool calls -->
+            <div class="setting-item">
+              <div class="setting-label-row">
+                <label for="max-tool-calls">Max tool calls per function</label>
+                <details class="why-details"><summary>why?</summary><p>Hard cap on total function invocations per function across all rounds. Prevents runaway loops on functions that always return errors. Set higher for write-classified functions that need more probing attempts.</p></details>
+              </div>
+              <input class="input" type="number" id="max-tool-calls" min="1" max="24" value="5" style="max-width:90px" />
+              <span class="setting-hint">1 – 24</span>
+            </div>
+
+            <!-- Max functions -->
+            <div class="setting-item">
+              <div class="setting-label-row">
+                <label for="max-functions">Max functions per run</label>
+                <details class="why-details"><summary>why?</summary><p>Limits exploration breadth by capping how many functions are probed. Useful for focused runs on a subset of a large binary. Leave blank to probe all selected invocables with no ceiling.</p></details>
+              </div>
+              <input class="input" type="number" id="max-functions" min="1" max="500" placeholder="all" style="max-width:90px" />
+              <span class="setting-hint">1 – 500, blank = all</span>
+            </div>
+
+            <!-- Min direct probes -->
+            <div class="setting-item">
+              <div class="setting-label-row">
+                <label for="probe-floor">Min direct probes per function</label>
+                <details class="why-details"><summary>why?</summary><p>Enforces a floor on direct call attempts before the model is allowed early-stop. A value of <code>1</code> means at least one real call must be made. Increase to <code>2</code>–<code>3</code> for release-quality runs where skipping a function prematurely is costly.</p></details>
+              </div>
+              <input class="input" type="number" id="probe-floor" min="1" max="5" value="1" style="max-width:90px" />
+              <span class="setting-hint">1 – 5</span>
+            </div>
+
+            <!-- Model override (full width) -->
+            <div class="setting-item setting-item-full">
+              <div class="setting-label-row">
+                <label for="model-override">Explore model override</label>
+                <details class="why-details"><summary>why?</summary><p>Optional model deployment name to route this run to a different model (e.g. <code>gpt-4o-mini</code> for cost reduction during dev runs, or a fine-tuned deployment for specialized domains). Leave blank to use the pipeline default <code>gpt-4o</code>.</p></details>
+              </div>
+              <input class="input" type="text" id="model-override" placeholder="leave blank for pipeline default (gpt-4o)" />
+            </div>
+
+            <!-- Feature toggles (full width) -->
+            <div class="setting-item setting-item-full">
+              <div class="setting-label-row" style="margin-bottom:8px">
+                <label>Feature toggles</label>
+              </div>
+              <div class="toggles-row">
+                <label class="toggle-item">
+                  <input type="checkbox" id="toggle-gap" />
+                  <span>Gap resolution</span>
+                  <details class="why-details"><summary>why?</summary><p>When enabled, functions where the model is uncertain trigger a mini-session asking you clarification questions. Required to move functions from "uncertain" to "documented" state. Disable for fast smoke checks where gap quality is not needed.</p></details>
+                </label>
+                <label class="toggle-item">
+                  <input type="checkbox" id="toggle-clarify" />
+                  <span>Clarification questions</span>
+                  <details class="why-details"><summary>why?</summary><p>Surfaces unresolved questions to the operator after exploration completes. Without this the model tries to resolve gaps autonomously. Enable when you have domain knowledge the model cannot infer from the binary alone.</p></details>
+                </label>
+                <label class="toggle-item">
+                  <input type="checkbox" id="toggle-skip-documented" checked />
+                  <span>Skip documented</span>
+                  <details class="why-details"><summary>why?</summary><p>Skip functions that already have rich parameter documentation from prior findings. Enable for incremental runs. Disable when re-running a full baseline from scratch or after code changes.</p></details>
+                </label>
+                <label class="toggle-item">
+                  <input type="checkbox" id="toggle-deterministic-fallback" checked />
+                  <span>Deterministic fallback</span>
+                  <details class="why-details"><summary>why?</summary><p>When a function returns non-deterministic results across calls, fall back to recording only its deterministic aspects. Keep enabled for stability — disabling produces noisier findings that are harder to compare across runs.</p></details>
+                </label>
+              </div>
+            </div>
+
+          </div>
+        </details>
+
+        <!-- Download row -->
+        <div class="explore-download-row">
+          <button class="btn btn-secondary" id="download-doc-btn" style="display:none">⬇ Documentation</button>
+          <button class="btn btn-secondary" id="download-spec-btn" style="display:none">🐍 Python Spec</button>
+          <button class="btn btn-secondary" id="download-schema-btn" style="display:none">⬇ Schema JSON</button>
+        </div>
+
+      </div>
+
+      <!-- Confidence gap questions surfaced after exploration -->
+      <div id="gap-questions-box" style="display:none;margin:12px 0;padding:12px 16px;
+        background:#fffbeb;border:1px solid #f59e0b;border-radius:8px;font-size:.85rem">
+        <strong style="color:#92400e">💡 Clarification questions from discovery</strong>
+        <p style="margin:4px 0 8px;color:#78350f;font-size:.82rem">
+          The system was uncertain about these items. Answer what you know — submitting will automatically re-run discovery on the affected functions.
+        </p>
+        <ul id="gap-questions-list" style="margin:0;padding-left:18px;color:#451a03"></ul>
+        <div id="gap-answers-row" style="display:none;margin-top:10px;display:flex;gap:8px;align-items:center">
+          <button class="btn btn-secondary" id="submit-gap-answers-btn"
+            style="padding:6px 12px;font-size:.8rem;background:#b45309;color:#fff;border-color:#b45309">
+            💾 Submit Answers
+          </button>
+          <span id="gap-answers-msg" style="font-size:.8rem;color:#92400e"></span>
+        </div>
+      </div>
+
+      <!-- Iterative refinement panel -->
+      <div id="refine-box" style="display:none;margin:12px 0;padding:14px 16px;
+        background:#f0fdf4;border:1px solid #86efac;border-radius:8px;font-size:.85rem">
+        <strong style="color:#14532d">🔄 Refine Discovery</strong>
+        <p style="margin:4px 0 8px;color:#166534;font-size:.82rem">
+          Found something wrong or missing? Describe it below and re-run targeted discovery on specific functions.
+        </p>
+        <div style="margin-bottom:8px">
+          <label style="display:block;font-size:.8rem;color:#15803d;margin-bottom:3px">Corrections (what's wrong)</label>
+          <textarea id="refine-corrections" rows="2" placeholder="e.g. CS_GetAccountBalance amounts are in millicents, not cents"
+            style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #86efac;border-radius:6px;font-size:.82rem;resize:vertical"></textarea>
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="display:block;font-size:.8rem;color:#15803d;margin-bottom:3px">Missing functionality</label>
+          <textarea id="refine-missing" rows="2" placeholder="e.g. CS_ApplyDiscount — applies a percentage discount to an order"
+            style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #86efac;border-radius:6px;font-size:.82rem;resize:vertical"></textarea>
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="display:block;font-size:.8rem;color:#15803d;margin-bottom:3px">Target specific functions (comma-separated, or leave blank for all)</label>
+          <input id="refine-targets" type="text" placeholder="e.g. CS_GetAccountBalance, CS_ProcessRefund"
+            style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #86efac;border-radius:6px;font-size:.82rem">
+        </div>
+        <button class="btn btn-secondary" id="refine-btn" style="padding:7px 14px;font-size:.82rem;background:#16a34a;color:#fff;border-color:#16a34a">
+          🔄 Run Refinement
+        </button>
+        <span id="refine-msg" style="margin-left:10px;font-size:.8rem;color:#15803d"></span>
+      </div>
+
+      <div class="review-header" id="run-review-header" style="display:none">
+        <div>
+          <div style="font-size:1rem;font-weight:600">Run Review</div>
+          <div class="review-summary" id="run-review-summary">
+            Review session, campaign, blockers, and the first artifacts worth reading.
+          </div>
+        </div>
+        <button class="btn btn-secondary" id="refresh-review-btn" style="padding:8px 14px;font-size:.82rem">Refresh Review</button>
+      </div>
+
+      <div id="run-review" style="display:none">
+        <div class="review-grid">
+          <div class="review-metric">
+            <span class="review-label">Session</span>
+            <span class="review-value" id="run-review-session">Not available yet</span>
+            <span class="review-detail" id="run-review-session-detail">A finished run will populate this panel.</span>
+          </div>
+          <div class="review-metric">
+            <span class="review-label">Coverage</span>
+            <span class="review-value" id="run-review-coverage">Not available yet</span>
+            <span class="review-detail" id="run-review-coverage-detail">Macro verdict coverage will appear here.</span>
+          </div>
+          <div class="review-metric">
+            <span class="review-label">Campaign</span>
+            <span class="review-value" id="run-review-campaign">No campaign attached</span>
+            <span class="review-detail" id="run-review-campaign-detail">Campaign summary appears when the run belongs to a multi-DLL campaign.</span>
+          </div>
+        </div>
+
+        <div class="review-notes" id="run-review-notes" style="display:none">
+          <strong style="font-size:.82rem">Blockers / warnings</strong>
+          <ul id="run-review-issues"></ul>
+        </div>
+
+        <div class="review-actions">
+          <button class="btn btn-secondary" id="review-report-btn">Report</button>
+          <button class="btn btn-secondary" id="review-schema-btn">Schema</button>
+          <button class="btn btn-secondary" id="review-findings-btn">Findings</button>
+          <button class="btn btn-secondary" id="review-session-btn">Session Snapshot</button>
+          <button class="btn btn-secondary" id="review-campaign-btn" style="display:none">Campaign Snapshot</button>
+        </div>
+      </div>
+
+      <div class="showcase-grid">
+        <div class="showcase-card">
+          <h4>Verification Snapshot</h4>
+          <span id="showcase-status-line">Run a verified lane to populate the snapshot.</span>
+          <div class="showcase-kpis">
+            <div class="showcase-kpi">
+              <strong id="showcase-verified-count">0</strong>
+              <span>Verified</span>
+            </div>
+            <div class="showcase-kpi">
+              <strong id="showcase-unresolved-count">0</strong>
+              <span>Unresolved</span>
+            </div>
+            <div class="showcase-kpi">
+              <strong id="showcase-working-calls">0</strong>
+              <span>Working Calls</span>
+            </div>
+          </div>
+          <ul class="showcase-list" id="showcase-summary-list">
+            <li>Coverage, blocker counts, and working calls will appear here.</li>
+          </ul>
+        </div>
+
+        <div class="showcase-card">
+          <h4>Dependency / Prerequisite Graph</h4>
+          <span id="graph-summary">The workflow-style prerequisite view appears after exploration artifacts exist.</span>
+          <div id="graph-list" style="margin-top:10px">
+            <div class="graph-line">
+              <span class="graph-node">Analyze a DLL</span>
+              <span class="graph-arrow">→</span>
+              <span class="graph-node">Run verification</span>
+              <span class="graph-arrow">→</span>
+              <span class="graph-node">Inspect state chains</span>
+            </div>
+          </div>
+          <div class="graph-actions">
+            <button class="btn btn-secondary" id="graph-expand-btn">Open Graph View</button>
+          </div>
+        </div>
+
+        <div class="showcase-card">
+          <h4>Evidence Viewer</h4>
+          <span>One verified example and one unresolved example, using the current job’s findings.</span>
+          <div class="finding-block">
+            <div class="finding-meta">
+              <strong id="showcase-verified-name">No verified example yet</strong>
+              <span id="showcase-verified-status">Waiting for findings</span>
+            </div>
+            <div class="finding-body" id="showcase-verified-body">Verified working-call evidence will appear here.</div>
+          </div>
+          <div class="finding-block">
+            <div class="finding-meta">
+              <strong id="showcase-blocked-name">No unresolved example yet</strong>
+              <span id="showcase-blocked-status">Waiting for findings</span>
+            </div>
+            <div class="finding-body" id="showcase-blocked-body">Blocked or unresolved reasoning will appear here.</div>
+          </div>
+        </div>
+
+        <div class="showcase-card">
+          <h4>Generated Outputs</h4>
+          <span>Everything in this card is meant to be exportable and legible to another engineer.</span>
+          <div class="output-actions">
+            <button class="btn btn-secondary" id="showcase-report-btn">Verification Report</button>
+            <button class="btn btn-secondary" id="showcase-schema-btn">MCP Schema</button>
+            <button class="btn btn-secondary" id="showcase-findings-btn">Findings JSON</button>
+            <button class="btn btn-secondary" id="showcase-session-btn">Session Snapshot</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="showcase-card frontier-card">
+        <h4>Current Frontier</h4>
+        <span>
+          The demo should make the system look honest, not omniscient. Use this card to explain what remains
+          outside the current recovery boundary.
+        </span>
+        <ul class="showcase-list" id="frontier-list">
+          <li>Real callback-heavy or flag-space APIs remain a weaker public-demo target.</li>
+          <li>Value-shaping and policy-denied functions should be called out separately from pure sequencing failures.</li>
+          <li>Only include a real-world DLL canary if the recovery story is legible and reproducible.</li>
+        </ul>
+      </div>
+
+      <div class="json-preview" id="schema-preview"></div>
+
+      <div class="modal-shell" id="preview-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div>
+              <div class="modal-title" id="preview-modal-title">Preview</div>
+              <div class="modal-subtitle" id="preview-modal-subtitle">Loaded from the current showcase surface.</div>
+            </div>
+            <button class="btn btn-secondary" id="preview-modal-close">Close</button>
+          </div>
+          <div class="modal-body">
+            <pre class="modal-code" id="preview-modal-body">No preview loaded.</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-shell" id="graph-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div>
+              <div class="modal-title">Prerequisite Graph View</div>
+              <div class="modal-subtitle" id="graph-modal-subtitle">Expanded left-to-right view of the current prerequisite chain.</div>
+            </div>
+            <button class="btn btn-secondary" id="graph-modal-close">Close</button>
+          </div>
+          <div class="modal-body">
+            <div class="graph-mermaid" id="graph-mermaid-view"></div>
+            <pre class="modal-code" id="graph-mermaid-source" style="margin-top:12px"></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-shell" id="campaign-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div>
+              <div class="modal-title">Campaign View</div>
+              <div class="modal-subtitle" id="campaign-modal-subtitle">Whole-package view of the featured Batch B checkpoint. Click a DLL below to inspect its internal prerequisite graph.</div>
+            </div>
+            <button class="btn btn-secondary" id="campaign-modal-close">Close</button>
+          </div>
+          <div class="modal-body">
+            <div class="graph-mermaid" id="campaign-mermaid-view"></div>
+            <div class="modal-subtitle" style="margin-top:8px">Cross-DLL reuse topology for this campaign run. This shows which DLL jobs were seeded from prior package context, not a true runtime call graph.</div>
+            <div class="graph-mermaid" id="campaign-reuse-view" style="margin-top:8px"></div>
+            <pre class="modal-code" id="campaign-reuse-source" style="margin-top:12px"></pre>
+            <div class="graph-actions" id="campaign-dll-actions" style="justify-content:flex-start;flex-wrap:wrap;gap:8px;margin-top:14px"></div>
+            <div class="graph-mermaid" id="campaign-drilldown-view" style="margin-top:14px"></div>
+            <pre class="modal-code" id="campaign-drilldown-source" style="margin-top:12px"></pre>
+            <pre class="modal-code" id="campaign-summary-body" style="margin-top:12px"></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-error" id="gen-error"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="back2-btn">← Back</button>
+        <button class="btn btn-success" id="to-chat-btn">Proceed to Chat →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Section 5 – Chat + Download ═══════════════════════════════ -->
+  <section id="sec-chat" class="hidden">
+    <div class="card">
+      <div class="card-title">
+        <span class="badge">Step 4</span>
+        Session Copilot And Final Outputs
+      </div>
+
+      <p style="font-size:.86rem;color:var(--muted);margin-bottom:14px">
+        Use the recovered tool surface in-chat, inspect the session transcript, and keep the generated outputs
+        attached to the same verification story.
+      </p>
+
+      <div class="chat-window" id="chat-window">
+        <div class="chat-empty" id="chat-empty">
+          Send a message to start the conversation.<br/>
+          <span style="font-size:.75rem;">e.g. "What tools are available?" or "Run add(3, 4)"</span>
+        </div>
+      </div>
+
+      <div class="chat-input-row">
+        <textarea id="chat-input" placeholder="Ask something about the MCP tools…" rows="2"></textarea>
+        <button class="btn btn-primary" id="send-btn">Send</button>
+      </div>
+
+      <div class="alert alert-error" id="chat-error"></div>
+
+      <div class="btn-row" style="margin-top:18px">
+        <button class="btn btn-secondary" id="back3-btn">← Back</button>
+        <button class="btn btn-secondary" id="transcript-btn">⬇ Transcript</button>
+        <button class="btn btn-secondary" id="restart-btn">↺ Start Over</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+
+<script src="/static/app.js"></script>
+</body>
+</html>

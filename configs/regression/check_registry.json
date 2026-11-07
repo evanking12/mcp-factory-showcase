@@ -1,0 +1,2687 @@
+{
+  "schema_version": "1.0",
+  "systems": [
+    {
+      "system_id": "change_admission_governance",
+      "path_patterns": [
+        "configs/regression/check_registry.json",
+        "scripts/regression/change_admission_check.py",
+        "scripts/regression/run_change_admission_floor.py",
+        "tests/test_change_admission_check.py",
+        "tests/test_change_admission_floor.py",
+        "docs/architecture/testing_strategy/SYSTEM-MAP.md",
+        "docs/architecture/testing_strategy/CHANGE-ADMISSION-PACKET-TEMPLATE.md",
+        "dynamic_campaigns/change_admission_enforcement_v1/**"
+      ],
+      "description": "Executable floor that classifies changed systems, expected stable contracts, allowed churn, and required meta-checks.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Registry validation is deterministic and fails missing system or check coverage.",
+        "Change-admission outputs include verdict, affected systems, durable contracts, allowed churn, required meta-checks, failures, warnings, and next blocker.",
+        "The floor never invokes lane trust, Easy01, Medium01, or expensive proving suites."
+      ],
+      "allowed_to_churn": [
+        "Registry row wording and system descriptions may evolve as system ownership becomes sharper.",
+        "Campaign prompt and summary prose may evolve while preserving the compact review surfaces."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Runtime lane startup",
+        "Compiled suite execution",
+        "Baseline comparison policy"
+      ]
+    },
+    {
+      "system_id": "path_aware_check_runner",
+      "path_patterns": [
+        "scripts/regression/run_path_aware_checks.py",
+        "tests/test_path_aware_checks.py",
+        "configs/regression/check_registry.json",
+        "configs/regression/observability_promotion_triggers.json",
+        "docs/architecture/testing_strategy/OBSERVABILITY-PROMOTION-TRIGGERS.md",
+        "dynamic_campaigns/path_aware_check_runner_v1/**"
+      ],
+      "description": "Selects and optionally executes exact cheap checks from changed paths, check_registry.json, and observability promotion triggers.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Changed paths map deterministically to affected systems and selected checks.",
+        "The runner reports selected checks, skipped checks, execution results, claim ceiling, and promotion-trigger advice.",
+        "The runner remains Tier 0 and does not invoke live lane or compiled-suite proving by itself."
+      ],
+      "allowed_to_churn": [
+        "Summary wording may evolve while preserving machine-readable JSON output.",
+        "Promotion-trigger hints may sharpen as migration evidence accumulates."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Runtime lane startup",
+        "Compiled suite execution",
+        "Stage handoff packet schema",
+        "Session route packet exposure"
+      ]
+    },
+    {
+      "system_id": "stage_breakpoint_check_runner",
+      "path_patterns": [
+        "scripts/regression/run_stage_breakpoint_checks.py",
+        "tests/test_stage_breakpoint_checks.py",
+        ".github/workflows/stage-breakpoint-checks.yml",
+        "configs/regression/check_registry.json"
+      ],
+      "description": "Selects and executes changed-path-relevant stage breakpoint suites without invoking live lane or broad baseline gates.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Changed paths map deterministically to stage breakpoint checks through check_registry.json.",
+        "No relevant stage breakpoint suite is a green no-op with an explicit summary.",
+        "The runner reports selected suites, skipped checks, execution results, and stage/seam-only claim ceiling."
+      ],
+      "allowed_to_churn": [
+        "Summary wording may evolve while preserving machine-readable JSON output.",
+        "More stage breakpoint suites may be added one stage and one pressure family at a time."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Runtime lane startup",
+        "Easy01 checkpoint execution",
+        "Medium01 checkpoint execution",
+        "Baseline comparison policy"
+      ]
+    },
+    {
+      "system_id": "s02_runtime_stage_split",
+      "path_patterns": [
+        "api/pipeline/runner.py",
+        "api/pipeline/core/checkpoint.py",
+        "api/pipeline/s02_probe/*.py",
+        "api/pipeline/s02_probe/*.md",
+        "api/routes/routes_session.py",
+        "scripts/harness_lib/capture.py",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/STAGE-QUALIFICATION-MAP.md",
+        "tests/test_s02_runtime_stage_split.py",
+        "tests/test_checkpoint_stage_snapshots.py",
+        "tests/test_routes_session_snapshot_handoff_packet.py",
+        "tests/test_capture_manifests.py"
+      ],
+      "description": "Compatibility-preserving runtime split for S-02 into probe ordering, invocation execution, and evidence capture checkpoints under the s02_probe parent.",
+      "required_regression_tier": "tier1_or_higher",
+      "durable_contracts": [
+        "S-02A/B/C status and checkpoint IDs are runtime-visible without removing s02_probe parent compatibility.",
+        "S-02 artifact/session aliases are additive and preserve legacy stage-02-probe-loop paths.",
+        "Resume boundaries can target s02_probe and S-02 substages without corrupting downstream checkpoint state.",
+        "The split claims runtime attribution only and does not broaden probe, lane, S-01, or S-03 semantics."
+      ],
+      "allowed_to_churn": [
+        "S-02 operator wording and alias descriptions may sharpen while preserving legacy paths.",
+        "Stage proving rows may split S-02 into sharper breakpoint inventory after hosted validation."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-00 handoff packet behavior",
+        "S-01 unlock semantics",
+        "S-03 reconciliation semantics",
+        "Post-S-02 broad synthesis behavior"
+      ]
+    },
+    {
+      "system_id": "probe_candidate_ranking",
+      "path_patterns": [
+        "api/pipeline/core/evidence_candidates.py",
+        "api/pipeline/core/vocab.py",
+        "tests/test_evidence_candidates_ghidra.py",
+        "tests/test_probe_loop_preflight.py",
+        "dynamic_campaigns/medium02_product_green_to_promotion_ready_overnight_v1/**"
+      ],
+      "description": "Shared S-02 probe candidate ranking and post-probe enrichment safety for deterministic compiled-suite argument selection.",
+      "required_regression_tier": "tier1_or_higher",
+      "durable_contracts": [
+        "Runtime evidence candidates are ranked by semantic parameter family before generic or static string fallback.",
+        "Post-probe LLM enrichment is bounded and cannot hang an otherwise completed probe indefinitely.",
+        "Candidate-ranking repairs are shared pipeline behavior, not suite-specific runner hints."
+      ],
+      "allowed_to_churn": [
+        "Candidate family inference may sharpen when new compiled-suite identifiers become reusable evidence.",
+        "Timeout defaults may tighten while preserving fail-closed probe authority."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Runner suite ordering",
+        "Product-green eligibility rules",
+        "Baseline registry truth"
+      ]
+    },
+    {
+      "system_id": "s05_runtime_stage_split",
+      "path_patterns": [
+        "api/pipeline/runner.py",
+        "api/pipeline/core/checkpoint.py",
+        "api/pipeline/s05_enrichment/*.py",
+        "api/pipeline/s05_enrichment/*.md",
+        "api/routes/routes_session.py",
+        "scripts/harness_lib/capture.py",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/STAGE-QUALIFICATION-MAP.md",
+        "tests/test_s05_runtime_stage_split.py",
+        "tests/test_checkpoint_stage_snapshots.py",
+        "tests/test_routes_session_snapshot_handoff_packet.py",
+        "tests/test_capture_manifests.py"
+      ],
+      "description": "Compatibility-preserving runtime split for S-05 into schema backfill, verification replay, and read-to-write chaining checkpoints under the s05_enrichment parent.",
+      "required_regression_tier": "tier1_or_higher",
+      "durable_contracts": [
+        "S-05A/B/C status and checkpoint IDs are runtime-visible without removing s05_enrichment parent compatibility.",
+        "S-05 artifact/session aliases are additive and preserve legacy backfill, verification-report, and MC-5 decision paths.",
+        "Resume boundaries can target s05_enrichment and S-05 child stages without corrupting S-06 downstream checkpoint state.",
+        "The split claims runtime attribution only and does not broaden S-04, S-06, verification, MC-5, bridge, lane, or model semantics."
+      ],
+      "allowed_to_churn": [
+        "S-05 operator wording and alias descriptions may sharpen while preserving legacy paths.",
+        "Stage proving rows may split S-05 into sharper breakpoint inventory after hosted validation."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-04 synthesis semantics",
+        "S-06 gap resolution semantics",
+        "S-02 probe and S-03 reconciliation semantics",
+        "Post-S-05 broad finalization behavior"
+      ]
+    },
+    {
+      "system_id": "s05b_verification_replay_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s05_enrichment/verification_replay.py",
+        "api/pipeline/s05_enrichment/verify.py",
+        "api/pipeline/s05_enrichment/status.py",
+        "api/pipeline/s05_enrichment/LIVE-CONTRACT.md",
+        "api/pipeline/s05_enrichment/TRACE.md",
+        "api/pipeline/s05_enrichment/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S05-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/fixtures/s05b_verification_replay_direct_truth/**",
+        "tests/test_s05b_verification_replay_breakpoint_suite.py",
+        "dynamic_campaigns/s05_breakpoint_tier1_tier2_execution_v1/**"
+      ],
+      "description": "Stage-owned breakpoint suite for S-05B verification_replay: direct replay truth for deterministic compiled DLL working-call claims.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-05B direct replay truth must distinguish replayed DLL results from inherited working-call confidence.",
+        "S-05B direct replay Tier claims remain bounded to replay truth and do not substitute for state-effect verification, weak-positive non-promotion, S-05C chaining, S-05 seams, or bottom-up S-05 maturity.",
+        "Python mocks may isolate storage and status noise but cannot replace compiled DLL execution as Tier 1 or Tier 2 replay-truth evidence."
+      ],
+      "allowed_to_churn": [
+        "Fixture details may evolve one S-05B direct-replay breakpoint family at a time.",
+        "Expected report and patch fields may sharpen while preserving replayed-truth, state-drift, unsupported, and typed-argument boundaries."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-04 synthesis semantics",
+        "S-05A schema backfill",
+        "S-05C read-to-write chaining",
+        "S-06 gap handling",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s05b_weak_positive_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s05_enrichment/verification_replay.py",
+        "api/pipeline/s05_enrichment/verify.py",
+        "api/pipeline/s05_enrichment/status.py",
+        "api/pipeline/s05_enrichment/LIVE-CONTRACT.md",
+        "api/pipeline/s05_enrichment/TRACE.md",
+        "api/pipeline/s05_enrichment/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S05-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/fixtures/s05b_verification_replay_weak_positive/**",
+        "tests/test_s05b_weak_positive_breakpoint_suite.py",
+        "dynamic_campaigns/s05_stage_anchor_tier2_grounding_v1/**"
+      ],
+      "description": "Stage-owned breakpoint suite for S-05B verification_replay: weak-positive non-promotion for deterministic compiled replay pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-05B weak-positive non-promotion must keep inferred, partial, failed, and state-drift rows separate from verified replay evidence.",
+        "Weak-positive Tier claims do not substitute for direct replay truth, state-effect verification, S-05C chaining, S-05 seams, or bottom-up S-05 maturity.",
+        "Compiled DLL evidence is required for replayed verified and state-drift rows; skipped weak rows must remain unpatched even if their fixture exports would return success."
+      ],
+      "allowed_to_churn": [
+        "Weak-positive fixture details may sharpen while preserving verified, inferred, partial, failed, and state-drift boundaries.",
+        "Expected report and patch fields may sharpen while preserving non-promotion behavior."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-04 synthesis semantics",
+        "S-05A schema backfill",
+        "S-05C read-to-write chaining",
+        "S-06 gap handling",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s05a_schema_provenance_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s05_enrichment/schema_backfill.py",
+        "api/pipeline/s05_enrichment/backfill.py",
+        "api/pipeline/s05_enrichment/status.py",
+        "api/pipeline/s05_enrichment/LIVE-CONTRACT.md",
+        "api/pipeline/s05_enrichment/TRACE.md",
+        "api/pipeline/s05_enrichment/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S05-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/test_s05a_schema_provenance_breakpoint_suite.py",
+        "dynamic_campaigns/s05_stage_anchor_tier2_grounding_v1/**"
+      ],
+      "description": "Stage-owned breakpoint suite for S-05A schema_backfill: schema provenance under medium evidence-pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-05A schema provenance must record synthesis-derived backfill as enrichment, not verified proof.",
+        "S-05A provenance Tier claims do not substitute for prose-as-proof prevention, schema compatibility, S-05B verification, S-05 seams, or bottom-up S-05 maturity.",
+        "Harness packets are acceptable because S-05A owns schema provenance and proof-boundary preservation, not DLL execution."
+      ],
+      "allowed_to_churn": [
+        "Provenance summary fields may sharpen while preserving the schema_enrichment_not_verification boundary.",
+        "Backfill result metadata may grow additively."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-04 synthesis generation semantics",
+        "S-05B verification replay",
+        "S-05C read-to-write chaining",
+        "S-06 gap handling",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s05c_verified_read_extraction_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s05_enrichment/read_to_write_chaining.py",
+        "api/pipeline/s05_enrichment/mc5_chain_reads.py",
+        "api/pipeline/s05_enrichment/status.py",
+        "api/pipeline/s05_enrichment/LIVE-CONTRACT.md",
+        "api/pipeline/s05_enrichment/TRACE.md",
+        "api/pipeline/s05_enrichment/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S05-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/test_s05c_verified_read_extraction_breakpoint_suite.py",
+        "dynamic_campaigns/s05_stage_anchor_tier2_grounding_v1/**"
+      ],
+      "description": "Stage-owned breakpoint suite for S-05C read_to_write_chaining: verified-read extraction under medium MC-5 pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-05C verified-read extraction must chain only from verified read evidence, not inherited success or inferred rows.",
+        "S-05C verified-read Tier claims do not substitute for read-to-write dependency honesty, retry containment, S-05 seams, or bottom-up S-05 maturity.",
+        "Harness packets are acceptable because S-05C owns verified evidence selection and MC-5 decision boundaries, not DLL execution."
+      ],
+      "allowed_to_churn": [
+        "MC-5 decision analysis may add diagnostic fields while preserving verified-only extraction.",
+        "Fixture rows may sharpen while preserving verified, inferred, failed, partial, and irrelevant-read boundaries."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-04 synthesis semantics",
+        "S-05A schema backfill",
+        "S-05B replay execution",
+        "S-06 gap handling",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s05b_s05c_verified_to_chaining_seam_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s05_enrichment/verification_replay.py",
+        "api/pipeline/s05_enrichment/verify.py",
+        "api/pipeline/s05_enrichment/read_to_write_chaining.py",
+        "api/pipeline/s05_enrichment/mc5_chain_reads.py",
+        "api/pipeline/s05_enrichment/status.py",
+        "api/pipeline/s05_enrichment/LIVE-CONTRACT.md",
+        "api/pipeline/s05_enrichment/TRACE.md",
+        "api/pipeline/s05_enrichment/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S05-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/fixtures/s05b_s05c_verified_to_chaining_seam/**",
+        "tests/test_s05b_s05c_verified_to_chaining_seam_breakpoint_suite.py",
+        "dynamic_campaigns/s05b_s05c_verified_to_chaining_seam_tier2_v1/**"
+      ],
+      "description": "Seam-owned breakpoint suite for S-05B -> S-05C: verified replay evidence into bounded MC-5 read-to-write chaining.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-05B -> S-05C verified-to-chaining must preserve verified, inferred, partial, failed, and state-drift replay boundaries into MC-5 selection.",
+        "The seam Tier claim does not substitute for S-05 bottom-up maturity, S-05C retry execution correctness, S-05C -> S-06 gap handoff, or MC-5 end-to-end success.",
+        "Compiled DLL evidence is required for S-05B replay rows; S-05C may use harnessed retry planning because the seam claim is selection into chaining, not write execution."
+      ],
+      "allowed_to_churn": [
+        "Fixture rows may sharpen while preserving verified, inferred, failed, partial, and state-drift boundaries.",
+        "MC-5 decision analysis may add diagnostic fields while preserving verified-only handoff selection."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-04 synthesis semantics",
+        "S-05A schema backfill",
+        "S-05C -> S-06 gap handoff",
+        "S-06 gap handling",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "path_patterns": [
+        "api/pipeline/s05_enrichment/*.py",
+        "api/pipeline/s06_gaps/*.py",
+        "api/pipeline/s05_enrichment/LIVE-CONTRACT.md",
+        "api/pipeline/s05_enrichment/TRACE.md",
+        "api/pipeline/s05_enrichment/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S05-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/PIPELINE-PROVING-BASELINE-SNAPSHOTS.md",
+        "tests/fixtures/s05_full_family_tier2_baseline/**",
+        "tests/test_s05_full_family_tier2_baseline_suite.py",
+        "dynamic_campaigns/s05_full_family_tier2_baseline_v1/**"
+      ],
+      "description": "Mixed row-classifying Stage Breakpoint suite for the S-05 full-family Tier 2 baseline across remaining stage-owned, seam-owned, and bottom-up rows.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-05 full-family baseline rows must keep row-specific tier, claim ceiling, and blocked/deferred classifications rather than treating aggregate pass as broad S-05 maturity.",
+        "Compiled DLL evidence is required for replay/runtime rows; harness packets are allowed only for provenance, classification, persistence, deferral, and handoff truth.",
+        "Rows classified as blocked_at_tier2 or deferred_as_tier3_shaped are not promoted by a green aggregate suite result."
+      ],
+      "allowed_to_churn": [
+        "Fixture expectations may sharpen one S-05 row at a time.",
+        "Blocked-row rationale may update when a deterministic harness or consumer surface is added."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-04 synthesis semantics",
+        "S-06 gap-resolution semantics beyond explicit handoff reads",
+        "Bridge/lane startup",
+        "Model behavior",
+        "Broad hard-family baselines"
+      ]
+    },
+    {
+      "system_id": "pipeline_full_tier2_baseline_suite",
+      "path_patterns": [
+        "api/pipeline/s00_setup/*.py",
+        "api/pipeline/s01_unlock/*.py",
+        "api/pipeline/s03_reconcile/*.py",
+        "api/pipeline/s04_synthesis/*.py",
+        "api/pipeline/s06_gaps/*.py",
+        "api/pipeline/s07_finalize/*.py",
+        "docs/architecture/testing_strategy/BREAKPOINT-TIER-RUBRIC.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/PIPELINE-PROVING-BASELINE-SNAPSHOTS.md",
+        "docs/architecture/testing_strategy/S00-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S01-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S03-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S04-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S06-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S07-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/test_pipeline_full_tier2_baseline_suite.py",
+        "dynamic_campaigns/pipeline_full_tier2_baseline_v1/**"
+      ],
+      "description": "Mixed row-classifying Stage Breakpoint suite for the full S-00 through S-07 Tier 2 baseline.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Full-pipeline baseline rows must preserve failed, blocked, deferred, and unimplemented classifications rather than treating aggregate pass as pipeline Tier 2 maturity.",
+        "Rows marked failed_tier1, failed_tier2, blocked_at_tier1, or blocked_at_tier2 are baseline evidence and are not promoted by a green aggregate suite result.",
+        "Compiled DLL evidence is required for runtime and binary behavior claims; harness packets are allowed only for provenance, classification, persistence, deferral, handoff, report, and packaging truth."
+      ],
+      "allowed_to_churn": [
+        "Row-lock classifications may sharpen one row at a time.",
+        "Blocked-row rationale may update when a deterministic harness or consumer surface is added."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Hard-family suite outcomes",
+        "Live lane startup",
+        "Model behavior",
+        "Runtime stage identity",
+        "Existing S-02 and S-05 tier claims"
+      ]
+    },
+    {
+      "system_id": "enterprise_survivability_suite",
+      "path_patterns": [
+        "api/infra/service_identity.py",
+        "api/routes/main.py",
+        "scripts/bridge/gui_bridge.py",
+        "api/pipeline/core/enterprise_survivability.py",
+        "api/pipeline/core/spectrum_compiled_ingest.py",
+        "scripts/ops/nightly_groundtruth.py",
+        "scripts/regression/replay_hard03_reservation_managed_lane.py",
+        "scripts/regression/replay_hard03_dispatch_preview_managed_lane.py",
+        "scripts/regression/replay_hard03_fee_quote_managed_lane.py",
+        "scripts/regression/replay_hard03_attestation_stage_managed_lane.py",
+        "scripts/regression/replay_hard03_invoice_sync_managed_lane.py",
+        "scripts/runs/run_spectrum_compiled_hard01.py",
+        "scripts/runs/run_spectrum_compiled_hard02.py",
+        "scripts/runs/run_spectrum_compiled_hard03.py",
+        "docs/architecture/testing_strategy/ENTERPRISE-SURVIVABILITY-SUITE.md",
+        "docs/architecture/testing_strategy/HARD-FAMILY-MEASUREMENT-FABRIC.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/PIPELINE-PROVING-BASELINE-SNAPSHOTS.md",
+        "tests/test_enterprise_survivability_suite.py",
+        "tests/test_enterprise_survivability_compiled_fixture_ladder.py",
+        "tests/fixtures/enterprise_survivability/**",
+        "tests/test_nightly_preflight.py",
+        "tests/test_spectrum_compiled_ingest.py",
+        "dynamic_campaigns/enterprise_survivability_suite_design_v1/**",
+        "dynamic_campaigns/enterprise_survivability_runner_integration_v1/**",
+        "dynamic_campaigns/enterprise_survivability_compiled_fixture_ladder_v1/**",
+        "dynamic_campaigns/hard01_against_enterprise_survivability_ladder_v1/**",
+        "dynamic_campaigns/hard_family_measurement_terminalization_v1/**",
+        "dynamic_campaigns/hard_family_lane_identity_comparability_v1/**",
+        "dynamic_campaigns/hard_family_analyze_discovery_authority_v1/**",
+        "dynamic_campaigns/hard_family_measurement_fabric_inventory_v1/**"
+      ],
+      "description": "Fail-closed enterprise survivability suite layer for comparable, non-comparable, warning, skipped, and final-packet boundaries before hard-family semantic comparison resumes.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Enterprise survivability is separate from stage breakpoint maturity and cannot promote S-00 through S-07 rows.",
+        "Non-comparable hard-family target packets are valid baseline data but cannot satisfy semantic proof.",
+        "Dependency-invalid downstream targets must be skipped and named rather than run blindly after a required predecessor becomes non-comparable.",
+        "Hard-family semantic evidence is comparable only when runner, API, and bridge identities satisfy the local lane comparability contract.",
+        "Hard-family analyze/discovery failures must preserve precise analyzer authority diagnostics before semantic hard-family comparison resumes."
+      ],
+      "allowed_to_churn": [
+        "Survivability fixture shapes may evolve by tier while preserving claim ceilings.",
+        "Final packet fields may add diagnostics while preserving comparable, non-comparable, warning, and dependency-blocked boundaries."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Stage breakpoint tier claims",
+        "Hard01 semantic expectations",
+        "Model behavior",
+        "S-00 through S-07 stage semantics"
+      ]
+    },
+    {
+      "system_id": "hard_family_measurement_fabric",
+      "path_patterns": [
+        "api/routes/main.py",
+        "api/infra/worker.py",
+        "api/services/discovery.py",
+        "scripts/bridge/gui_bridge.py",
+        "scripts/ops/check_bridge_identity.py",
+        "scripts/ops/nightly_groundtruth.py",
+        "scripts/runs/run_spectrum_compiled_hard01.py",
+        "scripts/runs/run_spectrum_compiled_hard02.py",
+        "scripts/runs/run_spectrum_compiled_hard03.py",
+        "api/pipeline/core/spectrum_compiled_ingest.py",
+        "scripts/ops/measurement_control_plane.py",
+        "docs/architecture/testing_strategy/HARD-FAMILY-MEASUREMENT-FABRIC.md",
+        "docs/architecture/testing_strategy/HARD-FAMILY-MEASUREMENT-CONTROL-PLANE.md",
+        "docs/architecture/testing_strategy/HARD-FAMILY-FAILURE-SIGNAL-MAP.md",
+        "docs/architecture/testing_strategy/COMPILED-SUITE-GREEN-CONTRACT.md",
+        "docs/architecture/testing_strategy/ENTERPRISE-SURVIVABILITY-SUITE.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/PIPELINE-PROVING-BASELINE-SNAPSHOTS.md",
+        "tests/test_nightly_preflight.py",
+        "tests/test_bridge_identity_smoke.py",
+        "tests/test_medium01_product_route_authority.py",
+        "tests/test_worker_invocables_persistence.py",
+        "tests/test_measurement_control_plane.py",
+        "tests/test_spectrum_compiled_ingest.py",
+        "tests/test_stage_sticky_docs.py",
+        "tests/test_hard03_reservation_managed_lane.py",
+        "dynamic_campaigns/hard_family_measurement_fabric_inventory_v1/**",
+        "dynamic_campaigns/hard_family_measurement_control_plane_design_v1/**",
+        "dynamic_campaigns/measurement_control_plane_passive_observation_v1/**",
+        "dynamic_campaigns/measurement_control_plane_passive_bounded_proof_v1/**",
+        "dynamic_campaigns/hard_family_control_plane_bridge_health_signal_v1/**",
+        "dynamic_campaigns/hard_family_bridge_lease_and_health_gate_v1/**",
+        "dynamic_campaigns/measurement_control_plane_tier3_bridge_candidate_registry_v1/**",
+        "dynamic_campaigns/measurement_control_plane_tier3_runner_candidate_consumption_v1/**",
+        "dynamic_campaigns/measurement_control_plane_tier3_multi_bridge_candidate_discovery_v1/**",
+        "dynamic_campaigns/measurement_control_plane_tier3_runner_multi_bridge_selection_v1/**",
+        "dynamic_campaigns/measurement_control_plane_tier4_bridge_quarantine_recovery_v1/**",
+        "dynamic_campaigns/measurement_control_plane_hard01_baseline_readiness_gate_v1/**",
+        "dynamic_campaigns/hard01_bounded_baseline_attempt_v1/**",
+        "dynamic_campaigns/reservation_stage_analyzer_runtime_progress10_stall_v1/**",
+        "dynamic_campaigns/reservation_stage_discovery_child_launch_boundary_v1/**",
+        "dynamic_campaigns/reservation_stage_discovery_child_runtime_no_output_v1/**",
+        "dynamic_campaigns/reservation_stage_post_progress_10_control_stall_v1/**",
+        "dynamic_campaigns/compiled_suite_product_green_contract_v1/**",
+        "dynamic_campaigns/medium01_product_route_bridge_identity_restore_v1/**",
+        "dynamic_campaigns/medium01_product_route_authority_wiring_v1/**",
+        "dynamic_campaigns/hard03_managed_lane_wait_recovery_mismatch_v1/**",
+        "dynamic_campaigns/hard03_dispatch_preview_child_wrapper_wait_return_authority_v1/**",
+        "dynamic_campaigns/hard03_fee_quote_child_wrapper_wait_return_authority_v1/**",
+        "dynamic_campaigns/hard03_attestation_stage_child_wrapper_wait_return_authority_v1/**",
+        "dynamic_campaigns/hard03_invoice_sync_child_wrapper_wait_return_authority_v1/**"
+      ],
+      "description": "Adjacent proving layer for the hard-family measurement network: runner, control plane, API lane, bridge lease, analyzer, artifacts, and authority packets.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Hard-family measurement fabric stays separate from S-00 through S-07 breakpoint maturity and enterprise survivability tier claims.",
+        "Measurement-fabric failures must route through canonical signal keys before semantic hard-family interpretation.",
+        "Hard-family measurement control-plane traffic lights decide lane and bridge admission before analyzer work starts.",
+        "Passive control-plane observation may write packets into hard-family run output, but it must not schedule, skip, reroute, retry, or satisfy semantic proof.",
+        "Tier 2 control-plane enforcement must prevent red/quarantined hard-family scheduling and force yellow hard-family targets to remain diagnostic-only non-comparable evidence.",
+        "Tier 3 bridge candidate registry proof is runner-consumed for the configured local bridge only; true multi-bridge scheduling remains unclaimed.",
+        "Tier 3 configured bridge candidate discovery normalizes candidate rows only; it must not contact bridges, schedule work, or grant leases.",
+        "Tier 4 configured bridge quarantine/recovery selection must avoid active quarantined bridge-target-profile paths without poisoning unrelated targets.",
+        "Tier 5 hard01 readiness must emit ready_for_bounded_hard01_baseline_attempt or a specific not-ready verdict before hard01 is used as a bounded baseline surface.",
+        "A bounded hard01 baseline attempt is classification evidence only; it must not promote hard01 maturity, stage tiers, or survivability tiers.",
+        "Progress-10 analyzer-runtime artifacts without embedded authority route to post_progress_10_control_stall; latest embedded authority may supersede older worker_startup_stall evidence through latest-proof-wins.",
+        "Discovery child launch diagnostics must distinguish Popen construction, Popen exception, child started/no-output, and generic launch-missing boundaries before semantic interpretation.",
+        "Discovery child runtime diagnostics must distinguish diagnostic-missing, child analysis/output hang, child wrapper wait stall, and latest-proof-wins fallback to post_progress_10_control_stall when the child-runtime signal does not reproduce.",
+        "Progress-10 out-of-band worker breadcrumbs must distinguish status persistence, analyzer-runtime authority emission, return-marker writeback, progress-30 handoff, pre-progress-30 exception, and stale public status before semantic interpretation.",
+        "Discovery child diagnostic JSON files must not count as discovery output artifacts.",
+        "Compiled-suite product-green requires Ghidra-backed route authority and decision-bearing product evidence; compatibility green and measurement green must not be promoted to product green.",
+        "Lane identity, terminalization, dependency blocking, discovery output, subprocess control, bridge stream, Ghidra boundedness, output persistence, and signal routing each keep row-local claim ceilings.",
+        "A hard-family target cannot become comparable semantic evidence while its measurement-fabric row is non-comparable or active_blocker."
+      ],
+      "allowed_to_churn": [
+        "Measurement-fabric row wording may sharpen as signal keys become more precise.",
+        "Diagnostic packet fields may expand while preserving safe-to-compare and evidence-path boundaries."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-00 through S-07 semantic behavior",
+        "Stage breakpoint tier claims",
+        "Hard01 fixture expectations",
+        "Model behavior"
+      ]
+    },
+    {
+      "system_id": "compiled_suite_green_contract",
+      "path_patterns": [
+        "docs/architecture/testing_strategy/COMPILED-SUITE-GREEN-CONTRACT.md",
+        "docs/architecture/testing_strategy/README.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/PIPELINE-PROVING-BASELINE-SNAPSHOTS.md",
+        "docs/architecture/testing_strategy/HARD-FAMILY-MEASUREMENT-FABRIC.md",
+        "docs/architecture/testing_strategy/HARD-FAMILY-FAILURE-SIGNAL-MAP.md",
+        "docs/architecture/testing_strategy/ENTERPRISE-SURVIVABILITY-SUITE.md",
+        "configs/regression/product_proving_posture.json",
+        "scripts/ops/check_bridge_identity.py",
+        "scripts/runs/product_route_contract.py",
+        "scripts/runs/run_spectrum_compiled_medium01_product.py",
+        "scripts/runs/run_spectrum_compiled_medium01.py",
+        "scripts/runs/run_spectrum_compiled_medium02_product.py",
+        "scripts/runs/run_spectrum_compiled_medium02.py",
+        "tests/test_bridge_identity_smoke.py",
+        "tests/test_medium01_product_route_authority.py",
+        "tests/test_spectrum_compiled_ingest.py",
+        "tests/test_stage_sticky_docs.py",
+        "dynamic_campaigns/compiled_suite_product_green_contract_v1/**",
+        "dynamic_campaigns/medium01_product_green_route_probe_v1/**",
+        "dynamic_campaigns/medium01_product_route_bridge_identity_restore_v1/**",
+        "dynamic_campaigns/medium01_product_route_authority_wiring_v1/**"
+      ],
+      "description": "Governance contract separating compatibility, measurement, route, semantic, and product green for compiled suites.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Compiled-suite green labels must distinguish compatibility_green, measurement_green, route_green, semantic_green, and product_green.",
+        "Historical Medium01 green is compatibility/regression green unless Ghidra-backed route authority is proven.",
+        "Compiled enterprise product_green requires Ghidra-backed discovery plus decision-bearing semantic/product evidence.",
+        "Yellow, red, quarantined, or non-comparable records cannot satisfy semantic_green or product_green.",
+        "Active defended product baselines and gate membership are registry-owned, not prose-owned.",
+        "Medium01 product-route proof is additive and must not silently change historical Medium01 compatibility behavior."
+      ],
+      "allowed_to_churn": [
+        "Green-contract wording may sharpen while preserving product-green prerequisites.",
+        "Future report fields may add green_contract_level after the contract is accepted.",
+        "Medium01 product-route runner fields may sharpen while preserving Ghidra-required product prerequisites."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Hard01 fixture expectations",
+        "Medium01 fixture expectations",
+        "Bridge/Ghidra runtime behavior",
+        "S-00 through S-07 stage semantics"
+      ]
+    },
+    {
+      "system_id": "local_product_suite_entrypoint",
+      "path_patterns": [
+        "runtime/README.md",
+        "runtime/_managed_lane_startup.ps1",
+        "runtime/start-managed-lane.ps1",
+        "runtime/run-local-product-suite.ps1",
+        "runtime/run_local_product_suite.py",
+        "scripts/runs/run_spectrum_compiled_medium02_product.py",
+        "tests/test_local_product_suite_entrypoint.py",
+        "dynamic_campaigns/local_product_suite_single_entrypoint_v1/**"
+      ],
+      "description": "Single operator-facing runtime wrapper that ensures the canonical managed lane exists before invoking Easy01, Medium01, or Medium02 product-route suites.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "The operator entrypoint starts or reuses the canonical managed local lane before invoking a product-route runner.",
+        "Unknown or unsafe lane ownership remains fail-closed rather than being hidden inside suite semantics.",
+        "Easy01 and Medium01 product runners remain proving surfaces; startup policy stays in the runtime wrapper layer.",
+        "The wrapper emits a top-level packet that records lane startup, runner invocation, and the first routed blocker."
+      ],
+      "allowed_to_churn": [
+        "Wrapper packet wording may sharpen while preserving startup, runner, and blocker fields.",
+        "The suite dispatch map may grow additively one bounded product suite at a time."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Hard01 runner semantics",
+        "Historical compatibility runners",
+        "Bridge or API HTTP contract shape",
+        "S-00 through S-07 stage semantics"
+      ]
+    },
+    {
+      "system_id": "ci_eligibility",
+      "path_patterns": [
+        "scripts/regression/ci_gate_eligibility.py",
+        "tests/test_regression_ci_eligibility.py",
+        ".github/workflows/required-regression-gates.yml",
+        ".github/workflows/easy01-diagnostic-checkpoints.yml",
+        ".github/workflows/medium01-checkpoints.yml",
+        ".github/workflows/stage-breakpoint-checks.yml",
+        "docs/architecture/testing_strategy/REGRESSION-GATE-CI-V1.md"
+      ],
+      "description": "Decides whether runtime/regression-bearing changes should trigger required or visible regression gates.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Runtime, pipeline, workflow, gate, and suite changes trigger the heavy regression eligibility path.",
+        "Change-admission governance-only files do not trigger heavy gates when changed alone.",
+        "Mixed governance and runtime changes still trigger heavy gates."
+      ],
+      "allowed_to_churn": [
+        "Path pattern inventory may change when systems move.",
+        "Eligibility payloads may add diagnostic fields."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Lane trust canary semantics",
+        "Easy01 checkpoint execution",
+        "Medium01 checkpoint execution"
+      ]
+    },
+    {
+      "system_id": "checkpoint_aggregation",
+      "path_patterns": [
+        "scripts/regression/aggregate_checkpoint_suite.py",
+        "tests/test_checkpointized_regression_ci.py"
+      ],
+      "description": "Reconstructs suite-level summaries and compare inputs from checkpoint artifacts.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Checkpoint artifacts can be aggregated as standalone CI entrypoints.",
+        "Suite-level comparison remains authoritative after aggregation.",
+        "Missing or failed checkpoints remain visible in operator artifacts."
+      ],
+      "allowed_to_churn": [
+        "Internal stitching implementation may change.",
+        "Additional checkpoint metadata may be added."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Lane startup ownership",
+        "Discovery profile selection",
+        "Baseline registry semantics"
+      ]
+    },
+    {
+      "system_id": "checkpoint_summary",
+      "path_patterns": [
+        "scripts/regression/write_ci_job_summary.py",
+        "scripts/regression/write_checkpoint_job_summary.py",
+        "scripts/regression/regression_ci_diagnostics.py",
+        "tests/test_regression_ci_diagnostics.py",
+        "tests/test_write_ci_job_summary.py"
+      ],
+      "description": "Writes operator-facing summaries for startup, lane trust, checkpoint, and suite failures.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Summary writers run as standalone CI entrypoints.",
+        "Startup failures are labeled before suite execution failures.",
+        "Checkpoint summaries expose target, verdict, phase, job id, and first concrete failure."
+      ],
+      "allowed_to_churn": [
+        "Markdown wording may change while preserving the required fields.",
+        "Additional summary sections may be added."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Regression gate verdict semantics",
+        "Checkpoint runner target selection",
+        "Workflow runner labels"
+      ]
+    },
+    {
+      "system_id": "checkpoint_live_observability",
+      "path_patterns": [
+    "api/infra/storage.py",
+    "api/pipeline/core/checkpoint.py",
+    "api/pipeline/core/macro_coordinator.py",
+    "api/pipeline/runner.py",
+        "scripts/ops/nightly_groundtruth.py",
+        "scripts/runs/run_spectrum_compiled_easy01.py",
+        "scripts/runs/run_spectrum_compiled_easy01_product.py",
+        "scripts/runs/run_spectrum_compiled_medium01.py",
+        "scripts/regression/setup_ci_venv.ps1",
+        "scripts/regression/write_checkpoint_job_summary.py",
+        "scripts/regression/regression_ci_diagnostics.py",
+        "api/pipeline/s07_finalize/__init__.py",
+        "api/pipeline/s07_finalize/harmonize.py",
+        ".github/workflows/required-regression-gates.yml",
+        ".github/workflows/easy01-diagnostic-checkpoints.yml",
+        ".github/workflows/medium01-checkpoints.yml",
+        "docs/architecture/testing_strategy/LIVE-CHECKPOINT-OBSERVABILITY.md",
+        "docs/architecture/testing_strategy/OBSERVABILITY-PROMOTION-TRIGGERS.md",
+        "tests/test_checkpoint_stage_snapshots.py",
+        "tests/test_nightly_preflight.py",
+        "tests/test_direct_target_truth.py",
+        "tests/test_regression_ci_diagnostics.py",
+        "tests/test_write_ci_job_summary.py",
+        "dynamic_campaigns/checkpoint_live_observability_v1/**"
+      ],
+      "description": "Makes compiled checkpoint gates expose live phase, stage, progress, status stability, signature stability, soft-stall hints, and last-observation artifacts while running.",
+      "required_regression_tier": "tier1_or_higher",
+      "durable_contracts": [
+        "Long-running checkpoint steps emit live operator-visible observations before hard timeout.",
+        "Checkpoint observations preserve stage and internal span fields when stage span data exists.",
+        "Checkpoint stage ordering preserves resumable runtime boundaries.",
+        "Checkpoint packets and summaries preserve the last observed stage, span, message, progress, stability age, and soft-stall hint.",
+        "Live observations remain diagnostic-only and do not raise the proof tier by themselves."
+      ],
+      "allowed_to_churn": [
+        "Soft-stall hint names may sharpen as real hosted failures expose clearer families.",
+        "Summary wording may change while preserving machine-readable last-observation fields."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S00/S01 handoff packet schema",
+        "Baseline comparison policy",
+        "Compiled checkpoint target order"
+      ]
+    },
+    {
+      "system_id": "discovery_bridge_execution_metadata",
+      "path_patterns": [
+        "api/services/discovery.py",
+        "scripts/bridge/gui_bridge.py",
+        "tests/test_discovery_fallback.py"
+      ],
+      "description": "Keeps discovery, bridge analysis, and downstream execution metadata aligned so probe stages receive durable executable paths rather than transient analysis-only paths.",
+      "required_regression_tier": "tier1_or_higher",
+      "durable_contracts": [
+        "Transient upload or bridge temp paths are not persisted as durable execution metadata for downstream probe stages.",
+        "Stable hashed bridge upload paths remain authoritative when they already exist.",
+        "Cached bridge results that reference transient execution paths are rebuilt instead of reused silently."
+      ],
+      "allowed_to_churn": [
+        "Bridge cache invalidation rules may sharpen as hosted lane evidence exposes new stale-path families.",
+        "Staging location details may change if the bridge upload contract is replaced by a stronger artifact-root contract."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S07 finalization semantics",
+        "Checkpoint summary shape",
+        "Stage handoff packet schema"
+      ]
+    },
+    {
+      "system_id": "reusable_truth_policy",
+      "path_patterns": [
+        "api/pipeline/core/reusable_truth.py",
+        "tests/test_reusable_truth_policy.py"
+      ],
+      "description": "Owns reusable-truth eligibility, semantic-family matching, mismatch rejection, and direct-target truth seed admission.",
+      "required_regression_tier": "tier1_or_higher",
+      "durable_contracts": [
+        "Verified findings must still satisfy semantic-family checks before becoming reusable truth.",
+        "Semantic input mismatches block reusable-truth eligibility even when other verified evidence exists.",
+        "Operator identifiers, customer identifiers, output tokens, reservations, and other semantic families remain distinct."
+      ],
+      "allowed_to_churn": [
+        "Semantic-family inventories may grow when fixtures expose new real families.",
+        "Mismatch reason wording may sharpen while preserving machine-readable rejection."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Checkpoint live-observability status shape",
+        "Baseline registry paths",
+        "Discovery bridge execution metadata"
+      ]
+    },
+    {
+      "system_id": "regression_gate_contract",
+      "path_patterns": [
+        "api/analysis/regression_gate_v1.py",
+        "scripts/regression/run_regression_gate_v1.py",
+        "tests/test_regression_gate_v1.py",
+        "configs/regression/gate_v1.json",
+        "configs/regression/baseline_registry.json",
+        "configs/regression/pinned_baselines/**",
+        "docs/architecture/testing_strategy/REGRESSION-GATE-V1.md"
+      ],
+      "description": "Owns gate-level verdict construction, baseline comparison routing, and regression surface summaries.",
+      "required_regression_tier": "tier1_or_higher",
+      "durable_contracts": [
+        "Gate verdicts remain deterministic for lane trust, easy01, and medium01 surfaces.",
+        "Baseline comparison remains canonical for compiled suite verdicts.",
+        "Runner exceptions preserve first concrete failure details."
+      ],
+      "allowed_to_churn": [
+        "Report internals may change when baseline policy changes intentionally.",
+        "Additional diagnostic fields may be added to result artifacts."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Fast Checks floor",
+        "Runner topology labels",
+        "Workflow YAML path eligibility"
+      ]
+    },
+    {
+      "system_id": "regression_policy_governance",
+      "path_patterns": [
+        "docs/architecture/testing_strategy/README.md",
+        "docs/architecture/testing_strategy/REGRESSION-POLICY.md",
+        "docs/architecture/testing_strategy/REGRESSION-LADDER.md",
+        "docs/architecture/testing_strategy/BREAKPOINT-TIER-RUBRIC.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/STAGE-QUALIFICATION-MAP.md",
+        "docs/architecture/testing_strategy/ENTERPRISE-SURVIVABILITY-SUITE.md",
+        "docs/architecture/testing_strategy/HARD-FAMILY-MEASUREMENT-FABRIC.md",
+        "docs/architecture/testing_strategy/HARD-FAMILY-MEASUREMENT-CONTROL-PLANE.md",
+        "docs/architecture/testing_strategy/HARD-FAMILY-FAILURE-SIGNAL-MAP.md",
+        "docs/architecture/testing_strategy/COMPILED-SUITE-GREEN-CONTRACT.md",
+        "configs/regression/product_proving_posture.json",
+        "docs/architecture/testing_strategy/S00-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S01-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S03-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S04-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S05-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S06-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/S07-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "docs/architecture/testing_strategy/PIPELINE-PROVING-BASELINE-SNAPSHOTS.md"
+      ],
+      "description": "Owns regression claim-ceiling doctrine, CI-layer policy, breakpoint tier rubric, stage proving map, stage qualification map, and the additive ladder that controls how high a non-regression claim may go.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Regression policy separates Fast Checks, path-aware checks, lane trust, baseline comparison, and heavier regression tiers.",
+        "Regression ladder keeps lower tiers additive when stronger suites are added.",
+        "Stage migration claim ceilings remain tied to red/yellow/gray/green trace markers and explicit ladder tiers.",
+        "Breakpoint tier claims stay tied to ownership type, fixture realism, current tier, target tier, and claim ceiling.",
+        "Stage qualification stays separate from breakpoint maturity and classifies whether a stage is ready to strengthen or needs structural work first.",
+        "Pipeline breakpoint-variable inventories stay Tier 0 until real family-specific stage, seam, or bottom-up breakpoint fixtures exist.",
+        "S-00, S-01, S-03, S-04, S-06, and S-07 inventory docs must remain linked from STAGE-PROVING-MAP.md before hard-family comparison.",
+        "S-02 breakpoint-variable inventory stays Tier 0 until real S-02 stage or seam breakpoint fixtures exist.",
+        "S-05 breakpoint-variable inventory stays Tier 0 until real S-05 stage, seam, or bottom-up breakpoint fixtures exist.",
+        "Enterprise survivability stays separate from stage breakpoint maturity and gates when hard-family suites can be used as semantic comparison surfaces.",
+        "Hard-family measurement fabric stays separate from stage breakpoint maturity and owns runner/API/discovery/bridge/Ghidra/artifact authority rows before semantic interpretation.",
+        "Hard-family measurement control-plane admission stays separate from semantic proof and classifies green, yellow, red, and quarantined scheduling states before analyzer work.",
+        "Hard-family failure signal routing maps observed hard/full-suite signals to owners, row states, confidence, and next campaigns before architectural interpretation.",
+        "Compiled-suite green contract keeps compatibility, measurement, route, semantic, and product green separate before baseline claims are promoted.",
+        "Mutable current product proving posture lives in configs/regression/product_proving_posture.json rather than prose dashboards.",
+        "Pipeline proving baseline snapshots freeze pre-hard-run posture so hard-family failures can be compared against known weak points rather than interpreted from memory."
+      ],
+      "allowed_to_churn": [
+        "Policy wording may evolve as long as claim ceilings and tier boundaries stay explicit.",
+        "Named suite membership may evolve when new proving bands are added to the ladder."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Runtime lane startup",
+        "Compiled suite execution",
+        "Stage handoff packet schema",
+        "Session route packet exposure"
+      ]
+    },
+    {
+      "system_id": "runner_topology",
+      "path_patterns": [
+        ".github/workflows/fast-checks.yml",
+        ".github/workflows/required-regression-gates.yml",
+        ".github/workflows/easy01-diagnostic-checkpoints.yml",
+        ".github/workflows/medium01-checkpoints.yml",
+        "docs/architecture/testing_strategy/REGRESSION-GATE-CI-V1.md",
+        "runtime/start-managed-lane.ps1",
+        "runtime/validate-local-lane.ps1",
+        "tests/test_checkpointized_regression_ci.py"
+      ],
+      "description": "Owns CI job shape, runner labels, per-job lane startup, and port/local-data isolation.",
+      "required_regression_tier": "tier0_and_tier1",
+      "durable_contracts": [
+        "Required regression jobs do not assume lane persistence across jobs.",
+        "Runner labels and port roots remain explicit per runner.",
+        "Workflow YAML parses and exposes expected checkpoint jobs."
+      ],
+      "allowed_to_churn": [
+        "Job names and artifact naming may change when preserving status-surface intent.",
+        "Runner labels may be updated when the machine topology changes."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Compiled checkpoint target order",
+        "Baseline registry entries",
+        "Discovery analyzer routing"
+      ]
+    },
+    {
+      "system_id": "stage_handoff_packets",
+      "path_patterns": [
+        "api/pipeline/core/s00_s01_handoff.py",
+        "api/pipeline/core/types.py",
+        "api/pipeline/s00_setup/**",
+        "api/pipeline/s01_unlock/**",
+        "docs/architecture/testing_strategy/S00-S01-HANDOFF-REGRESSION-CHECKLIST.md",
+        "tests/test_s00_s01_handoff_packet.py"
+      ],
+      "description": "Owns S00/S01 handoff packet shape, stage-local packet writers, and durable handoff evidence between setup and unlock.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S00 and S01 packet schemas remain machine-readable and stage-addressable.",
+        "Handoff packets preserve enough evidence for downstream stage and route consumers.",
+        "Stage documentation describes packet ownership without widening required runtime suites."
+      ],
+      "allowed_to_churn": [
+        "Packet internals may add fields when preserving existing consumers.",
+        "Stage prose and examples may evolve with architecture changes."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Lane startup",
+        "Checkpoint aggregation",
+        "Baseline comparison policy"
+      ]
+    },
+    {
+      "system_id": "s00_s01_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/core/s00_s01_handoff.py",
+        "api/pipeline/s00_setup/*.py",
+        "api/pipeline/s01_unlock/*.py",
+        "api/pipeline/s00_setup/TRACE.md",
+        "api/pipeline/s00_setup/FAMILY-BLOCKERS.md",
+        "api/pipeline/s00_setup/LIVE-CONTRACT.md",
+        "api/pipeline/s01_unlock/TRACE.md",
+        "api/pipeline/s01_unlock/FAMILY-BLOCKERS.md",
+        "api/pipeline/s01_unlock/LIVE-CONTRACT.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "tests/fixtures/s00_s01_admission_pressure/**",
+        "tests/test_s00_s01_breakpoint_suite.py"
+      ],
+      "description": "First stage-scoped breakpoint suite for the S00/S01 seam: admitted target ordering, thin or malformed packet fallback, and bounded target breadth.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Strong admitted S00 targets change bounded S01 probe order without mutating legacy invocable order.",
+        "Thin, missing, or malformed packets preserve legacy S01 fallback behavior.",
+        "Rich S00 target sets remain capped and reviewable before downstream consumption.",
+        "Breakpoint failures remain attributable to S00 producer, shared handoff builder, S01 consumer, artifact shape, or blocker family."
+      ],
+      "allowed_to_churn": [
+        "Breakpoint fixture inventory may grow one named blocker family at a time.",
+        "Expected wording may sharpen while preserving producer, handoff, consumer, and fallback ownership."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Lane startup",
+        "S02 through S07 runtime semantics",
+        "Compiled suite execution",
+        "Baseline comparison policy"
+      ]
+    },
+    {
+      "system_id": "s00a_setup_baseline_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s00_setup/setup_baseline.py",
+        "api/pipeline/s00_setup/baseline_truth.py",
+        "api/pipeline/s00_setup/vocab_prior_hints.py",
+        "api/pipeline/s00_setup/vocab_seed.py",
+        "api/pipeline/s00_setup/calibration.py",
+        "api/pipeline/s00_setup/LIVE-CONTRACT.md",
+        "api/pipeline/s00_setup/TRACE.md",
+        "api/pipeline/s00_setup/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "tests/fixtures/s00_substage_medium_pressure/**",
+        "tests/test_s00_substage_breakpoint_suite.py"
+      ],
+      "description": "Stage-owned breakpoint suite for S-00A setup_baseline: vocab and sentinel baseline honesty before static evidence.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-00A preserves user hint, sentinel, and vocab baseline evidence without inventing static evidence.",
+        "S-00A failures remain attributable to setup_baseline, baseline_truth, vocab_prior_hints, vocab_seed, or calibration surfaces.",
+        "S-00A Tier claims remain bounded to setup baseline behavior and do not substitute for S-00B, S-00C, or seam maturity."
+      ],
+      "allowed_to_churn": [
+        "Fixture details may evolve one setup-baseline breakpoint family at a time.",
+        "Expected wording may sharpen while preserving vocab and sentinel honesty claims."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-00B static evidence extraction",
+        "S-00C admission handoff",
+        "S-01 unlock semantics",
+        "Compiled suite execution"
+      ]
+    },
+    {
+      "system_id": "s00b_static_evidence_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s00_setup/static_evidence.py",
+        "api/pipeline/s00_setup/static_analysis.py",
+        "api/pipeline/s00_setup/static_enrichment.py",
+        "api/pipeline/s00_setup/static_surface_extraction.py",
+        "api/pipeline/s00_setup/LIVE-CONTRACT.md",
+        "api/pipeline/s00_setup/TRACE.md",
+        "api/pipeline/s00_setup/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "tests/fixtures/s00_s01_admission_pressure/**",
+        "tests/fixtures/s00_substage_medium_pressure/**",
+        "tests/test_s00_substage_breakpoint_suite.py"
+      ],
+      "description": "Stage-owned breakpoint suite for S-00B static_evidence: callable and static-string inventory richness without runtime truth claims.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-00B extracts static analysis, dll_strings, and static_enrichment from compiled binary evidence when available.",
+        "S-00B records ambiguity and provenance instead of claiming absent Ghidra or runtime truth.",
+        "S-00B Tier claims remain bounded to static evidence behavior and do not substitute for S-00C admission or S-01 consumption."
+      ],
+      "allowed_to_churn": [
+        "Fixture details may evolve one static-evidence breakpoint family at a time.",
+        "Static enrichment fields may grow when existing fallback and provenance remain honest."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-00A setup baseline",
+        "S-00C admission handoff",
+        "S-01 unlock semantics",
+        "Compiled suite execution"
+      ]
+    },
+    {
+      "system_id": "s00c_admission_handoff_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s00_setup/admission_handoff.py",
+        "api/pipeline/core/s00_s01_handoff.py",
+        "api/pipeline/s00_setup/LIVE-CONTRACT.md",
+        "api/pipeline/s00_setup/TRACE.md",
+        "api/pipeline/s00_setup/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "tests/fixtures/s00_s01_admission_pressure/**",
+        "tests/fixtures/s00_substage_medium_pressure/**",
+        "tests/test_s00_substage_breakpoint_suite.py"
+      ],
+      "description": "Stage-owned breakpoint suite for S-00C admission_handoff: packet admission, cap, defer, and ambiguity honesty before S-01 consumption.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-00C builds an admitted packet that caps broad target sets and keeps deferred or ambiguous static material reviewable.",
+        "S-00C failures remain attributable to admission_handoff or the shared packet builder before S-01 consumption.",
+        "S-00C Tier claims remain bounded to packet admission behavior and do not substitute for S-01 consumer or seam maturity."
+      ],
+      "allowed_to_churn": [
+        "Fixture details may evolve one admission-handoff breakpoint family at a time.",
+        "Packet internals may add fields when existing consumers and fallback remain stable."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-00A setup baseline",
+        "S-00B static evidence extraction",
+        "S-01 unlock semantics",
+        "Compiled suite execution"
+      ]
+    },
+    {
+      "system_id": "s02a_probe_ordering_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s02_probe/probe_ordering.py",
+        "api/pipeline/s02_probe/curriculum.py",
+        "api/pipeline/s02_probe/status.py",
+        "api/pipeline/s02_probe/LIVE-CONTRACT.md",
+        "api/pipeline/s02_probe/TRACE.md",
+        "api/pipeline/s02_probe/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/fixtures/s02a_probe_ordering_tier2/**",
+        "tests/test_s02a_probe_ordering_breakpoint_suite.py",
+        "dynamic_campaigns/s02_tier2_grounding_priority_v1/**"
+      ],
+      "description": "Stage-owned breakpoint suite for S-02A probe_ordering: ordering quality for compiled callable inventory under medium naming pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-02A preserves all candidate invocables while moving setup/read-like work ahead of write/commit-like work under medium compiled naming pressure.",
+        "S-02A Tier claims remain bounded to ordering quality and do not substitute for prerequisite DAG truth, S-02B execution, or S-02C durability.",
+        "Compiled DLL fixture inventory may prove product-shaped ordering pressure, but this suite must not claim runtime invocation correctness."
+      ],
+      "allowed_to_churn": [
+        "Fixture details may evolve one S-02A ordering-quality breakpoint family at a time.",
+        "Expected ordering assertions may sharpen while preserving fallback, no-drop, and no-duplicate behavior."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "S-02B invocation execution",
+        "S-02C evidence capture",
+        "S-03 reconcile semantics",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s02b_invocation_execution_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s02_probe/invocation_execution.py",
+        "api/pipeline/s02_probe/probe_loop.py",
+        "api/pipeline/s02_probe/status.py",
+        "api/pipeline/s02_probe/LIVE-CONTRACT.md",
+        "api/pipeline/s02_probe/TRACE.md",
+        "api/pipeline/s02_probe/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/fixtures/s02b_invocation_raw_observation_tier1/**",
+        "tests/fixtures/s02b_invocation_raw_observation_tier2/**",
+        "tests/test_s02b_invocation_execution_breakpoint_suite.py",
+        "dynamic_campaigns/s02b_invocation_execution_tier2_raw_observation_pressure_v1/**"
+      ],
+      "description": "Stage-owned breakpoint suite for S-02B invocation_execution: raw observation integrity for compiled DLL calls under easy and medium pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-02B preserves executed function name, arguments, raw result text, and backend trace for easy and medium compiled DLL invocations.",
+        "S-02B Tier claims remain bounded to raw observation integrity and do not substitute for lane failure classification, S-02C durability, or S-03 interpretation.",
+        "Python mocks may remove model/storage noise but cannot replace compiled DLL execution as Tier 1 or Tier 2 evidence."
+      ],
+      "allowed_to_churn": [
+        "Fixture details may evolve one S-02B raw-observation breakpoint family at a time.",
+        "Probe-log expected fields may sharpen while preserving raw observation and trace integrity."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "S-02A probe ordering",
+        "S-02C evidence capture",
+        "S-03 reconcile semantics",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s02a_s02b_ordering_execution_seam_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s02_probe/probe_ordering.py",
+        "api/pipeline/s02_probe/invocation_execution.py",
+        "api/pipeline/s02_probe/probe_loop.py",
+        "api/pipeline/s02_probe/curriculum.py",
+        "api/pipeline/s02_probe/status.py",
+        "api/pipeline/s02_probe/LIVE-CONTRACT.md",
+        "api/pipeline/s02_probe/TRACE.md",
+        "api/pipeline/s02_probe/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/fixtures/s02a_probe_ordering_tier2/**",
+        "tests/test_s02a_s02b_seam_breakpoint_suite.py",
+        "dynamic_campaigns/s02_tier2_grounding_priority_v1/**"
+      ],
+      "description": "Seam-owned breakpoint suite for S-02A -> S-02B: ordering-to-execution preservation under medium compiled seam pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-02B consumes the ordered invocable plan produced by S-02A rather than silently reverting to original scrambled input order.",
+        "S-02A -> S-02B seam claims remain bounded to ordered-plan preservation and do not substitute for prerequisite overtrust, S-02B broad execution correctness, S-02C durability, or bottom-up S-02 maturity.",
+        "The compiled DLL fixture supplies medium ordering pressure; Python mocks may remove storage/model noise but cannot replace product-shaped seam evidence."
+      ],
+      "allowed_to_churn": [
+        "Fixture details may evolve one S-02A -> S-02B seam breakpoint family at a time.",
+        "Expected ordering assertions may sharpen when S-02A or S-02B ordering contracts change intentionally."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "S-02C evidence capture",
+        "S-03 reconcile semantics",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s02b_s02c_raw_observation_durability_seam_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s02_probe/invocation_execution.py",
+        "api/pipeline/s02_probe/evidence_capture.py",
+        "api/pipeline/s02_probe/probe_loop.py",
+        "api/pipeline/s02_probe/status.py",
+        "api/pipeline/s02_probe/LIVE-CONTRACT.md",
+        "api/pipeline/s02_probe/TRACE.md",
+        "api/pipeline/s02_probe/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/fixtures/s02b_invocation_raw_observation_tier2/**",
+        "tests/test_s02b_s02c_seam_breakpoint_suite.py",
+        "dynamic_campaigns/s02b_s02c_raw_observation_durability_seam_tier2_v1/**"
+      ],
+      "description": "Seam-owned breakpoint suite for S-02B -> S-02C: raw-observation durability through the live probe-log handoff under medium compiled pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-02B raw observations survive the live legacy probe-log handoff into S-02C-owned durable aliases without loss or semantic rewriting.",
+        "S-02B -> S-02C seam claims remain bounded to raw-observation durability and do not substitute for S-02C -> S-03 consumability, lane/runtime failure classification, or bottom-up S-02 maturity.",
+        "The compiled DLL fixture supplies S-02B medium raw-observation pressure; Python mocks may isolate storage/model noise but cannot replace product-shaped seam evidence."
+      ],
+      "allowed_to_churn": [
+        "Fixture details may evolve one S-02B -> S-02C seam breakpoint family at a time.",
+        "Expected durability assertions may sharpen when S-02B append or S-02C alias contracts change intentionally."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "S-02A probe ordering",
+        "S-03 reconcile semantics",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s02c_s03_probe_evidence_consumability_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s02_probe/evidence_capture.py",
+        "api/pipeline/s03_reconcile/reconcile.py",
+        "api/pipeline/s03_reconcile/ARTIFACTS.md",
+        "api/pipeline/s03_reconcile/TRACE.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/test_s02c_s03_seam_breakpoint_suite.py",
+        "dynamic_campaigns/s02c_s03_probe_evidence_consumability_tier2_v1/**"
+      ],
+      "description": "Seam-owned breakpoint suite for S-02C -> S-03: probe evidence consumability from durable S-02C artifacts into reconciliation under medium focused pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-03 prefers S-02C-owned durable probe evidence and falls back to legacy explore_probe_log.json when the alias is absent.",
+        "S-02C -> S-03 seam claims remain bounded to probe evidence consumability and do not substitute for S-03 contradiction maturity, MC-3 correctness, or bottom-up S-02 composition.",
+        "Blocked or missing observations must not be rewritten into false success by reconciliation."
+      ],
+      "allowed_to_churn": [
+        "Expected durable alias read behavior may sharpen while preserving legacy fallback.",
+        "Seam fixtures may grow one S-02C -> S-03 breakpoint family at a time."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "S-02A probe ordering",
+        "S-02B invocation execution",
+        "S-02C capture semantics",
+        "S-04 synthesis semantics",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s02b_s02c_s03_bottom_up_evidence_window_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s02_probe/invocation_execution.py",
+        "api/pipeline/s02_probe/evidence_capture.py",
+        "api/pipeline/s02_probe/probe_loop.py",
+        "api/pipeline/s02_probe/status.py",
+        "api/pipeline/s03_reconcile/reconcile.py",
+        "api/pipeline/s03_reconcile/ARTIFACTS.md",
+        "api/pipeline/s03_reconcile/TRACE.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/fixtures/s02b_invocation_raw_observation_tier2/**",
+        "tests/test_s02b_s02c_s03_bottom_up_breakpoint_suite.py",
+        "dynamic_campaigns/s02b_s02c_s03_bottom_up_evidence_window_tier2_v1/**"
+      ],
+      "description": "Bottom-up breakpoint suite for S-02B -> S-02C -> S-03: raw runtime evidence becomes reconciliation input under medium focused pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-02B raw observations pass through S-02C durable capture into S-03 reconciliation without loss, semantic rewriting, or false success.",
+        "S-02B -> S-02C -> S-03 bottom-up claims remain bounded to short-chain evidence flow and do not substitute for all-S-02 maturity, S-03 contradiction maturity, lane/runtime failure classification, or S-02A ordering participation.",
+        "The compiled DLL fixture supplies S-02B medium raw-observation pressure; Python mocks may isolate storage/model noise but cannot replace product-shaped execution evidence."
+      ],
+      "allowed_to_churn": [
+        "Fixture details may evolve one bottom-up window family at a time.",
+        "Expected reconciliation assertions may sharpen when S-02C alias or S-03 probe-evidence contracts change intentionally."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "S-02A probe ordering",
+        "S-03 contradiction maturity",
+        "S-04 synthesis semantics",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s02_remaining_tier2_grounding_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s02_probe/curriculum.py",
+        "api/pipeline/s02_probe/probe_ordering.py",
+        "api/pipeline/s02_probe/invocation_execution.py",
+        "api/pipeline/s02_probe/evidence_capture.py",
+        "api/pipeline/s02_probe/probe_loop.py",
+        "api/pipeline/s02_probe/status.py",
+        "api/pipeline/s03_reconcile/reconcile.py",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/fixtures/s02_remaining_tier2/**",
+        "tests/test_s02_remaining_tier2_grounding_suite.py",
+        "dynamic_campaigns/s02_remaining_tier2_grounding_v1/**"
+      ],
+      "description": "Mixed S-02 stage/seam/bottom-up breakpoint suite for remaining Tier 2 grounding attempts, including explicit blocked_at_tier2 rows where the fixture cannot honestly prove the family.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Remaining S-02 Tier 2 claims are family-specific and must not claim all-S-02 maturity.",
+        "Tier 2 promotion requires deterministic fixture or preservation evidence; blocked_at_tier2 rows remain below Tier 2.",
+        "The suite records S-02A unlock ordering, prerequisite guidance, pass-scope containment, S-02C state/recalibration preservation, S-02C -> S-03 missing-observation deferral, and the blocked S-02A -> S-02B -> S-02C ordered evidence window."
+      ],
+      "allowed_to_churn": [
+        "Fixture expectations may sharpen one remaining S-02 family at a time.",
+        "Blocked rows may become Tier 2 only after a deterministic harness or code fix makes the claim honest."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "S-03 contradiction redesign",
+        "S-04 synthesis semantics",
+        "S-05 enrichment",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s02b_argument_construction_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s02_probe/invocation_execution.py",
+        "api/pipeline/s02_probe/probe_loop.py",
+        "api/pipeline/s02_probe/status.py",
+        "api/pipeline/core/helpers.py",
+        "api/pipeline/s02_probe/LIVE-CONTRACT.md",
+        "api/pipeline/s02_probe/TRACE.md",
+        "api/pipeline/s02_probe/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/fixtures/s02b_argument_construction_tier2/**",
+        "tests/test_s02b_invocation_execution_breakpoint_suite.py",
+        "dynamic_campaigns/s02_tier2_grounding_priority_v1/**"
+      ],
+      "description": "Stage-owned breakpoint suite for S-02B invocation_execution: argument construction for medium-pressure simple typed exports.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-02B constructs visible typed fallback arguments for medium-pressure compiled DLL exports.",
+        "S-02B argument construction claims remain bounded to argument selection/use and do not substitute for raw observation integrity, lane failure classification, functional precondition handling, S-02C durability, or S-03 interpretation.",
+        "Compiled DLL return values verify the arguments received by the product-shaped call path; Python mocks may remove model/storage noise but cannot replace compiled execution evidence."
+      ],
+      "allowed_to_churn": [
+        "Fixture details may evolve one S-02B argument-construction breakpoint family at a time.",
+        "Expected fallback argument values may sharpen when the generic argument builder contract changes intentionally."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "S-02A probe ordering",
+        "S-02C evidence capture",
+        "S-03 reconcile semantics",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s02b_functional_precondition_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s02_probe/invocation_execution.py",
+        "api/pipeline/s02_probe/probe_loop.py",
+        "api/pipeline/s02_probe/status.py",
+        "api/pipeline/s02_probe/LIVE-CONTRACT.md",
+        "api/pipeline/s02_probe/TRACE.md",
+        "api/pipeline/s02_probe/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/fixtures/s02b_functional_precondition_tier2/**",
+        "tests/test_s02b_invocation_execution_breakpoint_suite.py",
+        "dynamic_campaigns/s02_tier2_grounding_priority_v1/**"
+      ],
+      "description": "Stage-owned breakpoint suite for S-02B invocation_execution: functional precondition handling under medium stateful pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-02B records blocked-before-init and allowed-after-init compiled observations without rewriting them into final semantic truth.",
+        "S-02B functional-precondition claims remain bounded to raw observation handling and do not substitute for lane/runtime failure classification, S-02C durability, or S-03 interpretation.",
+        "The compiled DLL fixture supplies deterministic stateful behavior; Python mocks may remove model/storage noise but cannot replace product-shaped execution evidence."
+      ],
+      "allowed_to_churn": [
+        "Fixture details may evolve one S-02B functional-precondition breakpoint family at a time.",
+        "Expected fallback argument values may sharpen when the generic argument builder contract changes intentionally, provided raw blocked/success observations remain visible."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "S-02A probe ordering",
+        "S-02C evidence capture",
+        "S-03 reconcile semantics",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s02c_evidence_capture_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s02_probe/evidence_capture.py",
+        "api/pipeline/s02_probe/session_artifacts.py",
+        "api/pipeline/s02_probe/status.py",
+        "api/pipeline/s02_probe/LIVE-CONTRACT.md",
+        "api/pipeline/s02_probe/TRACE.md",
+        "api/pipeline/s02_probe/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/test_s02c_evidence_capture_breakpoint_suite.py",
+        "dynamic_campaigns/s02c_evidence_capture_tier2_probe_log_durability_v1/**"
+      ],
+      "description": "Stage-owned breakpoint suite for S-02C evidence_capture: probe-log durability for S-02B-shaped raw observations under easy and medium pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-02C persists function name, arguments, raw result text, backend trace, and classification/status boundary into an S-02C-owned probe-log artifact for one or multiple raw observation rows.",
+        "S-02C Tier claims remain bounded to probe-log durability and do not substitute for S-02B execution, S-03 interpretation, or session ZIP capture.",
+        "Missing or malformed legacy probe logs degrade safely without failing the existing pipeline."
+      ],
+      "allowed_to_churn": [
+        "S-02C snapshot details may sharpen while preserving raw observation fields and legacy probe-log compatibility.",
+        "Probe-log durability fixtures may grow one S-02C breakpoint family at a time."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "S-02A probe ordering",
+        "S-02B invocation execution",
+        "S-03 reconcile semantics",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "s02c_finding_status_persistence_breakpoint_suite",
+      "path_patterns": [
+        "api/pipeline/s02_probe/evidence_capture.py",
+        "api/pipeline/s02_probe/session_artifacts.py",
+        "api/pipeline/s02_probe/status.py",
+        "api/pipeline/s02_probe/LIVE-CONTRACT.md",
+        "api/pipeline/s02_probe/TRACE.md",
+        "api/pipeline/s02_probe/FAMILY-BLOCKERS.md",
+        "docs/architecture/testing_strategy/STAGE-PROVING-MAP.md",
+        "docs/architecture/testing_strategy/S02-BREAKPOINT-VARIABLE-INVENTORY.md",
+        "tests/test_s02c_evidence_capture_breakpoint_suite.py",
+        "dynamic_campaigns/s02_tier2_grounding_priority_v1/**"
+      ],
+      "description": "Stage-owned breakpoint suite for S-02C evidence_capture: finding-status persistence under medium status-distinction pressure.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "S-02C persists observed, blocked, ambiguous, and unresolved status distinctions into an S-02C-owned finding-status artifact.",
+        "S-02C finding-status claims remain bounded to durable status distinction preservation and do not substitute for S-03 interpretation, S-02B execution, or bottom-up pipeline truth.",
+        "Missing or malformed legacy probe logs degrade safely without failing the existing pipeline."
+      ],
+      "allowed_to_churn": [
+        "Finding-status snapshot details may sharpen while preserving status, boundary, function, args, result excerpt, and trace reviewability.",
+        "Status persistence fixtures may grow one S-02C breakpoint family at a time."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "S-02A probe ordering",
+        "S-02B invocation execution",
+        "S-03 reconcile semantics",
+        "Live lane startup"
+      ]
+    },
+    {
+      "system_id": "stage_live_truth_governance",
+      "path_patterns": [
+        "api/pipeline/README.md",
+        "api/pipeline/s*_*/README.md",
+        "api/pipeline/s*_*/PURPOSE.md",
+        "api/pipeline/s*_*/FLOW.md",
+        "api/pipeline/s*_*/ARTIFACTS.md",
+        "api/pipeline/s*_*/SYSTEMS.md",
+        "api/pipeline/s*_*/LIVE-CONTRACT.md",
+        "api/pipeline/s*_*/TRACE.md",
+        "api/pipeline/s*_*/FAMILY-BLOCKERS.md",
+        "docs/architecture/stage_split/**",
+        "docs/architecture/agentic_ecosystem/MIGRATION-AUDIT-ROLE-MAP.md",
+        "docs/architecture/agentic_ecosystem/prompts/templates/DYNAMIC-CAMPAIGN-PROMPT-TEMPLATE.md",
+        "docs/architecture/agentic_ecosystem/prompts/templates/DYNAMIC-TRANCHE-PROMPT-TEMPLATE.md",
+        "docs/architecture/agentic_ecosystem/prompts/templates/DYNAMIC-TRANCHE-SUMMARY-SCHEMA.md",
+        "docs/architecture/agentic_ecosystem/prompts/templates/DYNAMIC-CAMPAIGN-CLOSEOUT-SCHEMA.md",
+        "tests/test_stage_sticky_docs.py"
+      ],
+      "description": "Owns the cheap governance proof that live stage truth, trace markers, blocker-family docs, stage-split doctrine, and migration audit role surfaces stay synchronized.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Every numbered pipeline stage keeps the required sticky doc set.",
+        "Stage README runtime owner files are represented in TRACE.md with red/yellow/gray/green context.",
+        "Stage live contracts expose semantic obligation, handoff rules, advance/stay/fail posture, compatibility notes, and blocker-family awareness.",
+        "Stage-split and migration audit doctrine remains connected to live stage truth without claiming runtime proof."
+      ],
+      "allowed_to_churn": [
+        "Stage doc wording may evolve as long as required headings and ownership markers remain.",
+        "Migration doctrine may add examples while preserving the live-truth versus architecture-doctrine boundary."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Lane startup",
+        "Compiled suite execution",
+        "Baseline comparison policy",
+        "Runtime packet production"
+      ]
+    },
+    {
+      "system_id": "session_routes",
+      "path_patterns": [
+        "api/routes/routes_session.py",
+        "tests/test_routes_session_snapshot_handoff_packet.py",
+        "tests/test_routes_session_report.py"
+      ],
+      "description": "Owns session snapshot and route surfaces that expose handoff packet truth to API consumers.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Session routes preserve snapshot and handoff packet fields needed by operators.",
+        "Route-level packet reads remain deterministic and do not require heavy suite execution.",
+        "Route tests catch schema breakage before runtime regression gates."
+      ],
+      "allowed_to_churn": [
+        "Response payloads may add fields when old fields remain readable.",
+        "Route implementation may move while preserving API-facing packet semantics."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Compiled checkpoint execution",
+        "Runner topology",
+        "Lane trust canary semantics"
+      ]
+    },
+    {
+      "system_id": "session_capture_artifacts",
+      "path_patterns": [
+        "scripts/harness_lib/capture.py",
+        "scripts/harness_lib/collector.py",
+        "scripts/ops/save-session.ps1",
+        "scripts/ops/collect_session.py",
+        "tests/test_capture_manifests.py",
+        "tests/test_capture_compact_context.py"
+      ],
+      "description": "Owns save-session and blob-only checkpoint artifact materialization used by hosted/local regression gates.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Blob-only captures preserve route-equivalent packet and legacy artifact visibility.",
+        "Session manifests identify emitted versus recovered artifacts.",
+        "Key checkpoint artifacts remain reviewable without requiring a live API snapshot route."
+      ],
+      "allowed_to_churn": [
+        "Additional artifacts may be materialized when old aliases remain readable.",
+        "Manifest metadata may become richer when existing origin/source fields remain stable."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "S-01 unlock semantics",
+        "Compiled checkpoint execution",
+        "Discovery profile selection"
+      ]
+    },
+    {
+      "system_id": "worker_persistence",
+      "path_patterns": [
+        "api/infra/worker.py",
+        "tests/test_worker_invocables_persistence.py"
+      ],
+      "description": "Owns worker-side persistence of invocables and route-visible run evidence.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Worker persistence writes invocable evidence in the expected durable location.",
+        "Persistence failures remain observable through focused tests before suite gates.",
+        "Worker state changes do not silently break route/session consumers."
+      ],
+      "allowed_to_churn": [
+        "Persistence internals may change while preserving artifact and route contracts.",
+        "Additional persisted fields may be added."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "CI runner labels",
+        "Baseline registry entries",
+        "Discovery profile selection"
+      ]
+    },
+    {
+      "system_id": "agent_governance",
+      "path_patterns": [
+        "AGENTS.md",
+        ".agents/**",
+        "docs/architecture/agentic_ecosystem/**"
+      ],
+      "description": "Owns Codex operating law, specialist dispatch doctrine, and dynamic-campaign governance contracts.",
+      "required_regression_tier": "tier0",
+      "durable_contracts": [
+        "Agent governance changes remain auditable by the governance audit.",
+        "Dynamic-campaign and dispatch laws do not silently contradict registry-backed check roles.",
+        "Governance-only changes stay on the cheap floor unless mixed with runtime changes."
+      ],
+      "allowed_to_churn": [
+        "Prompt doctrine and role wording may evolve as long as auditability is preserved.",
+        "Specialist-role lifecycle metadata may change under explicit governance updates."
+      ],
+      "unrelated_surfaces_expected_stable": [
+        "Compiled suite execution",
+        "Lane startup",
+        "Checkpoint artifact shape"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "check_id": "change_admission_evaluator_tests",
+      "system_id": "change_admission_governance",
+      "category": "meta_check",
+      "command": "python -m pytest tests/test_change_admission_check.py tests/test_change_admission_floor.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When change-admission registry, evaluator, floor runner, campaign packet, or testing-strategy governance docs change."
+    },
+    {
+      "check_id": "path_aware_check_runner_tests",
+      "system_id": "path_aware_check_runner",
+      "category": "meta_check",
+      "command": "python -m pytest tests/test_path_aware_checks.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 20,
+      "when_required": "When path-aware check selection, execution, output shape, or promotion triggers change."
+    },
+    {
+      "check_id": "stage_breakpoint_check_runner_tests",
+      "system_id": "stage_breakpoint_check_runner",
+      "category": "meta_check",
+      "command": "python -m pytest tests/test_stage_breakpoint_checks.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 20,
+      "when_required": "When stage breakpoint runner code, workflow wiring, or registry mappings change."
+    },
+    {
+      "check_id": "ci_eligibility_tests",
+      "system_id": "ci_eligibility",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_regression_ci_eligibility.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 10,
+      "when_required": "When eligibility patterns, workflow triggers, or governance-only fast-floor path policy changes."
+    },
+    {
+      "check_id": "checkpoint_aggregation_tests",
+      "system_id": "checkpoint_aggregation",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_checkpointized_regression_ci.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 60,
+      "when_required": "When checkpoint artifact shape, aggregation code, suite runner target selection, or checkpoint workflow shape changes."
+    },
+    {
+      "check_id": "summary_writer_tests",
+      "system_id": "checkpoint_summary",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_write_ci_job_summary.py tests/test_regression_ci_diagnostics.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 15,
+      "when_required": "When summary writer entrypoints or operator-truth fields change."
+    },
+    {
+      "check_id": "regression_gate_v1_tests",
+      "system_id": "regression_gate_contract",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_regression_gate_v1.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 60,
+      "when_required": "When gate verdict logic, baseline comparison routing, or result artifact construction changes."
+    },
+    {
+      "check_id": "regression_policy_governance_tests",
+      "system_id": "regression_policy_governance",
+      "category": "meta_check",
+      "command": "python -m pytest tests/test_stage_sticky_docs.py tests/test_regression_ci_eligibility.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When regression policy, ladder doctrine, stage proving map, stage qualification map, any S-00 through S-07 breakpoint inventory, or proving baseline snapshots change."
+    },
+    {
+      "check_id": "s02_runtime_stage_split_tests",
+      "system_id": "s02_runtime_stage_split",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_s02_runtime_stage_split.py tests/test_checkpoint_stage_snapshots.py tests/test_routes_session_snapshot_handoff_packet.py tests/test_capture_manifests.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02 runtime split code, checkpoint order, session aliases, or S-02 sticky docs change."
+    },
+    {
+      "check_id": "s02_runtime_stage_split_meta_floor",
+      "system_id": "s02_runtime_stage_split",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02 runtime split registry coverage, proving map rows, or qualification routing changes."
+    },
+    {
+      "check_id": "probe_candidate_ranking_tests",
+      "system_id": "probe_candidate_ranking",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_evidence_candidates_ghidra.py tests/test_probe_loop_preflight.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When shared probe candidate ranking, reusable evidence-family inference, or post-probe enrichment timeout behavior changes."
+    },
+    {
+      "check_id": "probe_candidate_ranking_meta_floor",
+      "system_id": "probe_candidate_ranking",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When probe candidate-ranking registry coverage or durable-contract routing changes."
+    },
+    {
+      "check_id": "s05_runtime_stage_split_tests",
+      "system_id": "s05_runtime_stage_split",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_s05_runtime_stage_split.py tests/test_checkpoint_stage_snapshots.py tests/test_routes_session_snapshot_handoff_packet.py tests/test_capture_manifests.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-05 runtime split code, checkpoint order, session aliases, or S-05 sticky docs change."
+    },
+    {
+      "check_id": "s05_runtime_stage_split_meta_floor",
+      "system_id": "s05_runtime_stage_split",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-05 runtime split registry coverage, proving map rows, or qualification routing changes."
+    },
+    {
+      "check_id": "workflow_portability_floor",
+      "system_id": "runner_topology",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When workflow YAML, CI entrypoints, runner topology, or change-admission floor code changes."
+    },
+    {
+      "check_id": "checkpoint_summary_entrypoint_smoke",
+      "system_id": "checkpoint_summary",
+      "category": "meta_check",
+      "command": "python scripts/regression/write_checkpoint_job_summary.py --help",
+      "blocking": true,
+      "expected_runtime_seconds": 5,
+      "when_required": "When checkpoint summary entrypoints change or are added to CI."
+    },
+    {
+      "check_id": "checkpoint_live_observability_tests",
+      "system_id": "checkpoint_live_observability",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_nightly_preflight.py tests/test_direct_target_truth.py tests/test_regression_ci_diagnostics.py tests/test_write_ci_job_summary.py tests/test_job_status_storage.py tests/test_checkpoint_stage_snapshots.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When checkpoint polling, live observations, S07 finalization status, checkpoint packets, or checkpoint summaries change."
+    },
+    {
+      "check_id": "checkpoint_live_observability_meta_floor",
+      "system_id": "checkpoint_live_observability",
+      "category": "meta_check",
+      "command": "python -m pytest tests/test_stage_sticky_docs.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 20,
+      "when_required": "When checkpoint live-observability doctrine, registry mapping, or campaign governance changes."
+    },
+    {
+      "check_id": "discovery_bridge_execution_metadata_tests",
+      "system_id": "discovery_bridge_execution_metadata",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_discovery_fallback.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 20,
+      "when_required": "When discovery bridge path normalization, bridge execution metadata, transient upload path handling, or bridge cache validity changes."
+    },
+    {
+      "check_id": "discovery_bridge_execution_metadata_meta_floor",
+      "system_id": "discovery_bridge_execution_metadata",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When discovery or bridge execution metadata paths are changed and need registry-backed blast-radius classification."
+    },
+    {
+      "check_id": "reusable_truth_policy_tests",
+      "system_id": "reusable_truth_policy",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_reusable_truth_policy.py tests/test_direct_target_truth.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When reusable-truth semantic-family policy, direct-target truth eligibility, or mismatch rejection changes."
+    },
+    {
+      "check_id": "reusable_truth_policy_meta_floor",
+      "system_id": "reusable_truth_policy",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When reusable-truth policy paths are changed and need registry-backed blast-radius classification."
+    },
+    {
+      "check_id": "regression_gate_entrypoint_smoke",
+      "system_id": "regression_gate_contract",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_regression_gate_v1.py --help",
+      "blocking": true,
+      "expected_runtime_seconds": 5,
+      "when_required": "When regression gate entrypoints change or are added to CI."
+    },
+    {
+      "check_id": "runner_topology_workflow_parse",
+      "system_id": "runner_topology",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When workflow files or runner-topology scripts change."
+    },
+    {
+      "check_id": "ci_eligibility_meta_floor",
+      "system_id": "ci_eligibility",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When changed-file eligibility or Fast Checks gating changes."
+    },
+    {
+      "check_id": "checkpoint_aggregation_entrypoint_smoke",
+      "system_id": "checkpoint_aggregation",
+      "category": "meta_check",
+      "command": "python scripts/regression/aggregate_checkpoint_suite.py --help",
+      "blocking": true,
+      "expected_runtime_seconds": 5,
+      "when_required": "When checkpoint aggregation is used as a hosted CI entrypoint."
+    },
+    {
+      "check_id": "stage_handoff_packet_tests",
+      "system_id": "stage_handoff_packets",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_s00_s01_handoff_packet.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 20,
+      "when_required": "When S00/S01 handoff packet code, stage docs, or packet schemas change."
+    },
+    {
+      "check_id": "stage_handoff_meta_floor",
+      "system_id": "stage_handoff_packets",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When stage handoff paths are changed and need check-registry coverage validation."
+    },
+    {
+      "check_id": "s00_s01_breakpoint_suite_tests",
+      "system_id": "s00_s01_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s00_s01_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S00/S01 red owned code, yellow handoff dependencies, TRACE marker surfaces, family blockers, or the stage proving map change.",
+      "breakpoint_scope": "S-00C -> S-01",
+      "ownership_type": "seam-owned",
+      "breakpoint_family": "admission pressure",
+      "current_tier": "Tier 1",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "handoff survives one easy compiled pressure case"
+    },
+    {
+      "check_id": "s00_s01_breakpoint_suite_meta_floor",
+      "system_id": "s00_s01_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S00/S01 breakpoint suite registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s00a_setup_baseline_breakpoint_suite_tests",
+      "system_id": "s00a_setup_baseline_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s00_substage_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-00A setup_baseline red owned code, setup baseline docs, or stage proving map rows change.",
+      "breakpoint_scope": "S-00A setup_baseline",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "vocab/sentinel baseline honesty",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "setup baseline handles noisier prior hints and multiple explicit sentinels in deterministic medium compiled-context pressure"
+    },
+    {
+      "check_id": "s00a_setup_baseline_breakpoint_suite_meta_floor",
+      "system_id": "s00a_setup_baseline_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-00A breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s00b_static_evidence_breakpoint_suite_tests",
+      "system_id": "s00b_static_evidence_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s00_substage_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-00B static_evidence red owned code, static evidence docs, fixture surfaces, or stage proving map rows change.",
+      "breakpoint_scope": "S-00B static_evidence",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "callable/static-string inventory richness",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "static evidence handles medium compiled callable pressure, capped inventory, richer strings, and absent-Ghidra ambiguity"
+    },
+    {
+      "check_id": "s00b_static_evidence_breakpoint_suite_meta_floor",
+      "system_id": "s00b_static_evidence_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-00B breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s00c_admission_handoff_breakpoint_suite_tests",
+      "system_id": "s00c_admission_handoff_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s00_substage_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-00C admission_handoff red owned code, packet builder dependency, admission docs, fixture surfaces, or stage proving map rows change.",
+      "breakpoint_scope": "S-00C admission_handoff",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "packet admission/cap/defer honesty",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "admission handoff preserves bounded target admission and reviewable deferred static evidence under medium compiled pressure"
+    },
+    {
+      "check_id": "s00c_admission_handoff_breakpoint_suite_meta_floor",
+      "system_id": "s00c_admission_handoff_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-00C breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s02a_probe_ordering_breakpoint_suite_tests",
+      "system_id": "s02a_probe_ordering_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s02a_probe_ordering_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-02A probe_ordering code, curriculum ordering, S-02 docs, fixture surfaces, or stage proving map rows change.",
+      "breakpoint_scope": "S-02A probe_ordering",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "ordering quality",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-02A can produce a useful ordered probe plan under medium naming pressure"
+    },
+    {
+      "check_id": "s02a_probe_ordering_breakpoint_suite_meta_floor",
+      "system_id": "s02a_probe_ordering_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02A breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s02b_invocation_execution_breakpoint_suite_tests",
+      "system_id": "s02b_invocation_execution_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s02b_invocation_execution_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-02B invocation_execution code, probe-loop raw observation handling, S-02 docs, fixture surfaces, or stage proving map rows change.",
+      "breakpoint_scope": "S-02B invocation_execution",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "raw observation integrity",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-02B preserves raw observations under medium compiled invocation pressure"
+    },
+    {
+      "check_id": "s02b_invocation_execution_breakpoint_suite_meta_floor",
+      "system_id": "s02b_invocation_execution_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02B breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s02a_s02b_ordering_execution_seam_breakpoint_suite_tests",
+      "system_id": "s02a_s02b_ordering_execution_seam_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s02a_s02b_seam_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-02A ordering, S-02B execution intake, S-02 seam docs, fixture surfaces, or stage proving map rows change.",
+      "breakpoint_scope": "S-02A -> S-02B",
+      "ownership_type": "seam-owned",
+      "breakpoint_family": "ordering-to-execution preservation",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-02B receives the S-02A ordered plan and preserves execution order under medium compiled seam pressure"
+    },
+    {
+      "check_id": "s02a_s02b_ordering_execution_seam_breakpoint_suite_meta_floor",
+      "system_id": "s02a_s02b_ordering_execution_seam_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02A -> S-02B seam breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s02b_s02c_raw_observation_durability_seam_breakpoint_suite_tests",
+      "system_id": "s02b_s02c_raw_observation_durability_seam_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s02b_s02c_seam_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-02B execution append, S-02C evidence capture read/write, S-02 seam docs, fixture surfaces, or stage proving map rows change.",
+      "breakpoint_scope": "S-02B -> S-02C",
+      "ownership_type": "seam-owned",
+      "breakpoint_family": "raw-observation durability",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-02B raw observations survive the live S-02C durability handoff under medium compiled pressure"
+    },
+    {
+      "check_id": "s02b_s02c_raw_observation_durability_seam_breakpoint_suite_meta_floor",
+      "system_id": "s02b_s02c_raw_observation_durability_seam_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02B -> S-02C seam breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s02c_s03_probe_evidence_consumability_breakpoint_suite_tests",
+      "system_id": "s02c_s03_probe_evidence_consumability_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s02c_s03_seam_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When S-02C durable evidence, S-03 reconciliation evidence loading, S-02/S-03 seam docs, or stage proving map rows change.",
+      "breakpoint_scope": "S-02C -> S-03",
+      "ownership_type": "seam-owned",
+      "breakpoint_family": "probe evidence consumability",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-03 consumes S-02C durable probe evidence boundaries under medium focused seam pressure"
+    },
+    {
+      "check_id": "s02c_s03_probe_evidence_consumability_breakpoint_suite_meta_floor",
+      "system_id": "s02c_s03_probe_evidence_consumability_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02C -> S-03 seam breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s02b_s02c_s03_bottom_up_evidence_window_breakpoint_suite_tests",
+      "system_id": "s02b_s02c_s03_bottom_up_evidence_window_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s02b_s02c_s03_bottom_up_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-02B execution, S-02C evidence capture, S-03 reconciliation evidence loading, S-02 bottom-up docs, fixture surfaces, or stage proving map rows change.",
+      "breakpoint_scope": "S-02B -> S-02C -> S-03",
+      "ownership_type": "bottom-up window",
+      "breakpoint_family": "raw runtime evidence becomes reconciliation input",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-02B raw observations pass through S-02C durable capture into S-03 reconciliation under medium focused bottom-up pressure"
+    },
+    {
+      "check_id": "s02b_s02c_s03_bottom_up_evidence_window_breakpoint_suite_meta_floor",
+      "system_id": "s02b_s02c_s03_bottom_up_evidence_window_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02B -> S-02C -> S-03 bottom-up breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s02_remaining_tier2_grounding_breakpoint_suite_tests",
+      "system_id": "s02_remaining_tier2_grounding_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s02_remaining_tier2_grounding_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 120,
+      "when_required": "When remaining S-02 Tier 2 stage, seam, bottom-up, fixture, inventory, registry, or proving-map rows change.",
+      "breakpoint_scope": "S-02 remaining Tier 2 targets",
+      "ownership_type": "mixed stage/seam/bottom-up",
+      "breakpoint_family": "remaining S-02 Tier 2 grounding",
+      "current_tier": "partial Tier 2 with blocked_at_tier2 rows",
+      "target_tier": "Tier 2",
+      "claim_ceiling": "Family-specific remaining S-02 Tier 2 evidence only; blocked_at_tier2 rows are not promoted"
+    },
+    {
+      "check_id": "s02_remaining_tier2_grounding_breakpoint_suite_meta_floor",
+      "system_id": "s02_remaining_tier2_grounding_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When remaining S-02 Tier 2 grounding registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s02b_argument_construction_breakpoint_suite_tests",
+      "system_id": "s02b_argument_construction_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s02b_invocation_execution_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-02B argument construction, generic fallback args, S-02 docs, fixture surfaces, or stage proving map rows change.",
+      "breakpoint_scope": "S-02B invocation_execution",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "argument construction",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-02B constructs usable typed arguments for medium-pressure simple exports"
+    },
+    {
+      "check_id": "s02b_argument_construction_breakpoint_suite_meta_floor",
+      "system_id": "s02b_argument_construction_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02B argument-construction breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s02b_functional_precondition_breakpoint_suite_tests",
+      "system_id": "s02b_functional_precondition_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s02b_invocation_execution_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-02B functional precondition handling, S-02 docs, fixture surfaces, or stage proving map rows change.",
+      "breakpoint_scope": "S-02B invocation_execution",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "functional precondition handling",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-02B records blocked calls without pretending final semantics are known"
+    },
+    {
+      "check_id": "s02b_functional_precondition_breakpoint_suite_meta_floor",
+      "system_id": "s02b_functional_precondition_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02B functional-precondition breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s02c_evidence_capture_breakpoint_suite_tests",
+      "system_id": "s02c_evidence_capture_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s02c_evidence_capture_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When S-02C evidence_capture code, probe-log snapshot handling, S-02 docs, or stage proving map rows change.",
+      "breakpoint_scope": "S-02C evidence_capture",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "probe-log durability",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-02C persists multiple raw observation packets under medium durability pressure without loss or semantic rewriting"
+    },
+    {
+      "check_id": "s02c_evidence_capture_breakpoint_suite_meta_floor",
+      "system_id": "s02c_evidence_capture_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02C breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s02c_finding_status_persistence_breakpoint_suite_tests",
+      "system_id": "s02c_finding_status_persistence_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s02c_evidence_capture_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When S-02C finding-status persistence, S-02 docs, or stage proving map rows change.",
+      "breakpoint_scope": "S-02C evidence_capture",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "finding status persistence",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-02C preserves observed, blocked, ambiguous, and unresolved finding-status distinctions under medium pressure"
+    },
+    {
+      "check_id": "s02c_finding_status_persistence_breakpoint_suite_meta_floor",
+      "system_id": "s02c_finding_status_persistence_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-02C finding-status breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s05b_verification_replay_breakpoint_suite_tests",
+      "system_id": "s05b_verification_replay_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05b_verification_replay_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-05B verification replay code, direct replay truth fixture, S-05 docs, or stage proving map rows change.",
+      "breakpoint_scope": "S-05B verification_replay",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "direct replay truth",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-05B distinguishes replayed truth from inherited working-call confidence under deterministic compiled replay pressure"
+    },
+    {
+      "check_id": "s05b_verification_replay_breakpoint_suite_meta_floor",
+      "system_id": "s05b_verification_replay_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-05B verification replay breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s05b_weak_positive_breakpoint_suite_tests",
+      "system_id": "s05b_weak_positive_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05b_weak_positive_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-05B verification replay code, weak-positive fixture, S-05 docs, or stage proving map rows change.",
+      "breakpoint_scope": "S-05B verification_replay",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "weak-positive non-promotion",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-05B keeps weak-positive replay outcomes separate from verified evidence under deterministic medium replay pressure"
+    },
+    {
+      "check_id": "s05b_weak_positive_breakpoint_suite_meta_floor",
+      "system_id": "s05b_weak_positive_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-05B weak-positive breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s05a_schema_provenance_breakpoint_suite_tests",
+      "system_id": "s05a_schema_provenance_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05a_schema_provenance_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When S-05A schema backfill code, S-05 docs, or stage proving map rows change.",
+      "breakpoint_scope": "S-05A schema_backfill",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "schema provenance",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-05A records schema-backfill provenance under medium evidence pressure without proof laundering"
+    },
+    {
+      "check_id": "s05a_schema_provenance_breakpoint_suite_meta_floor",
+      "system_id": "s05a_schema_provenance_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-05A schema provenance breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s05c_verified_read_extraction_breakpoint_suite_tests",
+      "system_id": "s05c_verified_read_extraction_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05c_verified_read_extraction_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When S-05C read-to-write chaining code, S-05 docs, or stage proving map rows change.",
+      "breakpoint_scope": "S-05C read_to_write_chaining",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "verified-read extraction",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-05C extracts write-retry values only from verified read evidence under medium MC-5 pressure"
+    },
+    {
+      "check_id": "s05c_verified_read_extraction_breakpoint_suite_meta_floor",
+      "system_id": "s05c_verified_read_extraction_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-05C verified-read breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s05b_s05c_verified_to_chaining_seam_breakpoint_suite_tests",
+      "system_id": "s05b_s05c_verified_to_chaining_seam_breakpoint_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05b_s05c_verified_to_chaining_seam_breakpoint_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 90,
+      "when_required": "When S-05B verification replay, S-05C read-to-write chaining, S-05 seam docs, fixture surfaces, or stage proving map rows change.",
+      "breakpoint_scope": "S-05B -> S-05C",
+      "ownership_type": "seam-owned",
+      "breakpoint_family": "verified-to-chaining boundary",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-05C chains only from S-05B-verified read evidence under medium seam pressure"
+    },
+    {
+      "check_id": "s05b_s05c_verified_to_chaining_seam_breakpoint_suite_meta_floor",
+      "system_id": "s05b_s05c_verified_to_chaining_seam_breakpoint_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-05B -> S-05C seam breakpoint registry coverage or stage proving map routing changes."
+    },
+    {
+      "check_id": "s05_full_family_tier2_baseline_suite_tests",
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05_full_family_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 120,
+      "when_required": "When S-05 full-family proving baseline fixture, docs, registry, or stage proving rows change.",
+      "breakpoint_scope": "S-05 full family baseline",
+      "ownership_type": "mixed stage/seam/bottom-up",
+      "breakpoint_family": "full S-05 Tier 2 baseline",
+      "current_tier": "mixed Tier 2 with blocked_at_tier2 and deferred rows",
+      "target_tier": "Tier 2",
+      "claim_ceiling": "Family-specific S-05 Tier 2 evidence only; blocked and deferred rows are not promoted"
+    },
+    {
+      "check_id": "s05a_remaining_schema_boundaries_breakpoint_suite_tests",
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05_full_family_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 120,
+      "when_required": "When S-05A schema-boundary rows or full-family baseline fixture changes.",
+      "breakpoint_scope": "S-05A schema_backfill",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "prose-as-proof prevention; partial-backfill honesty; schema compatibility preservation",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-05A preserves prose, partial-backfill, and compatibility boundaries under medium schema pressure"
+    },
+    {
+      "check_id": "s05b_remaining_replay_patch_baseline_suite_tests",
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05_full_family_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 120,
+      "when_required": "When S-05B finding-patch or partial-coverage baseline rows change.",
+      "breakpoint_scope": "S-05B verification_replay",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "finding-patch honesty; partial verification coverage",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-05B preserves replay patch provenance and partial coverage boundaries under deterministic medium replay pressure"
+    },
+    {
+      "check_id": "s05b_state_effect_blocked_tier2_suite_tests",
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05_full_family_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 120,
+      "when_required": "When S-05B state-effect verification baseline rows change.",
+      "breakpoint_scope": "S-05B verification_replay",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "state-effect verification",
+      "current_tier": "blocked_at_tier2",
+      "target_tier": "Tier 2",
+      "claim_ceiling": "No Tier 2 claim; same-session state-effect replay harness is not trustworthy enough yet"
+    },
+    {
+      "check_id": "s05b_bridge_degradation_blocked_tier2_suite_tests",
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05_full_family_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 120,
+      "when_required": "When S-05B bridge/degradation classification baseline rows change.",
+      "breakpoint_scope": "S-05B verification_replay",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "bridge/degradation classification",
+      "current_tier": "blocked_at_tier2",
+      "target_tier": "Tier 2",
+      "claim_ceiling": "No Tier 2 claim; deterministic infra-versus-product failure harness is absent"
+    },
+    {
+      "check_id": "s05c_remaining_mc5_decision_baseline_suite_tests",
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05_full_family_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 120,
+      "when_required": "When S-05C decision durability, dependency honesty, or unresolved deferral baseline rows change.",
+      "breakpoint_scope": "S-05C read_to_write_chaining",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "read-to-write dependency honesty; MC-5 decision durability; unresolved deferral",
+      "current_tier": "Tier 2",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "S-05C persists bounded MC-5 dependency decisions and unresolved deferral under medium harness pressure"
+    },
+    {
+      "check_id": "s05c_retry_containment_blocked_tier2_suite_tests",
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05_full_family_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 120,
+      "when_required": "When S-05C retry containment baseline rows change.",
+      "breakpoint_scope": "S-05C read_to_write_chaining",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "retry containment",
+      "current_tier": "blocked_at_tier2",
+      "target_tier": "Tier 2",
+      "claim_ceiling": "No Tier 2 claim; medium harness exposes retry widening to distractor writes"
+    },
+    {
+      "check_id": "s05c_weak_id_overtrust_deferred_suite_tests",
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05_full_family_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 120,
+      "when_required": "When S-05C weak-ID/value overtrust baseline rows change.",
+      "breakpoint_scope": "S-05C read_to_write_chaining",
+      "ownership_type": "stage-owned",
+      "breakpoint_family": "weak-ID/value overtrust",
+      "current_tier": "deferred_as_tier3_shaped",
+      "target_tier": "Tier 3",
+      "claim_ceiling": "No Tier 2 claim; meaningful weak-ID/value overtrust pressure is Tier 3-shaped"
+    },
+    {
+      "check_id": "s05_remaining_seams_baseline_suite_tests",
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05_full_family_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 120,
+      "when_required": "When remaining S-05 seam baseline rows change.",
+      "breakpoint_scope": "S-04 -> S-05A; S-05A -> S-05B; S-05C -> S-06",
+      "ownership_type": "seam-owned",
+      "breakpoint_family": "synthesis-to-backfill provenance; enrichment-to-verification boundary; chaining-to-gaps deferral",
+      "current_tier": "partial Tier 2 with blocked_at_tier2 row",
+      "target_tier": "Tier 2",
+      "claim_ceiling": "S-04/S-05A and S-05A/S-05B seams are Tier 2; S-05C/S-06 remains blocked without explicit S-05C consumer surface"
+    },
+    {
+      "check_id": "s05_bottom_up_windows_baseline_suite_tests",
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_s05_full_family_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 120,
+      "when_required": "When S-05 bottom-up baseline rows change.",
+      "breakpoint_scope": "S-05 bottom-up windows",
+      "ownership_type": "bottom-up window",
+      "breakpoint_family": "S-05A -> S-05B -> S-05C; S-04 -> S-05A -> S-05B; S-05B -> S-05C -> S-06",
+      "current_tier": "partial Tier 2 with blocked_at_tier2 row",
+      "target_tier": "Tier 2",
+      "claim_ceiling": "S-05A/B/C and S-04/A/B short windows are Tier 2; S-05B/C/S-06 remains blocked by S-05C -> S-06 handoff gap"
+    },
+    {
+      "check_id": "s05_full_family_tier2_baseline_suite_meta_floor",
+      "system_id": "s05_full_family_tier2_baseline_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When S-05 full-family baseline registry coverage or proving-map routing changes."
+    },
+    {
+      "check_id": "pipeline_full_tier2_baseline_suite_tests",
+      "system_id": "pipeline_full_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_pipeline_full_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 60,
+      "when_required": "When full-pipeline baseline row lock, inventory docs, proving map, snapshot, or baseline suite changes.",
+      "breakpoint_scope": "S-00 -> S-07 full pipeline baseline",
+      "ownership_type": "mixed stage/seam/coordinator/bottom-up",
+      "breakpoint_family": "full pipeline Tier 2 baseline classification",
+      "current_tier": "mixed Tier 2 with failed_tier2, blocked_at_tier2, deferred, and unimplemented rows",
+      "target_tier": "Tier 2",
+      "claim_ceiling": "Full-pipeline row classification only; failed, blocked, deferred, and unimplemented rows are not promoted"
+    },
+    {
+      "check_id": "pipeline_failed_rows_baseline_suite_tests",
+      "system_id": "pipeline_full_tier2_baseline_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_pipeline_full_tier2_baseline_suite.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 60,
+      "when_required": "When failed or blocked full-pipeline baseline rows change.",
+      "breakpoint_scope": "S-03 and S-07 failed baseline rows",
+      "ownership_type": "mixed stage-owned",
+      "breakpoint_family": "failed_tier2 preservation",
+      "current_tier": "failed_tier2",
+      "target_tier": "Tier 2",
+      "claim_ceiling": "S-03 contradiction and S-07 close-path failures are preserved as baseline evidence"
+    },
+    {
+      "check_id": "pipeline_full_tier2_baseline_suite_meta_floor",
+      "system_id": "pipeline_full_tier2_baseline_suite",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When full-pipeline baseline registry coverage or proving-map routing changes."
+    },
+    {
+      "check_id": "enterprise_survivability_suite_tests",
+      "system_id": "enterprise_survivability_suite",
+      "category": "stage_breakpoint",
+      "command": "python -m pytest tests/test_enterprise_survivability_suite.py tests/test_enterprise_survivability_compiled_fixture_ladder.py tests/test_nightly_preflight.py tests/test_spectrum_compiled_ingest.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When enterprise survivability contract, hard-family measurement terminalization, runner packet handling, or survivability strategy docs change.",
+      "breakpoint_scope": "enterprise survivability",
+      "ownership_type": "suite-family",
+      "breakpoint_family": "fail-closed diagnosability",
+      "current_tier": "Tier 3 runner-equivalent compiled fixture ladder plus lane identity comparability guard and analyzer-authority classifier",
+      "target_tier": "Tier 5 hard-family readiness",
+      "claim_ceiling": "Enterprise survivability runner-integrated and runner-equivalent compiled fixture boundaries only; no hard-family semantic maturity or stage breakpoint promotion"
+    },
+    {
+      "check_id": "enterprise_survivability_suite_meta_floor",
+      "system_id": "enterprise_survivability_suite",
+      "category": "meta_check",
+      "command": "python -m pytest tests/test_stage_sticky_docs.py tests/test_change_admission_check.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When enterprise survivability registry coverage, proving-map routing, or strategy doc wiring changes."
+    },
+    {
+      "check_id": "hard_family_measurement_fabric_meta_floor",
+      "system_id": "hard_family_measurement_fabric",
+      "category": "meta_check",
+      "command": "python -m pytest tests/test_stage_sticky_docs.py tests/test_change_admission_check.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When hard-family measurement-fabric registry coverage, signal routing, proving-map routing, or strategy doc wiring changes."
+    },
+    {
+      "check_id": "hard_family_measurement_control_plane_tests",
+      "system_id": "hard_family_measurement_fabric",
+      "category": "meta_check",
+      "command": "python -m pytest tests/test_measurement_control_plane.py tests/test_spectrum_compiled_ingest.py tests/test_stage_sticky_docs.py tests/test_change_admission_check.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When hard-family measurement control-plane traffic-light admission, bridge lease policy, or strategy doc wiring changes."
+    },
+    {
+      "check_id": "compiled_suite_green_contract_tests",
+      "system_id": "compiled_suite_green_contract",
+      "category": "meta_check",
+      "command": "python -m pytest tests/test_stage_sticky_docs.py tests/test_change_admission_check.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When compiled-suite green taxonomy, product-green prerequisites, baseline relabeling, or strategy doc wiring changes."
+    },
+    {
+      "check_id": "local_product_suite_entrypoint_tests",
+      "system_id": "local_product_suite_entrypoint",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_runtime_contract.py tests/test_proving_lane_canary.py tests/test_local_product_suite_entrypoint.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When the local product-suite runtime wrapper, canonical runtime docs, or wrapper packet contract changes."
+    },
+    {
+      "check_id": "local_product_suite_entrypoint_meta_floor",
+      "system_id": "local_product_suite_entrypoint",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When local product-suite entrypoint registry coverage or operator-path routing changes."
+    },
+    {
+      "check_id": "stage_live_truth_governance_tests",
+      "system_id": "stage_live_truth_governance",
+      "category": "meta_check",
+      "command": "python -m pytest tests/test_stage_sticky_docs.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 20,
+      "when_required": "When live stage sticky docs, TRACE.md, FAMILY-BLOCKERS.md, stage-split doctrine, campaign templates, or migration audit role maps change."
+    },
+    {
+      "check_id": "session_routes_packet_tests",
+      "system_id": "session_routes",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_routes_session_snapshot_handoff_packet.py tests/test_routes_session_report.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 20,
+      "when_required": "When session snapshot routes or route-visible handoff packet surfaces change."
+    },
+    {
+      "check_id": "session_routes_meta_floor",
+      "system_id": "session_routes",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When session route paths are changed and need registry-backed blast-radius classification."
+    },
+    {
+      "check_id": "session_capture_artifact_tests",
+      "system_id": "session_capture_artifacts",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_capture_manifests.py tests/test_capture_compact_context.py tests/test_routes_session_snapshot_handoff_packet.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 20,
+      "when_required": "When save-session, blob-only capture, collector, or checkpoint artifact materialization changes."
+    },
+    {
+      "check_id": "session_capture_meta_floor",
+      "system_id": "session_capture_artifacts",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When session capture artifact changes need registry-backed blast-radius classification."
+    },
+    {
+      "check_id": "worker_persistence_tests",
+      "system_id": "worker_persistence",
+      "category": "durable_contract",
+      "command": "python -m pytest tests/test_worker_invocables_persistence.py -q",
+      "blocking": true,
+      "expected_runtime_seconds": 15,
+      "when_required": "When worker persistence or invocable artifact writeback changes."
+    },
+    {
+      "check_id": "worker_persistence_meta_floor",
+      "system_id": "worker_persistence",
+      "category": "meta_check",
+      "command": "python scripts/regression/run_change_admission_floor.py --output-root .tmp/change-admission-floor-local --mode local",
+      "blocking": true,
+      "expected_runtime_seconds": 45,
+      "when_required": "When worker persistence changes need cheap blast-radius classification."
+    },
+    {
+      "check_id": "agent_governance_audit",
+      "system_id": "agent_governance",
+      "category": "meta_check",
+      "command": "python scripts/audit_governance.py",
+      "blocking": true,
+      "expected_runtime_seconds": 30,
+      "when_required": "When AGENTS.md, specialist doctrine, or agentic ecosystem governance surfaces change."
+    },
+    {
+      "check_id": "change_admission_packet_template_review",
+      "system_id": "change_admission_governance",
+      "category": "allowed_to_churn",
+      "command": "manual review against docs/architecture/testing_strategy/CHANGE-ADMISSION-PACKET-TEMPLATE.md",
+      "blocking": false,
+      "expected_runtime_seconds": 0,
+      "when_required": "When closeout packet wording or fields evolve."
+    }
+  ]
+}

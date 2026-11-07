@@ -1,0 +1,174 @@
+{
+  "schema_version": "1.0.0",
+  "suite_id": "spectrum_transaction_release_settlement_suite",
+  "case_id": "medium-01",
+  "proof_class": "compiled_local_binary",
+  "entry_surface": "upload",
+  "compiled_fixture_root": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite",
+  "compiled_targets": [
+    "spectrum_session_bootstrap.dll",
+    "spectrum_reservation_stage.dll",
+    "spectrum_dispatch_preview.dll",
+    "spectrum_fee_quote.dll",
+    "spectrum_settlement_reconcile.dll"
+  ],
+  "expected_active_modules": [
+    "session_bootstrap",
+    "reservation_stage",
+    "dispatch_preview",
+    "fee_quote",
+    "settlement_reconcile"
+  ],
+  "expected_execution_flow": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "dispatch_preview.prepare_release_preview",
+    "fee_quote.stage_release_fee_quote",
+    "settlement_reconcile.verify_reserved_release"
+  ],
+  "expected_symbol_flow": [
+    "SP_OpenOperatorSession",
+    "SP_IssueReleaseHold",
+    "SP_PrepareReleasePreview",
+    "SP_StageReleaseFeeQuote",
+    "SP_VerifyReservedRelease"
+  ],
+  "discovered_symbol_flow": [
+    "SP_OpenOperatorSession",
+    "SP_IssueReleaseHold",
+    "SP_PrepareReleasePreview",
+    "SP_StageReleaseFeeQuote",
+    "SP_VerifyReservedRelease"
+  ],
+  "semantic_symbol_flow": [
+    "SP_OpenOperatorSession",
+    "SP_IssueReleaseHold",
+    "SP_PrepareReleasePreview",
+    "SP_StageReleaseFeeQuote",
+    "SP_VerifyReservedRelease"
+  ],
+  "binary_ingest_proof_succeeded": true,
+  "binary_embodiment_gap": [],
+  "semantic_checkpoint_alignment_succeeded": true,
+  "semantic_checkpoint_gap": [],
+  "per_run": [
+    {
+      "dll_name": "spectrum_session_bootstrap.dll",
+      "job_id": "2753a715",
+      "entry_surface": "upload",
+      "binary_hash": "cc2c00f32e32d71f31f3f192fb4b9aed000918a0cf32232ed50752ddad254b46",
+      "expected_exports": [
+        "SP_OpenOperatorSession"
+      ],
+      "discovered_invocables": [
+        "SP_OpenOperatorSession",
+        "entry"
+      ],
+      "additional_discovered_invocables": [],
+      "export_contract_match": true,
+      "semantic_checkpoint_statuses": {
+        "SP_OpenOperatorSession": "verified_success"
+      },
+      "semantic_checkpoint_match": true,
+      "session_artifacts_present": true
+    },
+    {
+      "dll_name": "spectrum_reservation_stage.dll",
+      "job_id": "8206ccb6",
+      "entry_surface": "upload",
+      "binary_hash": "ce27b2c37755acc75bb030d16b0338aa91a7f609da7dc1975efae9d31d5a931b",
+      "expected_exports": [
+        "SP_IssueReleaseHold"
+      ],
+      "discovered_invocables": [
+        "SP_IssueReleaseHold",
+        "entry"
+      ],
+      "additional_discovered_invocables": [],
+      "export_contract_match": true,
+      "semantic_checkpoint_statuses": {
+        "SP_IssueReleaseHold": "verified_success"
+      },
+      "semantic_checkpoint_match": true,
+      "session_artifacts_present": true
+    },
+    {
+      "dll_name": "spectrum_dispatch_preview.dll",
+      "job_id": "cf4dd19e",
+      "entry_surface": "upload",
+      "binary_hash": "9ca5a354673805eeeafc76a342ff8b15cba10027003aee0e7db7baec98a95dfe",
+      "expected_exports": [
+        "SP_PrepareReleasePreview"
+      ],
+      "discovered_invocables": [
+        "SP_PrepareReleasePreview",
+        "entry"
+      ],
+      "additional_discovered_invocables": [],
+      "export_contract_match": true,
+      "semantic_checkpoint_statuses": {
+        "SP_PrepareReleasePreview": "verified_success"
+      },
+      "semantic_checkpoint_match": true,
+      "session_artifacts_present": true
+    },
+    {
+      "dll_name": "spectrum_fee_quote.dll",
+      "job_id": "05dff57b",
+      "entry_surface": "upload",
+      "binary_hash": "72bfcce3be88c5eb8daa4efe001bf52a37c1550f403f3a476a89bcd27e011a4b",
+      "expected_exports": [
+        "SP_StageReleaseFeeQuote"
+      ],
+      "discovered_invocables": [
+        "SP_StageReleaseFeeQuote",
+        "entry"
+      ],
+      "additional_discovered_invocables": [],
+      "export_contract_match": true,
+      "semantic_checkpoint_statuses": {
+        "SP_StageReleaseFeeQuote": "verified_success"
+      },
+      "semantic_checkpoint_match": true,
+      "session_artifacts_present": true
+    },
+    {
+      "dll_name": "spectrum_settlement_reconcile.dll",
+      "job_id": "a2fc5472",
+      "entry_surface": "upload",
+      "binary_hash": "5f0b2b4fd8fb451196d05c1076fde3607a27ea33d05fcfc49e1b981fd2d75872",
+      "expected_exports": [
+        "SP_VerifyReservedRelease"
+      ],
+      "discovered_invocables": [
+        "SP_ConfirmAttestedRelease",
+        "SP_InvalidateStaleAttestedRelease",
+        "SP_SelectTrustedBranch",
+        "SP_VerifyReservedRelease",
+        "entry"
+      ],
+      "additional_discovered_invocables": [
+        "SP_ConfirmAttestedRelease",
+        "SP_InvalidateStaleAttestedRelease",
+        "SP_SelectTrustedBranch"
+      ],
+      "export_contract_match": true,
+      "semantic_checkpoint_statuses": {
+        "SP_VerifyReservedRelease": "verified_success"
+      },
+      "semantic_checkpoint_match": true,
+      "session_artifacts_present": true
+    }
+  ],
+  "comparison_note": "compiled binary ingest proof succeeded and medium-01 semantic checkpoints aligned",
+  "generated_at": "2026-04-10T08:59:55",
+  "output_dir": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\medium-01\\20260410-084431",
+  "authored_truth_manifest": ".\\docs\\architecture\\engineScaling\\engineScaling_SpectrumDesignSuite\\SpectrumDesignSuite_Source\\transaction_release_settlement_suite\\truth_manifest.json",
+  "compiled_truth_manifest": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\truth_manifest.json",
+  "package_manifest": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\package_manifest.json",
+  "product_validity": "compiled_local_binary",
+  "northstar_classification": "architecture-proof",
+  "spectrum_source_classification": "architecture-proof",
+  "spectrum_compiled_classification": "product-valid",
+  "authored_suite_id": "spectrum_transaction_release_settlement_suite"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "RB-2026-04-01-001",
+  "title": "Upload workflow prerequisite graph misclassifies open/session gates and drops reservation producer lineage",
+  "class": "contract",
+  "layer": "workflow upload prerequisite classification and replay alignment",
+  "symptom": "Upload-mode workflow reruns now replay WF_BindCustomer correctly with CUST-001 and no longer admit entry or classify WF_OpenFulfillment as init, but the lane still skips WF_CreateReservation before WF_OpenFulfillment and replays the open step with a customer string instead of a reservation ID.",
+  "smallest_reproducer": "upload -> analyze -> explore focused on WF_GetWorkflowNonce/WF_ConfirmWorkflow/WF_CommitShipment for contoso_workflow_live.dll on job 3167281b",
+  "trust_impact": "Workflow targeted reruns are now trustworthy enough to isolate the next blocker, but workflow/reporting closure is still limited by upload-mode reservation producer lineage not reaching prerequisite replay.",
+  "allowed_next_actions": [
+    "tighten build_prerequisite_dag to exclude pseudo functions from roles and prerequisites",
+    "stop treating open-style lifecycle functions as init in the DAG classifier",
+    "add function-name fallback for bind-customer prerequisite arg alignment when metadata is generic",
+    "inspect fixture overlay / discovery typing for lost reservation output buffers on upload runs",
+    "add bounded reservation-producing prerequisite inference for reservation-bearing open/fulfillment calls when upload discovery remains generic",
+    "promote enriched semantic parameter metadata into focused rerun prerequisite replay if raw analyze metadata is too weak"
+  ],
+  "disallowed_next_actions": [
+    "full 10-DLL rerun",
+    "reporting rerun before the classifier fix lands",
+    "new architecture subsystem work",
+    "broad planner changes"
+  ],
+  "exit_criteria": [
+    "WF_OpenFulfillment is no longer classified as init in prerequisite_state_machine.json",
+    "entry is absent from workflow prerequisite lists",
+    "WF_BindCustomer prerequisite replay uses customer-like input instead of param_1=1",
+    "workflow rerun proves a narrower downstream blocker: reservation producer lineage / reservation-ID routing into WF_OpenFulfillment"
+  ],
+  "next_move": "fix"
+}

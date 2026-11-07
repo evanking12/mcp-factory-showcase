@@ -1,0 +1,14 @@
+{
+  "CS_GetVersion": {
+    "name": "CS_GetVersion",
+    "parameters": []
+  },
+  "CS_ProcessPayment": {
+    "name": "CS_ProcessPayment",
+    "parameters": [
+      {
+        "name": "customer_id"
+      }
+    ]
+  }
+}

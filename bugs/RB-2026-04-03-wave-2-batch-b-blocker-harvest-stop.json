@@ -1,0 +1,29 @@
+{
+  "id": "RB-2026-04-03-wave-2-batch-b-blocker-harvest-stop",
+  "title": "Blocker-harvest stopped at wave-2-batch-b",
+  "class": "plateau",
+  "layer": "campaign_orchestration",
+  "symptom": "Wave wave-2-batch-b ended with verdict 'stop and roadblock'",
+  "smallest_reproducer": {
+    "wave_id": "wave-2-batch-b",
+    "campaign_id": "8e9a12f9",
+    "package_id": "contoso-business-suite",
+    "lane_gate_status": "trusted"
+  },
+  "trust_impact": "Campaign interpretation is not trustworthy enough to continue automatically.",
+  "allowed_next_actions": [
+    "harden lane trust and measurement",
+    "refine package curation",
+    "rerun the blocked wave only after fixing the stop cause"
+  ],
+  "disallowed_next_actions": [
+    "continue to later waves without fixing trust or measurement",
+    "treat the blocker as an architecture gap without trustworthy lane evidence"
+  ],
+  "exit_criteria": [
+    "lane gate not blocked",
+    "runtime path trust mismatches resolved",
+    "ledger row presence restored if missing"
+  ],
+  "next_move": "stop and roadblock"
+}

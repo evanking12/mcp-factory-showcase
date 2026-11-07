@@ -1,0 +1,54 @@
+{
+  "artifact_type": "atlas-expected-observed-report.json",
+  "contract_version": "1.0.0",
+  "slice_id": "atlas:first_slice_mutual_pressure",
+  "module_family": [
+    "batch",
+    "identity",
+    "ledger",
+    "reconcile"
+  ],
+  "expected_blockers": [
+    "mutual_pressure_blocker"
+  ],
+  "expected_producers": [
+    "batch.open_batch",
+    "batch.open_batch",
+    "identity.bind_party",
+    "ledger.stage_transfer"
+  ],
+  "expected_consumers": [
+    "identity.bind_party",
+    "ledger.stage_transfer",
+    "reconcile.confirm_alignment",
+    "reconcile.confirm_alignment"
+  ],
+  "expected_shared_state": [
+    "batch_window"
+  ],
+  "expected_family_groups": [
+    "mutual_pressure_blocker"
+  ],
+  "expected_confirmation_sites": [
+    "reconcile.confirm_alignment"
+  ],
+  "expected_lineage_branches": [],
+  "expected_accepted_branches": [],
+  "observed_blockers": [],
+  "observed_producers": [],
+  "observed_consumers": [],
+  "observed_shared_state": [],
+  "observed_family_groups": [],
+  "observed_confirmation_sites": [],
+  "observed_lineage_branches": [],
+  "observed_accepted_branches": [],
+  "mismatches": [],
+  "overclaims": [],
+  "underclaims": [],
+  "misgroups": [],
+  "deferred": [],
+  "notes": [
+    "expected_authored_from_source_truth",
+    "mutual_pressure_expected"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "RB-2026-04-05-batch-b-config-nested-retry-keyerror",
+  "title": "Batch B live config rerun can fail when nested blocked-prereq retry removes the same prereq twice",
+  "class": "state",
+  "layer": "s02_probe prerequisite replay retry bookkeeping",
+  "symptom": "The Batch B rerun rooted at campaign a10d79ab failed on contoso_config.dll job 6427b1c6 with explore_error = \"'CFG_ApproveLicensedCall'\" while replaying the config prerequisite chain. The failure occurred after same-run prerequisite successes had already been recorded for CFG_BindCustomer, CFG_OpenLicensedWindow, and CFG_GetLicenseNonce, which narrowed the issue to retry bookkeeping rather than package comparability.",
+  "smallest_reproducer": "wave-2-batch-b campaign a10d79ab config child 6427b1c6 on CFG_RunCustomerSync / CFG_ApproveLicensedCall prerequisite replay with live same-run promotion active",
+  "trust_impact": "This specific rerun is not decision-bearing because the config child terminated with a deterministic pipeline error before the campaign could emit trustworthy wave artifacts.",
+  "allowed_next_actions": [
+    "patch blocked-prereq retry bookkeeping so nested resumption cannot double-delete the same prereq",
+    "add a local proof for nested blocked-prereq consumption under hint-generation advancement",
+    "restart the local API and bridge so s02_probe picks up the repaired code",
+    "rerun only wave-2-batch-b after local validation is green"
+  ],
+  "disallowed_next_actions": [
+    "analyze overlap deltas from campaign a10d79ab as if it were trustworthy",
+    "start Batch C",
+    "widen package scope",
+    "treat the config error as DLL behavior",
+    "launch another live Batch B before the retry bookkeeping fix is validated locally"
+  ],
+  "exit_criteria": [
+    "local nested blocked-prereq retry proof passes",
+    "Tier A, Tier B, and harness validation pass on the patched code",
+    "the next Batch B rerun no longer errors on CFG_ApproveLicensedCall retry bookkeeping",
+    "a new Batch B campaign emits a trustworthy wave summary or reaches a narrower non-crash blocker"
+  ],
+  "next_move": "fix"
+}

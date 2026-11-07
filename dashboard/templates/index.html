@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCP Factory Dashboard</title>
+  <link rel="stylesheet" href="/static/dashboard.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="brand">MCP Factory</div>
+      <div class="subtitle">Diagnostic operator cockpit</div>
+    </div>
+    <div class="health-row">
+      <div class="chip"><span class="dot" id="health-api"></span>API</div>
+      <div class="chip"><span class="dot" id="health-bridge"></span>Bridge</div>
+      <div class="chip"><span class="dot" id="health-model"></span>Model</div>
+      <div class="chip"><span class="dot" id="health-storage"></span>Storage</div>
+      <div class="chip"><span class="dot" id="health-lane"></span>Lane</div>
+    </div>
+  </header>
+
+  <section id="lab-banner" class="lab-banner hidden">
+    <div>
+      <div class="lab-banner-title">Lab offline or degraded</div>
+      <div id="lab-banner-detail" class="muted">The cockpit can still render, but launch and job hooks are not trustworthy until the lab recovers.</div>
+    </div>
+    <div class="lab-actions">
+      <button id="refresh-health" class="action">Refresh Health</button>
+      <button id="restart-lab" class="action primary">Restart Lab</button>
+    </div>
+  </section>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="panel">
+        <div class="panel-title">Views</div>
+        <div class="tabs">
+          <button class="tab active" data-view="triage">Active Triage</button>
+          <button class="tab" data-view="review">Completed Review</button>
+          <button class="tab" data-view="campaign">Campaign/System</button>
+        </div>
+      </section>
+
+      <details class="panel disclosure" id="lab-control-panel">
+        <summary class="disclosure-summary">
+          <span class="panel-title tight">Lab Control</span>
+          <span class="disclosure-meta">Recovery utilities</span>
+        </summary>
+        <div class="disclosure-body">
+          <div id="lab-status-copy" class="small-note">Use refresh when the lab looks stale. Use restart when API and bridge are down or launch hooks are returning 500s.</div>
+          <div class="stack small">
+            <button id="refresh-health-sidebar" class="action">Refresh Health</button>
+            <button id="restart-lab-sidebar" class="action primary">Restart Lab Services</button>
+          </div>
+        </div>
+      </details>
+
+      <section class="panel">
+        <div class="panel-title">Recent Jobs</div>
+        <input id="recent-jobs-filter" class="text-input compact-input" type="text" placeholder="Filter by component, job id, or campaign" />
+        <div id="recent-jobs" class="stack small"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">Iteration</div>
+        <select id="iteration-selector" class="text-input">
+          <option value="">Select iteration</option>
+        </select>
+        <div id="iteration-selector-copy" class="small-note">One job currently equals one iteration. Campaign-level iteration grouping is still pending richer native hooks.</div>
+      </section>
+
+      <details class="panel disclosure" id="package-intake-panel">
+        <summary class="disclosure-summary">
+          <span class="panel-title tight">Package Intake</span>
+          <span class="disclosure-meta">Temporary path-based entry</span>
+        </summary>
+        <div class="disclosure-body">
+          <div class="small-note">This still uses the current `analyze-path` hook. The long-term product entry is enterprise package intake, not one-off DLL launching.</div>
+          <label class="field-label" for="intake-shape">Intake Shape</label>
+          <select id="intake-shape" class="text-input">
+            <option value="package">Enterprise package path</option>
+            <option value="fixture">Fixture library</option>
+            <option value="dll">Legacy DLL path</option>
+          </select>
+          <label class="field-label" for="fixture-select">Fixture Library</label>
+          <select id="fixture-select" class="text-input">
+            <option value="">Select a fixture</option>
+          </select>
+          <label class="field-label" for="custom-path">Filesystem Path</label>
+          <input id="custom-path" class="text-input" type="text" placeholder="C:\path\to\enterprise-package-or-dll" />
+          <div id="package-intake-note" class="small-note">Package mode is preferred. Today it still routes through the same path-based backend hook.</div>
+          <button id="run-custom" class="action primary">Start Intake</button>
+        </div>
+      </details>
+
+      <section class="panel">
+        <div class="panel-title">Hook Readiness</div>
+        <div id="hook-readiness" class="stack small"></div>
+      </section>
+
+      <section class="panel sidebar-context">
+        <div class="panel-title">Current Context</div>
+        <div id="current-context" class="stack small"></div>
+      </section>
+
+      <section class="panel sidebar-context">
+        <div class="panel-title">Reading Order</div>
+        <div id="reading-order" class="stack small">
+          <div class="small-note">1. Start with Top Blocker and Decision Cluster.</div>
+          <div class="small-note">2. Read Decision Basis and Chain Context.</div>
+          <div class="small-note">3. Inspect Ranked Evidence, then Stage Detail if the diagnosis is still unclear.</div>
+        </div>
+      </section>
+    </aside>
+
+    <section class="content">
+      <section class="hero-grid hero-grid--top">
+        <article class="hero-card">
+          <div class="card-label">Top Blocker</div>
+          <div id="top-blocker-title" class="hero-title">Select a job</div>
+          <div id="top-blocker-meta" class="muted">The highest-priority diagnosis will appear here.</div>
+        </article>
+        <article class="hero-card">
+          <div class="card-label">Trust Delta Vs Last Good</div>
+          <div id="trust-delta" class="hero-title">n/a</div>
+          <div id="trust-delta-meta" class="muted">No job selected yet.</div>
+        </article>
+        <article class="hero-card">
+          <div class="card-label">What Changed This Iteration</div>
+          <div id="iteration-change" class="hero-title">n/a</div>
+          <div id="iteration-change-meta" class="muted">Job status and explore phase changes appear here.</div>
+        </article>
+      </section>
+
+      <section class="grid-two dense-row investigation-header">
+        <div class="stack header-left-column">
+          <article class="panel compact-panel">
+            <div class="panel-head">
+              <div class="panel-title">Chain Steps</div>
+              <span class="scope-pill">chain</span>
+            </div>
+            <div id="chain-steps" class="chain-steps"></div>
+          </article>
+
+          <article class="panel compact-panel">
+            <div class="panel-head">
+              <div class="panel-title">Decision Cluster</div>
+              <span class="scope-pill">chain</span>
+            </div>
+            <div id="decision-cluster" class="stack small">
+              <div class="decision-chip-grid">
+                <div class="decision-chip">
+                  <div class="decision-chip-label">Blast Radius</div>
+                  <div id="blast-radius-summary" class="decision-chip-value">n/a</div>
+                  <div id="blast-radius-meta" class="small-note">Affected targets and local/global trust impact appear here.</div>
+                </div>
+                <div class="decision-chip">
+                  <div class="decision-chip-label">Recommended Next Action</div>
+                  <div id="next-action" class="decision-chip-value">n/a</div>
+                  <div id="next-action-meta" class="small-note">The cockpit recommends one next move at a time.</div>
+                </div>
+              </div>
+              <div class="cause-strip">
+                <div class="cause-pill">
+                  <div class="cause-pill-label">Primary Cause</div>
+                  <div id="primary-cause" class="small-note">n/a</div>
+                </div>
+                <div class="cause-pill">
+                  <div class="cause-pill-label">Secondary Consequence</div>
+                  <div id="secondary-consequence" class="small-note">n/a</div>
+                </div>
+                <div class="cause-pill">
+                  <div class="cause-pill-label">Not Promoted</div>
+                  <div id="not-promoted" class="small-note">n/a</div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel compact-panel">
+            <div class="panel-head">
+              <div class="panel-title">Decision Basis</div>
+              <span id="alignment-status-pill" class="scope-pill">alignment pending</span>
+            </div>
+            <div id="decision-basis" class="stack small"></div>
+          </article>
+
+          <article class="panel compact-panel">
+            <div class="panel-head">
+              <div class="panel-title">Chain Context</div>
+              <span class="scope-pill">chain</span>
+            </div>
+            <div id="chain-context" class="stack small"></div>
+          </article>
+        </div>
+
+        <article class="panel compact-panel tier-surface evidence-column" data-tier="tier1">
+          <div class="panel-head">
+            <div class="panel-title">Ranked Evidence</div>
+            <span class="scope-pill">proof</span>
+          </div>
+          <div id="supporting-evidence" class="stack small"></div>
+        </article>
+      </section>
+
+      <section id="summary-row" class="grid-two">
+        <article id="iteration-summary-panel" class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Iteration Summary</div>
+            <span class="scope-pill">iteration</span>
+          </div>
+          <div id="iteration-summary" class="stack"></div>
+        </article>
+        <article id="family-blockers-panel" class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Family Blockers</div>
+            <span class="scope-pill">iteration</span>
+          </div>
+          <div id="family-blockers" class="stack"></div>
+        </article>
+      </section>
+
+      <section id="focus-row" class="grid-two">
+        <article id="investigation-focus-panel" class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Investigation Focus</div>
+            <span class="scope-pill">iteration</span>
+          </div>
+          <div id="investigation-focus" class="stack"></div>
+        </article>
+        <article id="artifact-tiers-panel" class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Artifact Tiers</div>
+            <span class="scope-pill">proof</span>
+          </div>
+          <div id="artifact-tiers" class="stack"></div>
+          <div class="subsection-title">Proof Summary</div>
+          <div id="proof-summary" class="stack small"></div>
+          <div class="subsection-title">Artifact Priority Filters</div>
+          <div class="tabs tier-tabs">
+            <button class="tab tier-filter active" data-tier="tier1">Tier 1</button>
+            <button class="tab tier-filter active" data-tier="tier2">Tier 2</button>
+            <button class="tab tier-filter active" data-tier="tier3">Tier 3</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="diagnoses-row" class="grid-one">
+        <article id="diagnoses-panel" class="panel">
+          <div class="panel-title">Ranked Diagnostics Inbox</div>
+          <div id="diagnoses" class="stack"></div>
+        </article>
+      </section>
+
+      <section id="stage-row" class="grid-two">
+        <article id="stage-detail-panel" class="panel tier-surface" data-tier="tier1">
+          <div class="panel-head">
+            <div class="panel-title">Artifact-Backed Stage Detail</div>
+            <span class="scope-pill">stage</span>
+          </div>
+          <div id="stage-detail" class="stack"></div>
+        </article>
+        <article id="investigation-sources-panel" class="panel tier-surface" data-tier="tier2">
+          <div class="panel-head">
+            <div class="panel-title">Investigation Sources</div>
+            <span class="scope-pill">trace</span>
+          </div>
+          <div id="investigation-sources" class="stack small"></div>
+        </article>
+      </section>
+
+      <section class="grid-three review-only">
+        <article class="panel tier-surface" data-tier="tier2">
+          <div class="panel-title">Run Diff</div>
+          <div id="run-diff" class="stack small"></div>
+        </article>
+        <article class="panel tier-surface" data-tier="tier2">
+          <div class="panel-title">Trust Frontier</div>
+          <div id="trust-frontier" class="stack small"></div>
+        </article>
+        <article class="panel tier-surface" data-tier="tier2">
+          <div class="panel-title">Blocker To Blast Radius</div>
+          <div id="blast-radius-detail" class="stack small"></div>
+        </article>
+      </section>
+
+      <section class="grid-two">
+        <article class="panel tier-surface" data-tier="tier2">
+          <div class="panel-title">Stage Timeline</div>
+          <div id="stage-track" class="stage-track"></div>
+        </article>
+        <article class="panel tier-surface" data-tier="tier3">
+          <div class="panel-title">Event Log</div>
+          <div id="event-log" class="event-log"></div>
+        </article>
+      </section>
+
+      <section class="panel campaign-only">
+        <div class="panel-title">Campaign/System View</div>
+        <div id="campaign-overview" class="stack"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="/static/dashboard.js"></script>
+</body>
+</html>

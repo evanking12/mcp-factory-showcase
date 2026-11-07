@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Ablation Matrix Config",
+  "description": "Defines a cross-product experiment: targets x cache_states x seeding_modes x variants. Each cell becomes one serialized run.",
+  "type": "object",
+  "required": ["targets", "cache_states", "seeding_modes", "variants", "execution"],
+  "properties": {
+    "targets": {
+      "type": "array",
+      "description": "DLL targets to include in the matrix.",
+      "items": {
+        "type": "object",
+        "required": ["name", "dll_path"],
+        "properties": {
+          "name": {"type": "string"},
+          "dll_path": {"type": "string"},
+          "hints_file": {"type": "string"}
+        }
+      },
+      "minItems": 1
+    },
+    "cache_states": {
+      "type": "array",
+      "description": "Cache temperature conditions to test.",
+      "items": {"type": "string", "enum": ["warm", "cold"]},
+      "minItems": 1
+    },
+    "seeding_modes": {
+      "type": "array",
+      "description": "Prior-knowledge seeding strategies.",
+      "items": {"type": "string", "enum": ["none", "warm", "cross_dll"]},
+      "minItems": 1
+    },
+    "variants": {
+      "type": "array",
+      "description": "Explore settings variant configurations.",
+      "items": {
+        "type": "object",
+        "required": ["variant_id"],
+        "properties": {
+          "variant_id": {"type": "string"},
+          "explore_settings": {"type": "object"}
+        }
+      },
+      "minItems": 1
+    },
+    "execution": {
+      "type": "object",
+      "properties": {
+        "api_url": {"type": "string"},
+        "bridge_url": {"type": "string"},
+        "analyze_timeout_sec": {"type": "integer", "default": 1800},
+        "explore_timeout_sec": {"type": "integer", "default": 5400},
+        "poll_sec": {"type": "integer", "default": 10},
+        "stuck_seconds": {"type": "integer", "default": 900},
+        "snapshot_profile": {"type": "string", "enum": ["full", "compact"], "default": "full"},
+        "analysis_profile": {"type": "string", "enum": ["strict_dll", "greybox_dll", "full_surface"], "default": "strict_dll"}
+      }
+    }
+  }
+}

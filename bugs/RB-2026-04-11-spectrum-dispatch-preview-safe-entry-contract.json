@@ -1,0 +1,22 @@
+{
+  "id": "RB-2026-04-11-spectrum-dispatch-preview-safe-entry-contract",
+  "title": "Compiled dispatch-preview call surface collapses the SP_PrepareReleasePreview contract",
+  "class": "contract",
+  "layer": "compiled dispatch-preview discovery / execution contract",
+  "status": "active",
+  "symptom": "After Prompt 08 restored trusted bootstrap and reservation predecessors, the next unresolved consumer is SP_PrepareReleasePreview, but the compiled dispatch-preview artifacts still present the function as argless stdcall while the fixture header/source declare a four-parameter cdecl entrypoint.",
+  "smallest_reproducer": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\medium-01\\20260411-103804 plus source/header surfaces in tests/fixtures/spectrum_transaction_release_settlement_suite/include/spectrum_suite.h and src/spectrum_dispatch_preview.c.",
+  "trust_impact": "The next direct consumer in compiled medium-01 cannot yet be interpreted honestly because dispatch-preview failure may still be caused by a collapsed call contract rather than a real preview-state prerequisite.",
+  "allowed_next_actions": [
+    "inspect the owning contract source for why compiled discovery emits zero parameters and stdcall for SP_PrepareReleasePreview",
+    "make one bounded repair or truthful fixture-local override for this one dispatch-preview entrypoint",
+    "rerun only the dispatch-preview seam with the trusted bootstrap and reservation predecessors"
+  ],
+  "disallowed_next_actions": [
+    "skip directly to fee_quote or settlement_reconcile",
+    "spend a full medium rerun before dispatch-preview truth is repaired",
+    "resume medium-02 or hard-mode work before the direct consumer seam is trustworthy"
+  ],
+  "exit_criteria": "The compiled SP_PrepareReleasePreview call surface is no longer argless stdcall and the targeted dispatch-preview rerun yields a semantic or sentinel result that is not explained solely by contract collapse.",
+  "next_move": "fix"
+}

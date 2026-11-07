@@ -1,0 +1,165 @@
+{
+  "suite_id": "atlas_reconciliation_suite",
+  "suite_name": "Atlas Reconciliation Suite",
+  "suite_kind": "design_suite",
+  "schema_version": "1.0.0",
+  "active_modules": [
+    "batch",
+    "identity",
+    "ledger",
+    "reconcile"
+  ],
+  "deferred_modules": [
+    {
+      "module": "settlement",
+      "reason": "Settlement application stays deferred until the mutual-pressure family is locally proven."
+    },
+    {
+      "module": "notifications",
+      "reason": "Noisy side emission stays deferred so it does not distort the first slice."
+    }
+  ],
+  "preferred_expansion_order": [
+    "settlement",
+    "notifications"
+  ],
+  "module_sources": {
+    "batch": "tests/fixtures/design_suite/atlas_reconciliation_suite/src/batch.py",
+    "identity": "tests/fixtures/design_suite/atlas_reconciliation_suite/src/identity.py",
+    "ledger": "tests/fixtures/design_suite/atlas_reconciliation_suite/src/ledger.py",
+    "reconcile": "tests/fixtures/design_suite/atlas_reconciliation_suite/src/reconcile.py",
+    "settlement": "tests/fixtures/design_suite/atlas_reconciliation_suite/src/settlement.py",
+    "notifications": "tests/fixtures/design_suite/atlas_reconciliation_suite/src/notifications.py"
+  },
+  "execution_inputs": {
+    "tenant_id": "tenant-001",
+    "party_id": "party-001",
+    "amount_cents": 7300
+  },
+  "blocker_families": [
+    {
+      "family_id": "mutual_pressure_blocker",
+      "kind": "mutual_pressure_blocker",
+      "subjects": [
+        "identity.bind_party",
+        "ledger.stage_transfer",
+        "reconcile.confirm_alignment"
+      ],
+      "upstream_requirements": [
+        "identity.bind_party",
+        "ledger.stage_transfer"
+      ],
+      "shared_state_carriers": [
+        "batch_window",
+        "binding_receipt",
+        "staged_transfer_id"
+      ],
+      "failure_or_pressure_sites": [
+        "identity.bind_party",
+        "ledger.stage_transfer"
+      ],
+      "provisional_subjects": [
+        "identity.bind_party",
+        "ledger.stage_transfer"
+      ],
+      "confirmation_sites": [
+        "reconcile.confirm_alignment"
+      ],
+      "contradiction_state": "none",
+      "confidence": 0.88,
+      "explanation": "Identity binding and ledger staging can both look locally successful, but neither is trustworthy until reconcile confirms that party and transfer state still align under the same batch window."
+    }
+  ],
+  "shared_state_carriers": [
+    {
+      "carrier_id": "batch_window",
+      "carrier_kind": "shared_state_carrier",
+      "state_tokens": [
+        "batch_token",
+        "sequence_window"
+      ],
+      "downstream_consumers": [
+        "identity.bind_party",
+        "ledger.stage_transfer"
+      ],
+      "exporting_seams": [
+        "batch.open_batch"
+      ],
+      "importing_seams": [
+        "identity.bind_party",
+        "ledger.stage_transfer"
+      ],
+      "staleness_risk": "medium",
+      "confidence": 0.84
+    }
+  ],
+  "expected_relationships": {
+    "producer_consumers": [
+      {
+        "family": "batch_open_to_identity_bind",
+        "blocker_family": "mutual_pressure_blocker",
+        "producer_module": "batch",
+        "producer_step": "open_batch",
+        "consumer_module": "identity",
+        "consumer_step": "bind_party",
+        "state_tokens": [
+          "batch_token"
+        ],
+        "evidence_edges": [
+          "batch.open_batch->identity.bind_party"
+        ],
+        "dependency_mode": "shared_state_mediated",
+        "confidence": 0.87
+      },
+      {
+        "family": "batch_open_to_ledger_stage",
+        "blocker_family": "mutual_pressure_blocker",
+        "producer_module": "batch",
+        "producer_step": "open_batch",
+        "consumer_module": "ledger",
+        "consumer_step": "stage_transfer",
+        "state_tokens": [
+          "batch_token",
+          "sequence_window"
+        ],
+        "evidence_edges": [
+          "batch.open_batch->ledger.stage_transfer"
+        ],
+        "dependency_mode": "shared_state_mediated",
+        "confidence": 0.88
+      },
+      {
+        "family": "identity_bind_to_reconcile_confirm",
+        "blocker_family": "mutual_pressure_blocker",
+        "producer_module": "identity",
+        "producer_step": "bind_party",
+        "consumer_module": "reconcile",
+        "consumer_step": "confirm_alignment",
+        "state_tokens": [
+          "binding_receipt"
+        ],
+        "evidence_edges": [
+          "identity.bind_party->reconcile.confirm_alignment"
+        ],
+        "dependency_mode": "staged",
+        "confidence": 0.86
+      },
+      {
+        "family": "ledger_stage_to_reconcile_confirm",
+        "blocker_family": "mutual_pressure_blocker",
+        "producer_module": "ledger",
+        "producer_step": "stage_transfer",
+        "consumer_module": "reconcile",
+        "consumer_step": "confirm_alignment",
+        "state_tokens": [
+          "staged_transfer_id"
+        ],
+        "evidence_edges": [
+          "ledger.stage_transfer->reconcile.confirm_alignment"
+        ],
+        "dependency_mode": "staged",
+        "confidence": 0.86
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "contract_version": "1.0.0",
+  "auditor_version": "1.0.0",
+  "gates": {
+    "hard_fail": false
+  },
+  "summary": {
+    "pipeline_verdict": "GREEN"
+  },
+  "totals": {
+    "stage_fail": 0,
+    "transition_fail": 0
+  },
+  "failed_stages": [],
+  "failed_transitions": []
+}

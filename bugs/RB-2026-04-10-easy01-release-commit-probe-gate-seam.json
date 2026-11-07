@@ -1,0 +1,29 @@
+{
+  "id": "RB-2026-04-10-easy01-release-commit-probe-gate-seam",
+  "title": "Easy-01 release_commit semantic target is lost before trustworthy target probing",
+  "class": "contract",
+  "layer": "s02 probe pre-loop gating and prompt/contract assembly",
+  "symptom": "easy-01 now verifies session_bootstrap, reservation_stage, and audit_trace on the stable lane, but release_commit still ends with SP_CommitRelease unknown and emits only calibration-level probe artifacts instead of a target probe or semantic parameter rename.",
+  "smallest_reproducer": "stable lane 8201 -> 8090, spectrum_release_commit.dll upload run with prior_job_id and cross_dll_prior_job_ids seeded from easy-01 reservation_stage, required_semantic_checkpoint=SP_CommitRelease, selected_invocable_names=[SP_CommitRelease]",
+  "trust_impact": "easy-01 cannot be promoted to a baseline specimen because the remaining semantic checkpoint is not auditable; the probe layer can appear to complete while never proving whether the target function was skipped, contradicted by prompt guidance, or truly exercised.",
+  "allowed_next_actions": [
+    "emit explicit skip_pre_probe artifacts for cancel, documented, focus, and checkpoint exits",
+    "treat selected_invocable_names and required_semantic_checkpoint as must-probe overrides for the pre-loop skip gates",
+    "conditionalize init-first prompt guidance when no init-like callable is present in AVAILABLE FUNCTIONS",
+    "write mcp_schema_t0.json from the runtime-normalized tool schema so the stage-00 contract truth matches the live probe surface",
+    "run one narrow release_commit reproducer after those changes"
+  ],
+  "disallowed_next_actions": [
+    "another full easy-01 end-to-end rerun before the probe-gate seam is changed",
+    "medium-01 or medium-02 progression",
+    "UI work",
+    "broad vocabulary or curriculum rewrites unrelated to the release_commit seam"
+  ],
+  "exit_criteria": [
+    "release_commit emits either a real target probe or an explicit skip_pre_probe reason artifact on the smallest reproducer",
+    "selected semantic checkpoint SP_CommitRelease is no longer silently bypassed by documented or checkpoint skip logic",
+    "stage-00 schema snapshot reflects the runtime-normalized release input types for the reproducer",
+    "the next branch decision can distinguish target-probe failure from prompt-assembly failure using emitted artifacts"
+  ],
+  "next_move": "fix"
+}

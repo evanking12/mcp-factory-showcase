@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sample.wsdl  —  Contoso Customer Service SOAP/WSDL 1.1 fixture
+  Used by MCP Factory wsdl_analyzer.py demo.
+-->
+<definitions
+    name="ContosoCustomerService"
+    targetNamespace="http://contoso.com/customerservice"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:tns="http://contoso.com/customerservice"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/">
+
+  <!-- ============================================================ Types -->
+  <types>
+    <xsd:schema targetNamespace="http://contoso.com/customerservice">
+
+      <xsd:complexType name="Customer">
+        <xsd:sequence>
+          <xsd:element name="customerId"  type="xsd:int"/>
+          <xsd:element name="name"        type="xsd:string"/>
+          <xsd:element name="email"       type="xsd:string"/>
+          <xsd:element name="phone"       type="xsd:string" minOccurs="0"/>
+          <xsd:element name="tier"        type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Order">
+        <xsd:sequence>
+          <xsd:element name="orderId"     type="xsd:int"/>
+          <xsd:element name="customerId"  type="xsd:int"/>
+          <xsd:element name="totalAmount" type="xsd:double"/>
+          <xsd:element name="status"      type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+    </xsd:schema>
+  </types>
+
+  <!-- =========================================================== Messages -->
+
+  <!-- GetCustomer -->
+  <message name="GetCustomerRequest">
+    <part name="customerId" type="xsd:int"/>
+  </message>
+  <message name="GetCustomerResponse">
+    <part name="customer" type="tns:Customer"/>
+  </message>
+
+  <!-- CreateCustomer -->
+  <message name="CreateCustomerRequest">
+    <part name="name"  type="xsd:string"/>
+    <part name="email" type="xsd:string"/>
+    <part name="tier"  type="xsd:string"/>
+  </message>
+  <message name="CreateCustomerResponse">
+    <part name="customerId" type="xsd:int"/>
+  </message>
+
+  <!-- UpdateCustomer -->
+  <message name="UpdateCustomerRequest">
+    <part name="customerId" type="xsd:int"/>
+    <part name="name"       type="xsd:string"/>
+    <part name="email"      type="xsd:string"/>
+  </message>
+  <message name="UpdateCustomerResponse">
+    <part name="success" type="xsd:boolean"/>
+  </message>
+
+  <!-- DeleteCustomer -->
+  <message name="DeleteCustomerRequest">
+    <part name="customerId" type="xsd:int"/>
+  </message>
+  <message name="DeleteCustomerResponse">
+    <part name="success" type="xsd:boolean"/>
+  </message>
+
+  <!-- PlaceOrder -->
+  <message name="PlaceOrderRequest">
+    <part name="customerId"      type="xsd:int"/>
+    <part name="productSku"      type="xsd:string"/>
+    <part name="quantity"        type="xsd:int"/>
+    <part name="shippingAddress" type="xsd:string"/>
+  </message>
+  <message name="PlaceOrderResponse">
+    <part name="orderId"        type="xsd:int"/>
+    <part name="trackingNumber" type="xsd:string"/>
+  </message>
+
+  <!-- GetOrderStatus -->
+  <message name="GetOrderStatusRequest">
+    <part name="orderId" type="xsd:int"/>
+  </message>
+  <message name="GetOrderStatusResponse">
+    <part name="status"          type="xsd:string"/>
+    <part name="estimatedDelivery" type="xsd:string"/>
+  </message>
+
+  <!-- SubmitSupportTicket -->
+  <message name="SubmitSupportTicketRequest">
+    <part name="customerId" type="xsd:int"/>
+    <part name="subject"    type="xsd:string"/>
+    <part name="body"       type="xsd:string"/>
+    <part name="priority"   type="xsd:string"/>
+  </message>
+  <message name="SubmitSupportTicketResponse">
+    <part name="ticketId"   type="xsd:int"/>
+    <part name="slaDeadline" type="xsd:string"/>
+  </message>
+
+  <!-- ============================================================ PortType -->
+  <portType name="CustomerServicePortType">
+
+    <operation name="GetCustomer">
+      <documentation>Retrieve a customer record by their unique numeric ID.</documentation>
+      <input  message="tns:GetCustomerRequest"/>
+      <output message="tns:GetCustomerResponse"/>
+    </operation>
+
+    <operation name="CreateCustomer">
+      <documentation>Create a new customer account; returns the assigned customer ID.</documentation>
+      <input  message="tns:CreateCustomerRequest"/>
+      <output message="tns:CreateCustomerResponse"/>
+    </operation>
+
+    <operation name="UpdateCustomer">
+      <documentation>Update name or email for an existing customer.</documentation>
+      <input  message="tns:UpdateCustomerRequest"/>
+      <output message="tns:UpdateCustomerResponse"/>
+    </operation>
+
+    <operation name="DeleteCustomer">
+      <documentation>Permanently remove a customer record and all associated data.</documentation>
+      <input  message="tns:DeleteCustomerRequest"/>
+      <output message="tns:DeleteCustomerResponse"/>
+    </operation>
+
+    <operation name="PlaceOrder">
+      <documentation>Place a product order for a customer; returns order ID and tracking number.</documentation>
+      <input  message="tns:PlaceOrderRequest"/>
+      <output message="tns:PlaceOrderResponse"/>
+    </operation>
+
+    <operation name="GetOrderStatus">
+      <documentation>Query the fulfilment status and estimated delivery date for an order.</documentation>
+      <input  message="tns:GetOrderStatusRequest"/>
+      <output message="tns:GetOrderStatusResponse"/>
+    </operation>
+
+    <operation name="SubmitSupportTicket">
+      <documentation>Open a new customer support ticket; returns ticket ID and SLA deadline.</documentation>
+      <input  message="tns:SubmitSupportTicketRequest"/>
+      <output message="tns:SubmitSupportTicketResponse"/>
+    </operation>
+
+  </portType>
+
+  <!-- ============================================================ Binding -->
+  <binding name="CustomerServiceSoapBinding" type="tns:CustomerServicePortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <operation name="GetCustomer">
+      <soap:operation soapAction="http://contoso.com/customerservice/GetCustomer"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+
+    <operation name="CreateCustomer">
+      <soap:operation soapAction="http://contoso.com/customerservice/CreateCustomer"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+
+    <operation name="UpdateCustomer">
+      <soap:operation soapAction="http://contoso.com/customerservice/UpdateCustomer"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+
+    <operation name="DeleteCustomer">
+      <soap:operation soapAction="http://contoso.com/customerservice/DeleteCustomer"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+
+    <operation name="PlaceOrder">
+      <soap:operation soapAction="http://contoso.com/customerservice/PlaceOrder"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+
+    <operation name="GetOrderStatus">
+      <soap:operation soapAction="http://contoso.com/customerservice/GetOrderStatus"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+
+    <operation name="SubmitSupportTicket">
+      <soap:operation soapAction="http://contoso.com/customerservice/SubmitSupportTicket"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+
+  </binding>
+
+  <!-- ============================================================ Service -->
+  <service name="ContosoCustomerService">
+    <port name="CustomerServicePort" binding="tns:CustomerServiceSoapBinding">
+      <soap:address location="https://soap.contoso.com/CustomerService"/>
+    </port>
+  </service>
+
+</definitions>

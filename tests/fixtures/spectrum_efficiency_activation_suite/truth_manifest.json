@@ -1,0 +1,137 @@
+{
+  "fixture_id": "spectrum_efficiency_activation_suite_compiled",
+  "suite_id": "spectrum_efficiency_activation_suite",
+  "case_id": "activation-v1",
+  "suite_name": "Spectrum Efficiency Activation Suite",
+  "proof_class": "compiled_local_binary",
+  "product_validity": "product-valid",
+  "source_family_classification": "architecture-proof",
+  "northstar_classification": "product-shaping",
+  "compiled_suite_purpose": "Compiled binary embodiment of the Spectrum-medium-derived activation and pass-two reuse benchmark.",
+  "benchmark_groups": {
+    "pass_one_active_frontier": [
+      "session_bootstrap",
+      "reservation_stage",
+      "dispatch_preview",
+      "fee_quote"
+    ],
+    "pass_one_visible_but_deferred": [
+      "attestation_stage",
+      "invoice_sync",
+      "entitlement_sync",
+      "settlement_reconcile"
+    ],
+    "false_positive_frontier": [
+      "audit_trace",
+      "replay_branch"
+    ],
+    "pass_two_expansion": [
+      "attestation_stage",
+      "invoice_sync",
+      "entitlement_sync",
+      "settlement_reconcile"
+    ]
+  },
+  "dlls": [
+    {
+      "dll_name": "spectrum_session_bootstrap.dll",
+      "source_file": "tests/fixtures/spectrum_efficiency_activation_suite/src/spectrum_session_bootstrap.c",
+      "exports": [
+        "SP_OpenOperatorSession",
+        "SP_DescribeSessionBootstrapWindow",
+        "SP_ProjectSessionHandshakeFloor"
+      ],
+      "role": "pass_one_active_frontier"
+    },
+    {
+      "dll_name": "spectrum_reservation_stage.dll",
+      "source_file": "tests/fixtures/spectrum_efficiency_activation_suite/src/spectrum_reservation_stage.c",
+      "exports": [
+        "SP_IssueReleaseHold",
+        "SP_DescribeReservationFanout",
+        "SP_ProjectReservationSeed"
+      ],
+      "role": "pass_one_active_frontier"
+    },
+    {
+      "dll_name": "spectrum_dispatch_preview.dll",
+      "source_file": "tests/fixtures/spectrum_efficiency_activation_suite/src/spectrum_dispatch_preview.c",
+      "exports": [
+        "SP_PrepareReleasePreview",
+        "SP_DescribeDispatchWindow",
+        "SP_ClassifyDispatchDeferralRisk"
+      ],
+      "role": "pass_one_active_frontier"
+    },
+    {
+      "dll_name": "spectrum_fee_quote.dll",
+      "source_file": "tests/fixtures/spectrum_efficiency_activation_suite/src/spectrum_fee_quote.c",
+      "exports": [
+        "SP_StageReleaseFeeQuote",
+        "SP_DescribeFeeQuoteInputs",
+        "SP_ProjectPriorityFeeWindow"
+      ],
+      "role": "pass_one_active_frontier"
+    },
+    {
+      "dll_name": "spectrum_attestation_stage.dll",
+      "source_file": "tests/fixtures/spectrum_efficiency_activation_suite/src/spectrum_attestation_stage.c",
+      "exports": [
+        "SP_EmitReleaseAttestation",
+        "SP_SummarizeAttestationReuse",
+        "SP_PreviewAttestationEnvelope"
+      ],
+      "role": "pass_two_expansion"
+    },
+    {
+      "dll_name": "spectrum_invoice_sync.dll",
+      "source_file": "tests/fixtures/spectrum_efficiency_activation_suite/src/spectrum_invoice_sync.c",
+      "exports": [
+        "SP_StageReleaseInvoice",
+        "SP_DescribeInvoiceCarryForward",
+        "SP_ProjectInvoicePostingWindow"
+      ],
+      "role": "pass_two_expansion"
+    },
+    {
+      "dll_name": "spectrum_entitlement_sync.dll",
+      "source_file": "tests/fixtures/spectrum_efficiency_activation_suite/src/spectrum_entitlement_sync.c",
+      "exports": [
+        "SP_StageCustomerEntitlementUpdate",
+        "SP_DescribeEntitlementCarryForward",
+        "SP_ProjectEntitlementPostingWindow"
+      ],
+      "role": "pass_two_expansion"
+    },
+    {
+      "dll_name": "spectrum_settlement_reconcile.dll",
+      "source_file": "tests/fixtures/spectrum_efficiency_activation_suite/src/spectrum_settlement_reconcile.c",
+      "exports": [
+        "SP_ConfirmAttestedRelease",
+        "SP_VerifyReservedRelease",
+        "SP_DescribeSettlementProofWindow"
+      ],
+      "role": "pass_two_late_truth"
+    },
+    {
+      "dll_name": "spectrum_audit_trace.dll",
+      "source_file": "tests/fixtures/spectrum_efficiency_activation_suite/src/spectrum_audit_trace.c",
+      "exports": [
+        "SP_RecordReleaseReceipt",
+        "SP_DescribeAuditCoverage",
+        "SP_RehydrateAuditWindow"
+      ],
+      "role": "false_positive_frontier"
+    },
+    {
+      "dll_name": "spectrum_replay_branch.dll",
+      "source_file": "tests/fixtures/spectrum_efficiency_activation_suite/src/spectrum_replay_branch.c",
+      "exports": [
+        "SP_ReplayReleaseBranch",
+        "SP_DescribeReplayVariance",
+        "SP_SelectTrustedBranch"
+      ],
+      "role": "false_positive_frontier"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "case_id": "easy-01",
+  "case_name": "ticketed_release_chain",
+  "band": "easy",
+  "primary_blocker_family": "setup_gate",
+  "active_modules": [
+    "session_bootstrap",
+    "reservation_stage",
+    "release_commit",
+    "audit_trace"
+  ],
+  "entry_surface": "session_bootstrap.open_operator_session",
+  "execution_flow": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "release_commit.commit_release",
+    "audit_trace.record_release_receipt"
+  ],
+  "shared_state": [
+    "operator_token",
+    "reservation_handle",
+    "hold_token"
+  ],
+  "expected_value": "anchor_readability",
+  "product_lesson_if_green": "basic staged transaction reasoning is coherent",
+  "product_lesson_if_red": "the family is too hard too early or the base staged chain is still unstable"
+}

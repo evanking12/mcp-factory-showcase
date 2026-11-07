@@ -1,0 +1,20 @@
+{
+  "id": "RB-2026-04-11-spectrum-settlement-validator-safe-entry-contract",
+  "title": "Compiled settlement validator call surface collapses the SP_VerifyReservedRelease contract",
+  "class": "contract",
+  "layer": "compiled settlement validator discovery / execution contract",
+  "status": "resolved",
+  "symptom": "This blocker was real on the post-fee-quote lane, but Prompt 11 proved it no longer owns the active branch. `SP_VerifyReservedRelease` now presents a truthful five-parameter `cdecl` compiled surface and the targeted validator rerun closes as `verified_success`.",
+  "smallest_reproducer": "Resolved by Prompt 11 evidence at .\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\medium-01\\validator-lineage-truth\\20260411-115753 after the earlier contract-collapse proof from 20260411-103804.",
+  "trust_impact": "The validator seam is no longer blocked by contract collapse. The remaining package-scale question is broader: whether the repaired medium-01 chain aligns end to end.",
+  "allowed_next_actions": [
+    "preserve this record as resolved evidence for why full medium-01 reproof is now justified",
+    "use the repaired validator seam as a trusted predecessor for the next package-scale reproof"
+  ],
+  "disallowed_next_actions": [
+    "reopen validator contract-collapse as the active blocker without newer contradictory evidence",
+    "skip the package-scale medium-01 reproof and branch into later proving families from seam-local evidence alone"
+  ],
+  "exit_criteria": "Met: the compiled SP_VerifyReservedRelease call surface is no longer argless stdcall and the targeted validator rerun is not explained by contract collapse.",
+  "next_move": "defer"
+}

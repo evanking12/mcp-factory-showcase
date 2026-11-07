@@ -1,0 +1,76 @@
+﻿{
+  "campaign": {
+    "mode": "nightly",
+    "hours": 8,
+    "max_runs": 20,
+    "max_cases": 0,
+    "max_workers": 4
+  },
+  "targets": {
+    "names": ["contoso_cs", "contoso_cs_interwoven"],
+    "dll": "tests/fixtures/contoso_legacy/contoso_cs.dll",
+    "hints_file": "sessions/contoso_cs/contoso_cs.txt"
+  },
+  "api": {
+    "url": "http://127.0.0.1:8201",
+    "key": ""
+  },
+  "bridge": {
+    "url": "http://localhost:8090",
+    "key": ""
+  },
+  "explore_defaults": {
+    "analysis_profile": "strict_dll",
+    "model": "gpt-4o"
+  },
+  "variants": {
+    "enabled": false,
+    "parallel_runs": 1,
+    "variant_configs": []
+  },
+  "execution": {
+    "mode": "dev",
+    "max_rounds": 2,
+    "max_tool_calls": 5,
+    "snapshot_profile": "full"
+  },
+  "capture": {
+    "snapshot_profile": "full",
+    "mode": "strict"
+  },
+  "validity_gates": {
+    "strict_contract": true,
+    "hard_fail_blocks_baseline": true,
+    "profile_allowed_for_fixture": true
+  },
+  "reporting": {
+    "depth": ["l1", "l2", "l3"],
+    "machine_outputs": ["run-validity.json", "kpi_run.json", "artifact-index.json"]
+  },
+  "knob_contract": {
+    "analysis_profile": {
+      "affects_transitions": ["T-17", "T-18", "T-20"],
+      "required_artifacts": [
+        "session-meta.json",
+        "transition-index.json",
+        "cohesion-report.json"
+      ]
+    },
+    "snapshot_profile": {
+      "affects_transitions": ["T-14", "T-15"],
+      "required_artifacts": [
+        "snapshot-profile.json",
+        "run-validity.json",
+        "kpi_run.json"
+      ]
+    },
+    "parallel_runs": {
+      "affects_transitions": ["T-06", "T-11"],
+      "required_artifacts": [
+        "session-meta.json",
+        "stages/s02_probe/variants",
+        "stages/s02_probe/merged"
+      ]
+    }
+  }
+}

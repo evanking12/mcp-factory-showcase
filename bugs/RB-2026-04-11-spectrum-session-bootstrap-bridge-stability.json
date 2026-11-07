@@ -1,0 +1,28 @@
+{
+  "id": "RB-2026-04-11-spectrum-session-bootstrap-bridge-stability",
+  "title": "Compiled Spectrum session_bootstrap loses bridge transport between analyze and execute",
+  "class": "architecture",
+  "layer": "compiled spectrum medium-01 session_bootstrap bridge transport",
+  "status": "superseded",
+  "superseded_by": "RB-2026-04-11-spectrum-session-bootstrap-safe-entry-contract",
+  "symptom": "After the auth-repair tranche, protected bridge routes return 200 before the run, but the targeted session_bootstrap rerun records bridge transport failures ([WinError 10054], then [WinError 10061]) between analyze and execute and bridge health is down after the run.",
+  "smallest_reproducer": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\medium-01\\root-semantic-entry-unlock\\20260411-100038",
+  "trust_impact": "Bootstrap semantic evidence is not transport-clean enough to interpret because bridge lifecycle failure can still masquerade as a function-level sentinel or prerequisite problem.",
+  "allowed_next_actions": [
+    "inspect bridge lifecycle and analyze-to-execute handoff in scripts/bridge/gui_bridge.py",
+    "inspect API bridge caller surfaces in api/services/discovery.py and api/services/executor.py",
+    "make one bounded owning-layer repair and rerun only the targeted session_bootstrap proof"
+  ],
+  "disallowed_next_actions": [
+    "resume downstream continuation work",
+    "spend a full medium-01 rerun before the targeted bootstrap lane is transport-clean",
+    "treat SP_OpenOperatorSession as a semantic prerequisite blocker while bridge transport is still unstable"
+  ],
+  "exit_criteria": [
+    "targeted session_bootstrap rerun completes without bridge transport failure",
+    "bridge health remains live after the rerun",
+    "the resulting SP_OpenOperatorSession finding is transport-clean enough to interpret semantically"
+  ],
+  "next_move": "superseded",
+  "blocker_family_primary": "bridge_transport_persistence"
+}

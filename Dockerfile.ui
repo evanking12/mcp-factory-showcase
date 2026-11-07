@@ -1,0 +1,17 @@
+# MCP Factory – UI container
+# Lightweight: only FastAPI + httpx (proxies to the pipeline API).
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY ui/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY ui/ ./ui/
+
+# Managed local pipeline API URL.
+ENV PIPELINE_URL=http://127.0.0.1:8201
+
+EXPOSE 8080
+
+CMD ["uvicorn", "ui.main:app", "--host", "0.0.0.0", "--port", "8080"]

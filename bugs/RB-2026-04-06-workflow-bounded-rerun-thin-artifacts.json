@@ -1,0 +1,26 @@
+{
+  "id": "RB-2026-04-06-workflow-bounded-rerun-thin-artifacts",
+  "title": "Workflow bounded rerun can fall back to discovery-only artifacts when cluster runtime is sent to /api/analyze-path",
+  "class": "measurement",
+  "layer": "analyze-path to explore handoff",
+  "symptom": "Workflow bounded rerun job 13846a6c completed with only discovery artifacts (status.json, discovery_meta.json, invocables_map.json, exports_mcp.json) and emitted no explore_config, cluster_seed_plan, explore_probe_log, findings, or verification-report artifacts, so the run was not a trustworthy workflow cluster decision surface.",
+  "smallest_reproducer": "POST /api/analyze-path for tests/fixtures/contoso_workflow/contoso_workflow.dll with checkpoint_id=a582e3f8, checkpoint_stage=s02_probe, cluster_checkpoint_id=workflow_reservation_open_state, and focus_functions centered on WF_GetWorkflowState",
+  "trust_impact": "The workflow cluster gate cannot be judged from this run because the bounded runtime never entered the explore pipeline and therefore produced no observer-backed evidence.",
+  "allowed_next_actions": [
+    "treat /api/analyze-path as discovery-only for this lane",
+    "start a fresh workflow analyze-path job and then invoke /api/jobs/{job_id}/explore with the bounded cluster runtime",
+    "inspect the resulting explore_config, cluster_seed_plan, probe log, findings, and verification report before patching workflow logic"
+  ],
+  "disallowed_next_actions": [
+    "mark workflow green from job 13846a6c",
+    "launch another full Batch B run",
+    "patch workflow state logic based on a discovery-only job",
+    "start config tuning before the workflow gate is trustworthy"
+  ],
+  "exit_criteria": [
+    "a fresh workflow bounded rerun emits full explore-stage artifacts",
+    "the workflow cluster has observer-backed evidence for WF_GetWorkflowState",
+    "the next workflow tuning decision is based on probe and verification artifacts instead of thin discovery output"
+  ],
+  "next_move": "route_around"
+}

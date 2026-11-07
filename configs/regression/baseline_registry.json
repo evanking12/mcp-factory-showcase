@@ -1,0 +1,70 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-04-23",
+  "policy": "additive_regression_ladder",
+  "surfaces": [
+    {
+      "surface_id": "lane_trust",
+      "ladder_tier": 1,
+      "baseline_type": "contract_source",
+      "active": true,
+      "comparison_mode": "contract_packet",
+      "contract_sources": [
+        "runtime/local-runtime-contract.json",
+        "runtime/README.md",
+        "docs/architecture/runtime/LOCAL-RUNTIME-OWNERSHIP-REGISTRY.md"
+      ],
+      "notes": "Contract-based lane surface. No promoted-run baseline root."
+    },
+    {
+      "surface_id": "easy01",
+      "case_id": "easy-01",
+      "ladder_tier": 2,
+      "baseline_type": "pinned_output_root",
+      "active": true,
+      "comparison_mode": "compiled_ingest_report",
+      "pinned_root": "configs/regression/pinned_baselines/spectrum_transaction_release_settlement_suite/easy-01/20260423-151031",
+      "notes": "Defended Gate v1 Easy01 product-green baseline promoted by easy01_product_green_baseline_promotion_v2. Historical compatibility baseline remains tracked at configs/regression/pinned_baselines/spectrum_transaction_release_settlement_suite/easy-01/20260410-082334."
+    },
+    {
+      "surface_id": "medium01",
+      "case_id": "medium-01",
+      "ladder_tier": 3,
+      "baseline_type": "pinned_output_root",
+      "active": true,
+      "comparison_mode": "compiled_ingest_report",
+      "pinned_root": "configs/regression/pinned_baselines/spectrum_transaction_release_settlement_suite/medium-01/20260423-194924",
+      "notes": "Defended Gate v1 Medium01 product-green baseline promoted by medium01_product_green_baseline_promotion_v1. Historical compatibility baseline remains tracked at configs/regression/pinned_baselines/spectrum_transaction_release_settlement_suite/medium-01/20260410-084431."
+    },
+    {
+      "surface_id": "medium02",
+      "case_id": "medium-02",
+      "ladder_tier": 4,
+      "baseline_type": "pinned_output_root",
+      "active": true,
+      "comparison_mode": "compiled_ingest_report",
+      "pinned_root": "configs/regression/pinned_baselines/spectrum_transaction_release_settlement_suite/medium-02/20260424-104245",
+      "notes": "Defended Gate v1 Medium02 product-green baseline promoted by medium02_product_green_baseline_promotion_v1. Previously reserved as ladder member until Medium02 product-green held same-code confirmation."
+    },
+    {
+      "surface_id": "hard01",
+      "case_id": "hard-01",
+      "ladder_tier": 5,
+      "baseline_type": "pinned_output_root",
+      "active": true,
+      "comparison_mode": "compiled_ingest_report",
+      "pinned_root": "configs/regression/pinned_baselines/spectrum_transaction_release_settlement_suite/hard-01/20260425-111313",
+      "notes": "Defended Gate v1 Hard01 product-green baseline promoted by hard01_product_green_baseline_promotion_v1. Previously reserved as a hard-family pressure target until branch-invalidation authority and committed-code promotion readiness held green."
+    },
+    {
+      "surface_id": "hard02",
+      "case_id": "hard-02",
+      "ladder_tier": 6,
+      "baseline_type": "pinned_output_root",
+      "active": false,
+      "comparison_mode": "compiled_ingest_report",
+      "pinned_root": null,
+      "notes": "Reserved ladder member. Pin a baseline when the suite is restored."
+    }
+  ]
+}

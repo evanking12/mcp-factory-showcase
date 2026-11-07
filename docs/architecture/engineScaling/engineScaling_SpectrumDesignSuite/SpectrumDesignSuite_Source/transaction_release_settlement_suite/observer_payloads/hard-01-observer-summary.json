@@ -1,0 +1,132 @@
+{
+  "artifact_type": "spectrum-observer-summary.json",
+  "schema_version": "1.0.0",
+  "case_id": "hard-01",
+  "observer_results": [
+    {
+      "observer_name": "split_quality",
+      "subject_ids": [
+        "replay_branch.replay_release_branch",
+        "settlement_reconcile.select_trusted_branch",
+        "audit_trace.invalidate_untrusted_branch"
+      ],
+      "focus": "branch_grouping_vs_false_clarity",
+      "expected_outputs": [
+        "split_verdict",
+        "preserved_primary_blocker",
+        "false_clarity_risk",
+        "next_action"
+      ],
+      "example_output": {
+        "split_verdict": "warn",
+        "preserved_primary_blocker": true,
+        "false_clarity_risk": "high",
+        "next_action": "keep_replay_branch_grouped_with_branch_truth_selection"
+      }
+    },
+    {
+      "observer_name": "false_green",
+      "subject_ids": [
+        "release_commit.commit_release",
+        "replay_branch.replay_release_branch",
+        "settlement_reconcile.select_trusted_branch"
+      ],
+      "focus": "local_green_replay_branch",
+      "expected_outputs": [
+        "false_green_verdict",
+        "affected_paths",
+        "late_truth_conflict",
+        "next_action"
+      ],
+      "example_output": {
+        "false_green_verdict": "present",
+        "affected_paths": [
+          "replay_branch.replay_release_branch"
+        ],
+        "late_truth_conflict": "replay_receipt_looks_locally_executable_but_is_later_rejected_by_branch_selection",
+        "next_action": "add_branch_trust_or_replay_provenance_verdict_before_any_global_success_claim"
+      }
+    },
+    {
+      "observer_name": "branch_trust_observer",
+      "subject_ids": [
+        "release_commit.commit_release",
+        "replay_branch.replay_release_branch",
+        "settlement_reconcile.select_trusted_branch",
+        "audit_trace.invalidate_untrusted_branch"
+      ],
+      "focus": "late_branch_selection_and_replay_provenance",
+      "expected_outputs": [
+        "observer_name",
+        "candidate_branch_ids",
+        "trusted_branch_id",
+        "rejected_branch_ids",
+        "provenance_inputs",
+        "decision_reason",
+        "evidence_refs",
+        "late_invalidation_refs",
+        "observer_status",
+        "confidence"
+      ],
+      "example_output": {
+        "observer_name": "branch_trust_observer",
+        "candidate_branch_ids": [
+          "primary",
+          "replay"
+        ],
+        "trusted_branch_id": "primary",
+        "rejected_branch_ids": [
+          "replay"
+        ],
+        "provenance_inputs": {
+          "primary_commit_receipt": "COMMIT-RES-order-001",
+          "replay_commit_receipt": "REPLAY-COMMIT-RES-order-001",
+          "primary_attestation_packet": "ATTEST-RES-order-001",
+          "replay_attestation_packet": "REPLAY-ATTEST-HOLD-order-001",
+          "branch_reconciliation_token": "TRUST-COMMIT-RES-order-001"
+        },
+        "decision_reason": "late_branch_selection_and_audit_invalidation_are_preserved_as_first_class_provenance",
+        "evidence_refs": [
+          "release_commit.commit_release",
+          "replay_branch.replay_release_branch",
+          "settlement_reconcile.select_trusted_branch"
+        ],
+        "late_invalidation_refs": [
+          "audit_trace.invalidate_untrusted_branch"
+        ],
+        "observer_status": "pass",
+        "confidence": "high"
+      }
+    },
+    {
+      "observer_name": "decomposition_cohesion",
+      "subject_ids": [
+        "attestation_stage.emit_release_attestation",
+        "replay_branch.replay_release_branch",
+        "settlement_reconcile.select_trusted_branch",
+        "audit_trace.invalidate_untrusted_branch"
+      ],
+      "focus": "recomposition_of_branch_truth",
+      "expected_outputs": [
+        "cohesion_verdict",
+        "recomposition_gaps",
+        "human_review_risk",
+        "next_action"
+      ],
+      "example_output": {
+        "cohesion_verdict": "fragile_but_intact",
+        "recomposition_gaps": [
+          "late_truth_must_be_kept_attached_to_primary_and_replay_branch_outputs"
+        ],
+        "human_review_risk": "medium",
+        "next_action": "preserve_branch_ambiguity_until_reconciliation_and_audit_finish"
+      }
+    }
+  ],
+  "notes": [
+    "authored_from_spectrum_split_contract",
+    "useful_failure_expected_before_unlock_strength",
+    "hard_01_observers_now_model_branch_trust_failure_directly",
+    "branch_trust_observer_is_a_first_class_runtime_verdict_surface"
+  ]
+}

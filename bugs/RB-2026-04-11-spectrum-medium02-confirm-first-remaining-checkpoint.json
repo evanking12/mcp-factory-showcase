@@ -1,0 +1,23 @@
+{
+  "id": "RB-2026-04-11-spectrum-medium02-confirm-first-remaining-checkpoint",
+  "title": "Compiled medium-02 confirmation checkpoint still collapses after repaired attestation, invoice, and entitlement predecessors",
+  "class": "contract",
+  "layer": "compiled medium-02 confirmation-stage owner seam",
+  "status": "resolved",
+  "symptom": "After Prompts 15 through 17 repaired attestation, invoice, and entitlement, the original medium-02 confirmation artifact still shows SP_ConfirmAttestedRelease as an argless stdcall export with zero parameter coverage and sentinel failure -7104.",
+  "smallest_reproducer": "sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-02/20260411-125905/runs/08-settlement_reconcile/session/invocables_map.json shows the collapsed confirmation surface. The likely owner seam is tests/fixtures/spectrum_transaction_release_settlement_suite/settlement_validator_contract_overlay/truth_manifest.json because the same DLL already uses that overlay for SP_VerifyReservedRelease.",
+  "trust_impact": "A broader medium-02 rerun is not trustworthy until the last remaining checkpoint stops collapsing at discovery time. Treating confirmation as business-logic failure before repairing the contract/spec surface would spend proving budget on a likely inherited false blocker.",
+  "allowed_next_actions": [
+    "inspect only the original confirmation artifact and the settlement overlay owner seam",
+    "patch only the existing settlement overlay manifest justified by source and rerun evidence",
+    "rerun only the targeted confirmation checkpoint with repaired attestation, invoice, and entitlement predecessors"
+  ],
+  "disallowed_next_actions": [
+    "spend a broader medium-02 rerun before confirmation is locally trustworthy",
+    "invent a parallel overlay surface for the same DLL when the existing settlement overlay owns the contract repair mechanism",
+    "jump to hard-01 or hard-02 before medium-02 is honestly reclosed"
+  ],
+  "exit_criteria": "The confirmation checkpoint is narrowed to the settlement overlay owner seam, a targeted confirmation proof surface is executed, and the branch can decide from evidence whether one broader medium-02 rerun is now honest.",
+  "resolution_note": "Prompt 18 first repaired the existing settlement overlay so SP_ConfirmAttestedRelease turned semantically green, then repaired a narrower S-04 synthesis coverage omission that made the first rerun invalid. The second targeted rerun under sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-02/confirmation-final-remaining-checkpoint/20260411-141009 returned SP_ConfirmAttestedRelease = verified_success with valid_run = true.",
+  "next_move": "run-package-scale-medium02-reproof"
+}

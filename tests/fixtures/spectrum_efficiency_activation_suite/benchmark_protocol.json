@@ -1,0 +1,132 @@
+{
+  "schema_version": "1.0.0",
+  "suite_id": "spectrum_efficiency_activation_suite",
+  "case_id": "activation-v1",
+  "fixture_root": "tests/fixtures/spectrum_efficiency_activation_suite",
+  "package_manifest": "tests/fixtures/spectrum_efficiency_activation_suite/package_manifest.json",
+  "truth_manifest": "tests/fixtures/spectrum_efficiency_activation_suite/truth_manifest.json",
+  "callable_candidate_count": 30,
+  "pass_one_targets": [
+    {
+      "target_name": "session_bootstrap",
+      "staged_name": "spectrum_session_bootstrap.dll",
+      "primary_export": "SP_OpenOperatorSession",
+      "predecessor_targets": []
+    },
+    {
+      "target_name": "reservation_stage",
+      "staged_name": "spectrum_reservation_stage.dll",
+      "primary_export": "SP_IssueReleaseHold",
+      "predecessor_targets": [
+        "session_bootstrap"
+      ]
+    },
+    {
+      "target_name": "dispatch_preview",
+      "staged_name": "spectrum_dispatch_preview.dll",
+      "primary_export": "SP_PrepareReleasePreview",
+      "predecessor_targets": [
+        "session_bootstrap",
+        "reservation_stage"
+      ]
+    },
+    {
+      "target_name": "fee_quote",
+      "staged_name": "spectrum_fee_quote.dll",
+      "primary_export": "SP_StageReleaseFeeQuote",
+      "predecessor_targets": [
+        "session_bootstrap",
+        "reservation_stage"
+      ]
+    }
+  ],
+  "pass_two_targets": [
+    {
+      "target_name": "attestation_stage",
+      "staged_name": "spectrum_attestation_stage.dll",
+      "primary_export": "SP_EmitReleaseAttestation",
+      "predecessor_targets": [
+        "session_bootstrap",
+        "reservation_stage",
+        "dispatch_preview",
+        "fee_quote"
+      ]
+    },
+    {
+      "target_name": "invoice_sync",
+      "staged_name": "spectrum_invoice_sync.dll",
+      "primary_export": "SP_StageReleaseInvoice",
+      "predecessor_targets": [
+        "session_bootstrap",
+        "reservation_stage",
+        "attestation_stage"
+      ]
+    },
+    {
+      "target_name": "entitlement_sync",
+      "staged_name": "spectrum_entitlement_sync.dll",
+      "primary_export": "SP_StageCustomerEntitlementUpdate",
+      "predecessor_targets": [
+        "session_bootstrap",
+        "reservation_stage",
+        "attestation_stage"
+      ]
+    },
+    {
+      "target_name": "settlement_reconcile",
+      "staged_name": "spectrum_settlement_reconcile.dll",
+      "primary_export": "SP_ConfirmAttestedRelease",
+      "predecessor_targets": [
+        "session_bootstrap",
+        "reservation_stage",
+        "attestation_stage",
+        "invoice_sync",
+        "entitlement_sync"
+      ]
+    }
+  ],
+  "deferred_targets": [
+    "attestation_stage",
+    "invoice_sync",
+    "entitlement_sync",
+    "settlement_reconcile"
+  ],
+  "false_positive_frontier": [
+    {
+      "target_name": "audit_trace",
+      "staged_name": "spectrum_audit_trace.dll",
+      "primary_export": "SP_RecordReleaseReceipt",
+      "predecessor_targets": [
+        "session_bootstrap",
+        "reservation_stage",
+        "attestation_stage"
+      ]
+    },
+    {
+      "target_name": "replay_branch",
+      "staged_name": "spectrum_replay_branch.dll",
+      "primary_export": "SP_ReplayReleaseBranch",
+      "predecessor_targets": [
+        "reservation_stage"
+      ]
+    }
+  ],
+  "late_truth_targets": [
+    "settlement_reconcile"
+  ],
+  "required_output_artifact_names": [
+    "activation-plan-pass-one.json",
+    "activation-plan-pass-two.json",
+    "operator-useful-map.json",
+    "pass-two-reuse-report.json",
+    "efficiency-activation-report.json"
+  ],
+  "required_metrics_fields": [
+    "time_to_useful_map",
+    "surfaces_deeply_probed_pass_one",
+    "surfaces_deeply_probed_pass_two",
+    "deferred_surface_count",
+    "reuse_success_rate",
+    "wasted_deep_probe_count"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "RB-2026-04-11-spectrum-medium01-green-output-buffer-truth",
+  "title": "Aligned medium-01 still preserves stale output-buffer inputs in green write findings",
+  "class": "capture",
+  "layer": "s02 observed-success selection / s03 MC-3 write closeout",
+  "status": "active",
+  "symptom": "The full compiled medium-01 rerun at sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-01/20260411-120432 is semantically aligned, but green write findings still preserve stale output-buffer inputs and misleading MC-3 wording. SP_StageReleaseFeeQuote and SP_VerifyReservedRelease both close verified_success while carrying non-canonical output-buffer input values as the working_call.",
+  "smallest_reproducer": "Inspect sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-01/20260411-120432/runs/04-fee_quote/session/findings.json and runs/05-settlement_reconcile/session/findings.json together with api/pipeline/s02_probe/probe_loop.py and api/pipeline/s03_reconcile/mc3_write_analysis.py.",
+  "trust_impact": "Later proving families could inherit polluted green success rows as reusable truth, and human review is weakened because verified success is still framed as accidental success with stale output-buffer inputs.",
+  "allowed_next_actions": [
+    "inspect the smallest owner for choosing one best success row per output-buffered write function",
+    "patch only the owner seams that let MC-3 or observed-success ranking preserve stale output-buffer inputs",
+    "rerun only the fee-quote and validator seams to confirm the canonical green row is now preserved"
+  ],
+  "disallowed_next_actions": [
+    "treat medium-01 green as fully reusable for later proving families without tightening this closeout truth",
+    "jump to medium-02 or hard-mode proving before output-buffered green rows are trustworthy",
+    "broadly rewrite success wording across unrelated function families"
+  ],
+  "exit_criteria": "Fee-quote and validator reruns stay green while their preserved working_call and direct_target_truth rows use the canonical output-buffer shape and no longer rely on misleading MC-3 accidental-success wording.",
+  "next_move": "fix"
+}

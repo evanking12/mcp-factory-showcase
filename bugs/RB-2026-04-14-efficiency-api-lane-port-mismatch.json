@@ -1,0 +1,35 @@
+{
+  "id": "RB-2026-04-14-efficiency-api-lane-port-mismatch",
+  "title": "Compiled efficiency baseline runner invocation needs explicit localhost:8201 API URL and explicit bridge key",
+  "status": "narrowed",
+  "class": "contract",
+  "layer": "compiled efficiency runner invocation / API lane identity",
+  "symptom": "Baseline run failed first because API health was checked on localhost:8001 while the live API listener is on localhost:8201, then failed again because bridge identity required an explicit bridge key in this shell.",
+  "smallest_reproducer": ".venv\\Scripts\\python.exe scripts\\runs\\run_spectrum_efficiency_activation.py --api-url http://localhost:8201 --bridge-key <configured-bridge-secret> --output-root dynamic_campaigns\\efficiency_workflow_architect_v1\\outputs\\evaluations\\proving_runs\\baseline-01",
+  "trust_impact": "Compiled-suite proving-surface trust is red until the runner uses the trusted API lane and explicit bridge credentials.",
+  "allowed_next_actions": [
+    "verify bridge and API port reachability",
+    "rerun the baseline against http://localhost:8201 with explicit --bridge-key",
+    "capture the rerun packet and proving-authority review"
+  ],
+  "disallowed_next_actions": [
+    "workflow-policy experiments",
+    "semantic debugging",
+    "hard-family reruns",
+    "ranking coordinator seams from the failed localhost:8001 attempt"
+  ],
+  "exit_criteria": [
+    "compiled efficiency baseline completes against the trusted API lane with explicit bridge credentials",
+    "a proving-authority review can judge the resulting baseline packet"
+  ],
+  "next_move": "superseded",
+  "superseded_by": "RB-2026-04-14-efficiency-baseline-dispatch-preview-no-output",
+  "trust_zones": {
+    "compiled_efficiency_fixture": "green",
+    "bridge_lane_8090": "green",
+    "api_lane_default_8001": "red",
+    "api_lane_8201": "green",
+    "bridge_identity_without_explicit_key": "red",
+    "coordinator_policy_claims": "yellow until baseline rerun lands"
+  }
+}

@@ -1,0 +1,347 @@
+{
+  "version": "1.0",
+  "contract_version": "1.0.0",
+  "auditor_version": "1.0.0",
+  "transitions": [
+    {
+      "id": "T-01",
+      "name": "hints_to_vocab",
+      "status": "pass",
+      "producer_stage": "S-01",
+      "consumer_stage": "S-02",
+      "producer_evidence": [
+        "evidence/stage-01-pre-probe/hints.txt"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-01-pre-probe/vocab.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-02-probe-loop/stage-context.txt"
+      ]
+    },
+    {
+      "id": "T-02",
+      "name": "hint_error_codes_to_sentinels",
+      "status": "pass",
+      "producer_stage": "S-01",
+      "consumer_stage": "S-01",
+      "producer_evidence": [
+        "evidence/stage-01-pre-probe/hints.txt"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-01-pre-probe/sentinel-calibration.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-01-pre-probe/vocab.json"
+      ]
+    },
+    {
+      "id": "T-03",
+      "name": "vocab_to_probe_prompt",
+      "status": "pass",
+      "producer_stage": "S-01",
+      "consumer_stage": "S-02",
+      "producer_evidence": [
+        "evidence/stage-01-pre-probe/vocab.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-02-probe-loop/stage-context.txt"
+      ],
+      "effect_evidence": [
+        "evidence/stage-02-probe-loop/probe-log.json"
+      ]
+    },
+    {
+      "id": "T-04",
+      "name": "static_analysis_to_probe_prompt",
+      "status": "pass",
+      "producer_stage": "S-01",
+      "consumer_stage": "S-02",
+      "producer_evidence": [
+        "evidence/stage-01-pre-probe/static-analysis.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-02-probe-loop/probe-user-message-sample.txt"
+      ],
+      "effect_evidence": [
+        "evidence/stage-02-probe-loop/probe-log.json"
+      ]
+    },
+    {
+      "id": "T-05",
+      "name": "static_ids_to_fallback_args",
+      "status": "pass",
+      "producer_stage": "S-01",
+      "consumer_stage": "S-02",
+      "producer_evidence": [
+        "evidence/stage-01-pre-probe/static-analysis.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-02-probe-loop/probe-log.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-02-probe-loop/findings.json"
+      ]
+    },
+    {
+      "id": "T-06",
+      "name": "probe_findings_to_synthesis",
+      "status": "pass",
+      "producer_stage": "S-02",
+      "consumer_stage": "S-04",
+      "producer_evidence": [
+        "evidence/stage-02-probe-loop/findings.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-04-synthesis/api-reference.md"
+      ],
+      "effect_evidence": [
+        "evidence/stage-04-synthesis/stage-context.txt"
+      ]
+    },
+    {
+      "id": "T-07",
+      "name": "synthesis_to_backfill_patches",
+      "status": "pass",
+      "producer_stage": "S-04",
+      "consumer_stage": "S-05",
+      "producer_evidence": [
+        "evidence/stage-04-synthesis/api-reference.md"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-05-backfill/backfill-report.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-05-backfill/schema-post-backfill.json"
+      ]
+    },
+    {
+      "id": "T-08",
+      "name": "enrich_call_to_schema",
+      "status": "pass",
+      "producer_stage": "S-02",
+      "consumer_stage": "S-05",
+      "producer_evidence": [
+        "evidence/stage-02-probe-loop/probe-log.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-00-setup/invocables-map.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-05-backfill/schema-post-backfill.json"
+      ]
+    },
+    {
+      "id": "T-09",
+      "name": "auto_enrich_to_schema",
+      "status": "pass",
+      "producer_stage": "S-02",
+      "consumer_stage": "S-05",
+      "producer_evidence": [
+        "evidence/stage-02-probe-loop/probe-log.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-00-setup/invocables-map.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-05-backfill/schema-post-backfill.json"
+      ]
+    },
+    {
+      "id": "T-10",
+      "name": "vocab_to_param_names",
+      "status": "pass",
+      "producer_stage": "S-01",
+      "consumer_stage": "S-05",
+      "producer_evidence": [
+        "evidence/stage-01-pre-probe/vocab.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-00-setup/invocables-map.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-05-backfill/schema-post-backfill.json"
+      ]
+    },
+    {
+      "id": "T-11",
+      "name": "enriched_knowledge_to_synthesis_input",
+      "status": "pass",
+      "producer_stage": "S-02",
+      "consumer_stage": "S-04",
+      "producer_evidence": [
+        "evidence/stage-02-probe-loop/findings.json",
+        "evidence/stage-01-pre-probe/vocab.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-04-synthesis/stage-context.txt"
+      ],
+      "effect_evidence": [
+        "evidence/stage-04-synthesis/api-reference.md"
+      ]
+    },
+    {
+      "id": "T-12",
+      "name": "gap_answers_to_mini_session_context",
+      "status": "pass",
+      "producer_stage": "S-06",
+      "consumer_stage": "S-06",
+      "producer_evidence": [
+        "evidence/stage-01-pre-probe/vocab.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-06-gap-resolution/mini-session-transcript.txt"
+      ],
+      "effect_evidence": [
+        "evidence/stage-06-gap-resolution/gap-resolution-log.json"
+      ]
+    },
+    {
+      "id": "T-13",
+      "name": "mini_session_to_schema_evolution",
+      "status": "pass",
+      "producer_stage": "S-06",
+      "consumer_stage": "S-06",
+      "producer_evidence": [
+        "evidence/stage-06-gap-resolution/mini-session-transcript.txt"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-06-gap-resolution/schema-pre-mini-session.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-06-gap-resolution/schema-post-mini-session.json"
+      ]
+    },
+    {
+      "id": "T-14",
+      "name": "findings_to_chat_prompt",
+      "status": "pass",
+      "producer_stage": "S-02",
+      "consumer_stage": "S-07",
+      "producer_evidence": [
+        "evidence/stage-02-probe-loop/findings.json"
+      ],
+      "consumer_evidence": [
+        "diagnostics/chat-system-context-turn0.txt"
+      ],
+      "effect_evidence": [
+        "diagnostics/executor-trace.json"
+      ]
+    },
+    {
+      "id": "T-15",
+      "name": "vocab_to_chat_prompt",
+      "status": "pass",
+      "producer_stage": "S-01",
+      "consumer_stage": "S-07",
+      "producer_evidence": [
+        "evidence/stage-01-pre-probe/vocab.json"
+      ],
+      "consumer_evidence": [
+        "diagnostics/chat-system-context-turn0.txt"
+      ],
+      "effect_evidence": [
+        "diagnostics/executor-trace.json"
+      ]
+    },
+    {
+      "id": "T-16",
+      "name": "schema_evolution_present",
+      "status": "pass",
+      "producer_stage": "S-00",
+      "consumer_stage": "S-07",
+      "producer_evidence": [
+        "evidence/stage-00-setup/schema-t0.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-07-finalize/schema-evolution.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-07-finalize/schema-final.json"
+      ]
+    },
+    {
+      "id": "T-17",
+      "name": "sentinel_calibration_outcome",
+      "status": "pass",
+      "producer_stage": "S-01",
+      "consumer_stage": "S-02",
+      "producer_evidence": [
+        "evidence/stage-01-pre-probe/sentinel-calibration.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-02-probe-loop/stage-context.txt"
+      ],
+      "effect_evidence": [
+        "evidence/stage-02-probe-loop/probe-log.json"
+      ]
+    },
+    {
+      "id": "T-18",
+      "name": "write_unlock_probe_outcome",
+      "status": "pass",
+      "producer_stage": "S-01",
+      "consumer_stage": "S-02",
+      "producer_evidence": [
+        "evidence/stage-01-pre-probe/write-unlock-probe.json"
+      ],
+      "consumer_evidence": [
+        "evidence/stage-02-probe-loop/probe-log.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-02-probe-loop/probe-log.json"
+      ]
+    },
+    {
+      "id": "T-19",
+      "name": "mc_coordinator_decisions",
+      "status": "pass",
+      "producer_stage": "S-02",
+      "consumer_stage": "S-06",
+      "producer_evidence": [
+        "evidence/mc-decisions/mc3-post-reconcile.json",
+        "evidence/mc-decisions/mc4-post-synthesis.json"
+      ],
+      "consumer_evidence": [
+        "evidence/mc-decisions/mc5-post-verification.json",
+        "evidence/mc-decisions/mc6-post-gap-resolution.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-02-probe-loop/findings.json"
+      ]
+    },
+    {
+      "id": "T-20",
+      "name": "enrichment_verification_outcome",
+      "status": "pass",
+      "producer_stage": "S-05",
+      "consumer_stage": "S-06",
+      "producer_evidence": [
+        "evidence/stage-05-backfill/backfill-report.json",
+        "evidence/stage-02-probe-loop/findings.json"
+      ],
+      "consumer_evidence": [
+        "evidence/mc-decisions/verification-report.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-02-probe-loop/findings.json"
+      ]
+    },
+    {
+      "id": "T-21",
+      "name": "winning_init_sequence_persistence",
+      "status": "pass",
+      "producer_stage": "S-02",
+      "consumer_stage": "S-07",
+      "producer_evidence": [
+        "evidence/mc-decisions/mc6-post-gap-resolution.json"
+      ],
+      "consumer_evidence": [
+        "evidence/mc-decisions/winning-init-sequence.json"
+      ],
+      "effect_evidence": [
+        "evidence/stage-02-probe-loop/findings.json"
+      ]
+    }
+  ]
+}

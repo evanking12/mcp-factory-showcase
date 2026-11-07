@@ -1,0 +1,59 @@
+# Handoff Formatter Bot Eval 01
+
+- `evaluation_id`
+  - `handoff-formatter-bot-eval-01`
+- `evaluated_at`
+  - `2026-04-10`
+- `role_name`
+  - `handoff_formatter_bot`
+- `role_family`
+  - `handoff`
+- `prompt_version`
+  - `initial_prompt_contract_v1`
+- `task_id`
+  - `commit-3bd368b-vs-72a6846`
+- `task_type`
+  - `real_diff`
+- `task_input`
+  - produce a structured handoff block for the overnight checkpoint commit
+- `repo_surfaces_used`
+  - `git diff 72a6846..3bd368b`
+  - commit `3bd368b`
+  - system and prompt-chain docs referenced by the change
+- `output_produced`
+  - structured handoff with systems, contracts, evidence artifacts, tests,
+    residual risks, and next reviewers, plus self-critique
+- `what_it_got_right`
+  - produced the required handoff fields
+  - correctly framed the checkpoint as a cross-system change with residual risk
+  - self-critique usefully identified missing evidence and too-broad summaries
+- `what_it_missed`
+  - did not include a compact hotspot list
+  - did not structure test evidence tightly enough to be machine-reviewable
+  - did not tag confidence or missing evidence per field
+- `what_it_overclaimed`
+  - some `tests_run` and evidence statements were inferential rather than
+    strictly observed, even though the self-critique admitted that weakness
+- `signal_to_noise_assessment`
+  - useful but too broad for a high-throughput checkpoint workflow
+- `citation_quality_assessment`
+  - good system-level citation quality, weaker per-artifact prioritization
+- `boundedness_assessment`
+  - stayed within handoff scope
+- `usefulness_for_next_branch_choice`
+  - useful; it demonstrates the handoff role is worth keeping, but only after
+    stricter evidence hygiene
+- `refinement_needed`
+  - add `evidence_confidence` per field:
+    - `observed`
+    - `inferred`
+    - `missing`
+  - make `tests_run` structured:
+    - command
+    - pass/fail
+    - evidence path
+  - add `hotspots` with max five risky files
+  - require `next_reviewer` to include reviewer purpose and acceptance question
+  - emit `MISSING_EVIDENCE` instead of implying completion when proof is absent
+- `decision`
+  - `refine`

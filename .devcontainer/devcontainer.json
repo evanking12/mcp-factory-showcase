@@ -1,0 +1,49 @@
+{
+  "name": "MCP Factory",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "onCreateCommand": "pip install -r requirements.txt -r api/requirements.txt -r ui/requirements.txt",
+  "postCreateCommand": "pip install --quiet pre-commit && pre-commit install --install-hooks 2>/dev/null || true",
+  "forwardPorts": [
+    8000,
+    3000,
+    5000
+  ],
+  "portsAttributes": {
+    "8000": { "label": "Pipeline API", "onAutoForward": "notify" },
+    "3000": { "label": "MCP Factory UI", "onAutoForward": "openBrowser" },
+    "5000": { "label": "MCP Server", "onAutoForward": "notify" }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.terminal.activateEnvInCurrentTerminal": true,
+        "editor.formatOnSave": true,
+        "editor.rulers": [100]
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.debugpy",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-dotnettools.dotnet-interactive-vscode",
+        "redhat.vscode-yaml",
+        "humao.rest-client"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/dotnet:2": {
+      "version": "8.0"
+    }
+  },
+  "secrets": {
+    "OPENAI_API_KEY": { "description": "Direct OpenAI API key for local-first development" },
+    "MCP_STORAGE_BACKEND": { "description": "Use 'local' for normal local development and proving" },
+    "GUI_BRIDGE_SECRET": { "description": "Shared secret for the local bridge lane" }
+  },
+  "remoteEnv": {
+    "PYTHONPATH": "${containerWorkspaceFolder}/src/discovery"
+  }
+}

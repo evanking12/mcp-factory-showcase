@@ -1,0 +1,28 @@
+{
+  "id": "RB-2026-04-04-batch-b-overlap-static-id-contamination",
+  "title": "Batch B overlap regressions persist through static_id and overlap-baseline contamination",
+  "class": "capture",
+  "layer": "overlap-baseline evidence capture and selector input shaping",
+  "symptom": "Trusted Batch B overlap remains comparable but workflow, reporting, config, and pricing regressions still enter through static_id and overlap-baseline candidate pools before family-sensitive selector rules can fully correct them.",
+  "smallest_reproducer": "Trusted Batch B rerun 20260404-144931 / campaign 8ea9d3bc on WF_GetWorkflowState, WF_CancelWorkflow, PR_GetQuoteState, PR_SealQuote, CFG_GetLicenseNonce, CFG_ApproveLicensedCall, and RP_CloseReport.",
+  "trust_impact": "Architecture selection remains blocked because the overlap slice is still regressing by -23 despite a trustworthy comparison surface.",
+  "allowed_next_actions": [
+    "tighten resolved-type-aware family inference for misclassified string-style slots",
+    "demote or block static_id values from family-sensitive and numeric slots when they violate expected semantic family",
+    "sanitize overlap-baseline carry-forward so foreign-family values do not enter the candidate pool as trusted overlap evidence",
+    "rerun wave-2-batch-b only after the bounded fix"
+  ],
+  "disallowed_next_actions": [
+    "run Batch C",
+    "start a new architecture tranche",
+    "treat Batch B as stable enough for next-system selection",
+    "add Contoso-specific exception tables to core selector logic"
+  ],
+  "exit_criteria": [
+    "Batch B remains trusted and overlap-baseline comparable",
+    "workflow and reporting no longer route family-sensitive slots through foreign static_id or overlap-baseline values",
+    "config no longer reuses ticket envelopes as nonce or buffer-size values",
+    "the overlap verified delta is no longer materially negative due to foreign-family contamination"
+  ],
+  "next_move": "fix"
+}

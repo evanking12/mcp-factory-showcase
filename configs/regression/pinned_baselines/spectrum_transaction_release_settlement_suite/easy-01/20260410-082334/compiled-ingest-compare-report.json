@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0.0",
+  "suite_id": "spectrum_transaction_release_settlement_suite",
+  "case_id": "easy-01",
+  "proof_class": "compiled_local_binary",
+  "entry_surface": "upload",
+  "compiled_fixture_root": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite",
+  "compiled_targets": [
+    "spectrum_session_bootstrap.dll",
+    "spectrum_reservation_stage.dll",
+    "spectrum_release_commit.dll",
+    "spectrum_audit_trace.dll"
+  ],
+  "expected_active_modules": [
+    "session_bootstrap",
+    "reservation_stage",
+    "release_commit",
+    "audit_trace"
+  ],
+  "expected_execution_flow": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "release_commit.commit_release",
+    "audit_trace.record_release_receipt"
+  ],
+  "expected_symbol_flow": [
+    "SP_OpenOperatorSession",
+    "SP_IssueReleaseHold",
+    "SP_CommitRelease",
+    "SP_RecordReleaseReceipt"
+  ],
+  "discovered_symbol_flow": [
+    "SP_OpenOperatorSession",
+    "SP_IssueReleaseHold",
+    "SP_CommitRelease",
+    "SP_RecordReleaseReceipt",
+    "SP_InvalidateUntrustedBranch",
+    "SP_RecordStaleAttestationInvalidation"
+  ],
+  "semantic_symbol_flow": [
+    "SP_OpenOperatorSession",
+    "SP_IssueReleaseHold",
+    "SP_CommitRelease",
+    "SP_RecordReleaseReceipt"
+  ],
+  "binary_ingest_proof_succeeded": true,
+  "binary_embodiment_gap": [],
+  "semantic_checkpoint_alignment_succeeded": true,
+  "semantic_checkpoint_gap": [],
+  "per_run": [
+    {
+      "dll_name": "spectrum_session_bootstrap.dll",
+      "job_id": "98113b8b",
+      "entry_surface": "upload",
+      "binary_hash": "cc2c00f32e32d71f31f3f192fb4b9aed000918a0cf32232ed50752ddad254b46",
+      "expected_exports": [
+        "SP_OpenOperatorSession"
+      ],
+      "discovered_invocables": [
+        "SP_OpenOperatorSession",
+        "entry"
+      ],
+      "export_contract_match": true,
+      "semantic_checkpoint_statuses": {
+        "SP_OpenOperatorSession": "verified_success"
+      },
+      "semantic_checkpoint_match": true,
+      "session_artifacts_present": true
+    },
+    {
+      "dll_name": "spectrum_reservation_stage.dll",
+      "job_id": "518b98f0",
+      "entry_surface": "upload",
+      "binary_hash": "ce27b2c37755acc75bb030d16b0338aa91a7f609da7dc1975efae9d31d5a931b",
+      "expected_exports": [
+        "SP_IssueReleaseHold"
+      ],
+      "discovered_invocables": [
+        "SP_IssueReleaseHold",
+        "entry"
+      ],
+      "export_contract_match": true,
+      "semantic_checkpoint_statuses": {
+        "SP_IssueReleaseHold": "verified_success"
+      },
+      "semantic_checkpoint_match": true,
+      "session_artifacts_present": true
+    },
+    {
+      "dll_name": "spectrum_release_commit.dll",
+      "job_id": "85e7dbc3",
+      "entry_surface": "upload",
+      "binary_hash": "e8638a110e54094058cef7f3a43c6cf3e2d8f74d2126cc40c46cbf7e5d03e357",
+      "expected_exports": [
+        "SP_CommitRelease"
+      ],
+      "discovered_invocables": [
+        "SP_CommitRelease",
+        "entry"
+      ],
+      "export_contract_match": true,
+      "semantic_checkpoint_statuses": {
+        "SP_CommitRelease": "verified_success"
+      },
+      "semantic_checkpoint_match": true,
+      "session_artifacts_present": true
+    },
+    {
+      "dll_name": "spectrum_audit_trace.dll",
+      "job_id": "240d4549",
+      "entry_surface": "upload",
+      "binary_hash": "e18460d5c90aa623c98dabcbf8167f4e3f2708947fb68ef4364bf5cb3904a62a",
+      "expected_exports": [
+        "SP_RecordReleaseReceipt",
+        "SP_InvalidateUntrustedBranch",
+        "SP_RecordStaleAttestationInvalidation"
+      ],
+      "discovered_invocables": [
+        "SP_InvalidateUntrustedBranch",
+        "SP_RecordReleaseReceipt",
+        "SP_RecordStaleAttestationInvalidation",
+        "entry"
+      ],
+      "export_contract_match": true,
+      "semantic_checkpoint_statuses": {
+        "SP_RecordReleaseReceipt": "verified_success",
+        "SP_InvalidateUntrustedBranch": "",
+        "SP_RecordStaleAttestationInvalidation": ""
+      },
+      "semantic_checkpoint_match": false,
+      "session_artifacts_present": true
+    }
+  ],
+  "comparison_note": "compiled binary ingest proof succeeded and easy-01 semantic checkpoints aligned",
+  "generated_at": "2026-04-10T08:35:20",
+  "output_dir": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\easy-01\\20260410-082334",
+  "authored_truth_manifest": ".\\docs\\architecture\\engineScaling\\engineScaling_SpectrumDesignSuite\\SpectrumDesignSuite_Source\\transaction_release_settlement_suite\\truth_manifest.json",
+  "compiled_truth_manifest": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\truth_manifest.json",
+  "package_manifest": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\package_manifest.json",
+  "product_validity": "compiled_local_binary",
+  "northstar_classification": "architecture-proof",
+  "spectrum_source_classification": "architecture-proof",
+  "spectrum_compiled_classification": "product-valid",
+  "authored_suite_id": "spectrum_transaction_release_settlement_suite"
+}

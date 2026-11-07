@@ -1,0 +1,64 @@
+{
+  "id": "RB-2026-04-05-batch-b-adjacent-system-pivot-after-nonfruitful-fix",
+  "title": "Batch B stayed trusted but regressed from the -15 frontier after the nested retry fix; pivot to adjacent systems",
+  "class": "architecture",
+  "layer": "adjacent_system_selection_after_nonfruitful_batch_b_fix",
+  "symptom": "The bounded nested blocked-prereq retry fix cleared the config KeyError reproducer and the full Batch B rerun completed cleanly, but the trustworthy overlap surface worsened from the prior -15 frontier to overlap_verified_delta = -22 on campaign 54e06dab. No overlap regressions were recovered and 14 additional overlap regressions appeared across config, workflow, reporting, and pricing. This means the fix was valid as a state-correctness repair but non-fruitful as a Batch B improvement lane. The next step should no longer be another replay-hygiene tweak on the same theory; it should pivot to documented adjacent systems whose fit is now directly supported by the campaign attribution report.",
+  "smallest_reproducer": {
+    "wave_id": "wave-2-batch-b",
+    "campaign_id": "54e06dab",
+    "package_id": "contoso-business-suite",
+    "lane_gate_status": "trusted",
+    "overlap_baseline_comparable": true,
+    "previous_trusted_frontier_campaign_id": "f6ba985b",
+    "previous_overlap_verified_delta": -15,
+    "current_overlap_verified_delta": -22,
+    "new_regressions_since_frontier": [
+      "CFG_ApproveLicensedCall",
+      "CFG_RunCustomerSync",
+      "WF_GetWorkflowNonce",
+      "WF_ConfirmWorkflow",
+      "WF_OpenFulfillment",
+      "RP_GetReportNonce",
+      "RP_CloseReport",
+      "RP_GetReportState",
+      "RP_GetWorkflowHandle",
+      "RP_SelectFormat",
+      "PR_GetQuoteNonce",
+      "PR_ApproveRuleWindow",
+      "PR_BeginQuote",
+      "PR_GetQuoteState"
+    ],
+    "candidate_systems_from_attribution": [
+      "generalized runtime artifact materializer",
+      "discovery opacity augmenter",
+      "business-rule and approval classifier",
+      "prerequisite and state-machine classifier"
+    ]
+  },
+  "trust_impact": "The run is trustworthy enough to block promotion, to block Batch C, and to justify a documented adjacent-system pivot. The issue is not measurement noise.",
+  "allowed_next_actions": [
+    "freeze 54e06dab as the latest trustworthy non-fruitful rerun",
+    "pivot to up to two documented adjacent systems with system-vetting fields recorded",
+    "start with generalized runtime artifact materializer and discovery opacity augmenter unless a cheaper local proof points elsewhere",
+    "add local proofs before any new Batch B rerun",
+    "rerun only wave-2-batch-b after the pivoted bounded fix is locally green",
+    "document a new system candidate only if the documented adjacent systems clearly do not fit"
+  ],
+  "disallowed_next_actions": [
+    "continue another live Batch B rerun without a new local proof",
+    "keep iterating on the same replay-hygiene lane without a new system boundary",
+    "run Batch C",
+    "treat the -22 result as acceptable because the config crash was fixed",
+    "hardcode Contoso-specific identifiers or per-function exceptions into pipeline core",
+    "promote a new architecture tranche from the current Batch B run"
+  ],
+  "exit_criteria": [
+    "the pivoted system note records purpose, home, adjacent systems, outputs, measurable effect, verification, monitoring, cohesiveness boundary, and weaknesses",
+    "a bounded first-wave local proof exists for the chosen adjacent system(s)",
+    "the next Batch B rerun stays trusted and overlap-baseline comparable",
+    "the overlap delta improves materially from -22 and at least beats the prior -15 frontier or narrows the regression bundle honestly",
+    "the next fix leaves reusable evidence behind instead of only repairing one-off replay behavior"
+  ],
+  "next_move": "pivot to documented adjacent systems, starting with generalized runtime artifact materializer and discovery opacity augmenter, then rerun only Batch B after local proofs pass"
+}

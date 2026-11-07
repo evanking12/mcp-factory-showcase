@@ -1,0 +1,24 @@
+{
+  "id": "RB-2026-04-23-easy01-product-gate-capture-stability",
+  "title": "Easy01 product Gate V1 repeatability breaks before Medium01 promotion",
+  "class": "capture",
+  "secondary_tags": [
+    "contract",
+    "measurement"
+  ],
+  "layer": "Gate V1 product suite / analyzer and session-capture closeout",
+  "symptom": "Prior Easy01 product gate evidence failed at audit_trace session_capture with T-08 and T-10 semantic naming failures; latest pre-fix rerun moved to release_commit analyzer_timeout.",
+  "trust_impact": "Medium01 promotion is blocked until the defended Easy01 product baseline holds through the checked-in Gate V1 path.",
+  "allowed_next_actions": [
+    "restore Gate V1 no-reload lane parity for product surfaces",
+    "preserve semantic parameter names through session capture",
+    "require two Easy01 Gate V1 confirmations"
+  ],
+  "disallowed_next_actions": [
+    "promote Medium01 while Easy01 Gate V1 is unstable",
+    "relax product_green required fields",
+    "treat historical compatibility evidence as active Easy01 truth"
+  ],
+  "next_move": "fix",
+  "status": "active"
+}

@@ -1,0 +1,60 @@
+{
+  "trace_id": "creator-batch-b",
+  "metrics": [
+    {
+      "name": "bundled_dll_count",
+      "value": 10,
+      "unit": "count",
+      "status": "pass",
+      "why": "Shows package-scale intake breadth before expensive deep analysis.",
+      "labels": {
+        "dependency_only": 2,
+        "runtime_target": 8
+      }
+    },
+    {
+      "name": "runtime_target_count",
+      "value": 8,
+      "unit": "count",
+      "status": "pass",
+      "why": "Shows selective activation: not every DLL is deeply probed immediately.",
+      "labels": {
+        "selected_policy": "curated_runtime_subset"
+      }
+    },
+    {
+      "name": "dependency_confidence_counts",
+      "value": {
+        "high": 9,
+        "medium": 1
+      },
+      "unit": "counts",
+      "status": "pass",
+      "why": "Shows that package intake preserves confidence, dependency, and role labels.",
+      "labels": {
+        "source": "package_manifest"
+      }
+    },
+    {
+      "name": "candidate_comparability_state",
+      "value": "diagnostic_package_replay",
+      "unit": "state",
+      "status": "warn",
+      "why": "Distinguishes diagnostic output from evidence that can support comparison.",
+      "labels": {
+        "not_substitute_for": "Spectrum product-green proof"
+      }
+    },
+    {
+      "name": "next_action_confidence",
+      "value": "medium",
+      "unit": "confidence",
+      "status": "pass",
+      "why": "Tells the operator whether to fix, rerun, inspect, or stop.",
+      "labels": {
+        "next_action": "use as package-scale intake pressure, not product-green proof"
+      }
+    }
+  ],
+  "claim_ceiling": "telemetry is diagnostic evidence only"
+}

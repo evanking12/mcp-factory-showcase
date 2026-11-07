@@ -1,0 +1,201 @@
+{
+  "package_id": "spectrum-efficiency-activation-suite",
+  "package_label": "Spectrum Efficiency Activation Suite",
+  "package_purpose": "Compiled binary benchmark package for staged activation and pass-two reuse on a Spectrum-medium-derived suite.",
+  "doc_visibility": "known_fixture",
+  "dependency_context": "sibling_install_folder",
+  "operator_notes": "Use upload as the canonical entry surface for the efficiency activation benchmark.",
+  "bundle_name": "spectrum-efficiency-activation-suite",
+  "stage_root": ".tmp/fixture-packages/spectrum-efficiency-activation-suite",
+  "zip_path": ".tmp/fixture-packages/spectrum-efficiency-activation-suite.zip",
+  "package_context": {
+    "package_shape": "install_folder",
+    "curated_runtime_subset": true,
+    "proving_goal": "efficiency_activation_benchmark",
+    "suite_role": "product_shaping_activation_suite"
+  },
+  "bundled_dlls": [
+    {
+      "staged_name": "spectrum_session_bootstrap.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_session_bootstrap.dll",
+      "role": "pass_one_active_frontier",
+      "dependency_confidence": "high",
+      "selection_reason": "pass_one_session_anchor"
+    },
+    {
+      "staged_name": "spectrum_reservation_stage.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_reservation_stage.dll",
+      "role": "pass_one_active_frontier",
+      "dependency_confidence": "high",
+      "selection_reason": "pass_one_reservation_fanout"
+    },
+    {
+      "staged_name": "spectrum_dispatch_preview.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_dispatch_preview.dll",
+      "role": "pass_one_active_frontier",
+      "dependency_confidence": "high",
+      "selection_reason": "pass_one_dispatch_surface"
+    },
+    {
+      "staged_name": "spectrum_fee_quote.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_fee_quote.dll",
+      "role": "pass_one_active_frontier",
+      "dependency_confidence": "high",
+      "selection_reason": "pass_one_fee_surface"
+    },
+    {
+      "staged_name": "spectrum_attestation_stage.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_attestation_stage.dll",
+      "role": "pass_two_expansion",
+      "dependency_confidence": "high",
+      "selection_reason": "pass_two_attestation_reuse"
+    },
+    {
+      "staged_name": "spectrum_invoice_sync.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_invoice_sync.dll",
+      "role": "pass_two_expansion",
+      "dependency_confidence": "medium",
+      "selection_reason": "pass_two_invoice_carry_forward"
+    },
+    {
+      "staged_name": "spectrum_entitlement_sync.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_entitlement_sync.dll",
+      "role": "pass_two_expansion",
+      "dependency_confidence": "medium",
+      "selection_reason": "pass_two_entitlement_carry_forward"
+    },
+    {
+      "staged_name": "spectrum_settlement_reconcile.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_settlement_reconcile.dll",
+      "role": "pass_two_late_truth",
+      "dependency_confidence": "high",
+      "selection_reason": "pass_two_late_truth_surface"
+    },
+    {
+      "staged_name": "spectrum_audit_trace.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_audit_trace.dll",
+      "role": "false_positive_frontier",
+      "dependency_confidence": "medium",
+      "selection_reason": "false_positive_rich_audit_surface"
+    },
+    {
+      "staged_name": "spectrum_replay_branch.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_replay_branch.dll",
+      "role": "false_positive_frontier",
+      "dependency_confidence": "medium",
+      "selection_reason": "false_positive_replay_surface"
+    }
+  ],
+  "selected_runtime_targets": [
+    {
+      "staged_name": "spectrum_session_bootstrap.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_session_bootstrap.dll",
+      "target_name": "session_bootstrap",
+      "selection_reason": "pass_one_session_anchor",
+      "dependency_confidence": "high",
+      "lane_id": "lane-activation",
+      "benchmark_group": "pass_one_active_frontier",
+      "primary_export": "SP_OpenOperatorSession"
+    },
+    {
+      "staged_name": "spectrum_reservation_stage.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_reservation_stage.dll",
+      "target_name": "reservation_stage",
+      "selection_reason": "pass_one_reservation_fanout",
+      "dependency_confidence": "high",
+      "lane_id": "lane-activation",
+      "benchmark_group": "pass_one_active_frontier",
+      "primary_export": "SP_IssueReleaseHold"
+    },
+    {
+      "staged_name": "spectrum_dispatch_preview.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_dispatch_preview.dll",
+      "target_name": "dispatch_preview",
+      "selection_reason": "pass_one_dispatch_surface",
+      "dependency_confidence": "high",
+      "lane_id": "lane-activation",
+      "benchmark_group": "pass_one_active_frontier",
+      "primary_export": "SP_PrepareReleasePreview"
+    },
+    {
+      "staged_name": "spectrum_fee_quote.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_fee_quote.dll",
+      "target_name": "fee_quote",
+      "selection_reason": "pass_one_fee_surface",
+      "dependency_confidence": "high",
+      "lane_id": "lane-activation",
+      "benchmark_group": "pass_one_active_frontier",
+      "primary_export": "SP_StageReleaseFeeQuote"
+    },
+    {
+      "staged_name": "spectrum_attestation_stage.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_attestation_stage.dll",
+      "target_name": "attestation_stage",
+      "selection_reason": "pass_two_attestation_reuse",
+      "dependency_confidence": "high",
+      "lane_id": "lane-activation",
+      "benchmark_group": "pass_two_expansion",
+      "primary_export": "SP_EmitReleaseAttestation"
+    },
+    {
+      "staged_name": "spectrum_invoice_sync.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_invoice_sync.dll",
+      "target_name": "invoice_sync",
+      "selection_reason": "pass_two_invoice_carry_forward",
+      "dependency_confidence": "medium",
+      "lane_id": "lane-activation",
+      "benchmark_group": "pass_two_expansion",
+      "primary_export": "SP_StageReleaseInvoice"
+    },
+    {
+      "staged_name": "spectrum_entitlement_sync.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_entitlement_sync.dll",
+      "target_name": "entitlement_sync",
+      "selection_reason": "pass_two_entitlement_carry_forward",
+      "dependency_confidence": "medium",
+      "lane_id": "lane-activation",
+      "benchmark_group": "pass_two_expansion",
+      "primary_export": "SP_StageCustomerEntitlementUpdate"
+    },
+    {
+      "staged_name": "spectrum_settlement_reconcile.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_settlement_reconcile.dll",
+      "target_name": "settlement_reconcile",
+      "selection_reason": "pass_two_late_truth_surface",
+      "dependency_confidence": "high",
+      "lane_id": "lane-activation",
+      "benchmark_group": "pass_two_expansion",
+      "primary_export": "SP_ConfirmAttestedRelease"
+    },
+    {
+      "staged_name": "spectrum_audit_trace.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_audit_trace.dll",
+      "target_name": "audit_trace",
+      "selection_reason": "false_positive_rich_audit_surface",
+      "dependency_confidence": "medium",
+      "lane_id": "lane-activation",
+      "benchmark_group": "false_positive_frontier",
+      "primary_export": "SP_RecordReleaseReceipt"
+    },
+    {
+      "staged_name": "spectrum_replay_branch.dll",
+      "source_path": "tests/fixtures/spectrum_efficiency_activation_suite/bin/spectrum_replay_branch.dll",
+      "target_name": "replay_branch",
+      "selection_reason": "false_positive_replay_surface",
+      "dependency_confidence": "medium",
+      "lane_id": "lane-activation",
+      "benchmark_group": "false_positive_frontier",
+      "primary_export": "SP_ReplayReleaseBranch"
+    }
+  ],
+  "support_files": [
+    {
+      "relative_path": "README.txt",
+      "contents": "Compiled Spectrum package for the efficiency activation benchmark."
+    },
+    {
+      "relative_path": "config/spectrum.ini",
+      "contents": "[suite]\nname=spectrum_efficiency_activation\nproof=activation_v1\n"
+    }
+  ]
+}

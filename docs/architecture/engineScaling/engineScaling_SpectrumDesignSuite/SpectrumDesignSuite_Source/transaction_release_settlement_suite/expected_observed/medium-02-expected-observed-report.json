@@ -1,0 +1,97 @@
+{
+  "artifact_type": "spectrum-expected-observed-report.json",
+  "contract_version": "1.0.0",
+  "case_id": "medium-02",
+  "slice_id": "spectrum:medium-02",
+  "module_family": [
+    "session_bootstrap",
+    "reservation_stage",
+    "attestation_stage",
+    "invoice_sync",
+    "entitlement_sync",
+    "settlement_reconcile"
+  ],
+  "expected_blockers": [
+    "lineage_materialization"
+  ],
+  "expected_producers": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "attestation_stage.emit_release_attestation"
+  ],
+  "expected_consumers": [
+    "invoice_sync.stage_release_invoice",
+    "entitlement_sync.stage_customer_entitlement_update",
+    "settlement_reconcile.confirm_attested_release"
+  ],
+  "expected_shared_state": [
+    "operator_token",
+    "attestation_packet",
+    "attestation_nonce"
+  ],
+  "expected_family_groups": [
+    "lineage_materialization"
+  ],
+  "expected_confirmation_sites": [
+    "settlement_reconcile.confirm_attested_release"
+  ],
+  "expected_lineage_branches": [],
+  "expected_accepted_branches": [],
+  "observed_blockers": [
+    "lineage_materialization"
+  ],
+  "observed_producers": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "attestation_stage.emit_release_attestation"
+  ],
+  "observed_consumers": [
+    "invoice_sync.stage_release_invoice",
+    "entitlement_sync.stage_customer_entitlement_update",
+    "settlement_reconcile.confirm_attested_release"
+  ],
+  "observed_shared_state": [
+    "operator_token",
+    "attestation_packet"
+  ],
+  "observed_family_groups": [
+    "lineage_materialization"
+  ],
+  "observed_confirmation_sites": [
+    "settlement_reconcile.confirm_attested_release"
+  ],
+  "observed_lineage_branches": [],
+  "observed_accepted_branches": [],
+  "mismatches": [
+    {
+      "field": "shared_state",
+      "expected": "attestation_nonce",
+      "observed": "not_reused_by_both_downstream_consumers",
+      "meaning": "the attestation packet exists, but its trust-preserving lineage is weaker than the direct fanout case"
+    }
+  ],
+  "overclaims": [
+    {
+      "path": "invoice_sync.stage_release_invoice",
+      "reason": "invoice staging can appear successful even though the delayed attestation packet is not yet globally confirmed"
+    }
+  ],
+  "underclaims": [
+    {
+      "path": "settlement_reconcile.confirm_attested_release",
+      "reason": "delayed attestation confirmation is the true comparison surface and cannot be treated as just another consumer call"
+    }
+  ],
+  "misgroups": [],
+  "deferred": [
+    {
+      "surface": "medium-01 reproducibility comparison",
+      "reason": "same-family confidence depends on whether delayed attestation loss is still attributable to lineage materialization rather than a doctrine split"
+    }
+  ],
+  "notes": [
+    "expected_authored_from_spectrum_contract",
+    "medium_reproducibility_expected",
+    "observed_side_models_delayed_attestation_reproducibility_pressure"
+  ]
+}

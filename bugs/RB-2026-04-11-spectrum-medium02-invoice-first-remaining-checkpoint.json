@@ -1,0 +1,22 @@
+{
+  "id": "RB-2026-04-11-spectrum-medium02-invoice-first-remaining-checkpoint",
+  "title": "Compiled medium-02 invoice checkpoint still collapses after attestation repair",
+  "class": "contract",
+  "layer": "compiled medium-02 invoice-stage owner seam",
+  "status": "resolved",
+  "symptom": "After Prompt 15 repaired the attestation checkpoint, the original medium-02 invoice artifact still showed SP_StageReleaseInvoice as an argless stdcall export with zero parameter coverage and failure -7104. Prompt 16 repaired that invoice contract/spec surface.",
+  "smallest_reproducer": "Original reproducer: sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-02/20260411-125905/runs/06-invoice_sync. Resolved by adding tests/fixtures/spectrum_transaction_release_settlement_suite/invoice_sync_contract_overlay/truth_manifest.json and rerunning the invoice seam at sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-02/invoice-first-remaining-checkpoint/20260411-133824.",
+  "trust_impact": "Treating entitlement or settlement as the next blocker before invoice was narrowed would have broken first-remaining-checkpoint discipline and spent proving budget on potentially inherited downstream failures. That risk is now removed for the invoice seam.",
+  "allowed_next_actions": [
+    "inspect only the invoice-stage run artifact and the smallest likely contract/spec owner seam",
+    "patch only the owner seam justified by evidence",
+    "rerun only the invoice checkpoint with the repaired attestation predecessor"
+  ],
+  "disallowed_next_actions": [
+    "treat entitlement or confirm as co-equal blockers before invoice is narrowed",
+    "spend a broader medium-02 rerun before the invoice checkpoint is locally trustworthy",
+    "jump to hard-01 or hard-02 while the first remaining medium-02 checkpoint is still unresolved"
+  ],
+  "exit_criteria": "Satisfied on 2026-04-11: the invoice checkpoint was narrowed to the compiled contract/spec owner seam, a targeted invoice proof surface was executed, and the branch now advances from truthful invoice evidence.",
+  "next_move": "advance"
+}

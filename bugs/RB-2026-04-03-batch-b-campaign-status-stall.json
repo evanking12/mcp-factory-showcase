@@ -1,0 +1,26 @@
+{
+  "id": "RB-2026-04-03-batch-b-campaign-status-stall",
+  "title": "Batch B campaign stalls with child status and explore phase disagreement",
+  "class": "state",
+  "layer": "campaign/job lifecycle",
+  "symptom": "Wave 2 Batch B never emitted wave-summary.json; contoso_transport child job a1bf5c0e reports status=done while explore_phase=exploring, and campaign-poll.json remains stale with sibling jobs stuck at discovered.",
+  "smallest_reproducer": "Run python scripts/runs/run_blocker_harvest_waves.py --start-wave wave-2-batch-b --stop-after-wave wave-2-batch-b on lane-1 after trusted Wave 1 and Batch A baselines.",
+  "trust_impact": "Package-level blocker-family interpretation is untrustworthy because campaign truth, cohesion, and attribution never reached a coherent terminal state even though lane health remained trusted.",
+  "allowed_next_actions": [
+    "inspect campaign poller and terminal state writers for child jobs",
+    "compare job status.json fields against campaign-poll.json for a1bf5c0e and siblings",
+    "run one matched-profile minimal lifecycle reproducer after fixing the state writer path"
+  ],
+  "disallowed_next_actions": [
+    "Batch C expansion",
+    "new architecture tranche selection from Batch B",
+    "external package expansion",
+    "rerunning Batch B without fixing the lifecycle inconsistency"
+  ],
+  "exit_criteria": [
+    "wave-2-batch-b emits wave-summary.json and next-step-verdict.json",
+    "campaign-poll.json reaches a coherent terminal phase",
+    "child jobs no longer disagree between status and explore_phase on the same run"
+  ],
+  "next_move": "fix"
+}

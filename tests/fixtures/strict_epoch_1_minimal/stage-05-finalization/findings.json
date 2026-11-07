@@ -1,0 +1,10 @@
+[
+  {
+    "function": "CS_GetVersion",
+    "status": "success"
+  },
+  {
+    "function": "CS_ProcessPayment",
+    "status": "functional_precondition_unmet"
+  }
+]

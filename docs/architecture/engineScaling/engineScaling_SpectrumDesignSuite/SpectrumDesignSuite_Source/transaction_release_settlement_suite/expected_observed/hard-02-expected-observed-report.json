@@ -1,0 +1,110 @@
+{
+  "artifact_type": "spectrum-expected-observed-report.json",
+  "contract_version": "1.0.0",
+  "case_id": "hard-02",
+  "slice_id": "spectrum:hard-02",
+  "module_family": [
+    "session_bootstrap",
+    "reservation_stage",
+    "attestation_stage",
+    "invoice_sync",
+    "entitlement_sync",
+    "settlement_reconcile",
+    "audit_trace"
+  ],
+  "expected_blockers": [
+    "lineage_materialization"
+  ],
+  "expected_producers": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "attestation_stage.emit_release_attestation"
+  ],
+  "expected_consumers": [
+    "invoice_sync.stage_release_invoice",
+    "entitlement_sync.stage_customer_entitlement_update",
+    "settlement_reconcile.invalidate_stale_attested_release",
+    "audit_trace.record_stale_attestation_invalidation"
+  ],
+  "expected_shared_state": [
+    "operator_token",
+    "session_nonce",
+    "attestation_packet",
+    "attestation_nonce",
+    "attestation_epoch"
+  ],
+  "expected_family_groups": [
+    "lineage_materialization"
+  ],
+  "expected_confirmation_sites": [
+    "settlement_reconcile.invalidate_stale_attested_release",
+    "audit_trace.record_stale_attestation_invalidation"
+  ],
+  "expected_lineage_branches": [],
+  "expected_accepted_branches": [],
+  "observed_blockers": [
+    "lineage_materialization"
+  ],
+  "observed_producers": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "attestation_stage.emit_release_attestation"
+  ],
+  "observed_consumers": [
+    "invoice_sync.stage_release_invoice",
+    "entitlement_sync.stage_customer_entitlement_update",
+    "settlement_reconcile.invalidate_stale_attested_release",
+    "audit_trace.record_stale_attestation_invalidation"
+  ],
+  "observed_shared_state": [
+    "operator_token",
+    "attestation_packet",
+    "attestation_nonce",
+    "attestation_epoch"
+  ],
+  "observed_family_groups": [
+    "lineage_materialization"
+  ],
+  "observed_confirmation_sites": [
+    "settlement_reconcile.invalidate_stale_attested_release",
+    "audit_trace.record_stale_attestation_invalidation"
+  ],
+  "observed_lineage_branches": [],
+  "observed_accepted_branches": [],
+  "mismatches": [
+    {
+      "field": "shared_state",
+      "expected": "session_nonce",
+      "observed": "attestation_epoch_outlives_session_freshness",
+      "meaning": "the packet remains locally reusable while global trust decays because freshness evidence is no longer attached strongly enough"
+    }
+  ],
+  "overclaims": [
+    {
+      "path": "invoice_sync.stage_release_invoice",
+      "reason": "invoice reuse can look valid after the freshness window has already expired"
+    },
+    {
+      "path": "entitlement_sync.stage_customer_entitlement_update",
+      "reason": "entitlement reuse can mirror the same stale packet and create a misleading sense of cross-consumer agreement"
+    }
+  ],
+  "underclaims": [
+    {
+      "path": "settlement_reconcile.invalidate_stale_attested_release",
+      "reason": "late stale-state invalidation is the real global truth surface and must stay attached to the packet lineage"
+    }
+  ],
+  "misgroups": [],
+  "deferred": [
+    {
+      "surface": "freshness_aware_lineage_observer",
+      "reason": "hard-02 should drive a later runtime verdict that distinguishes reusable local packet state from globally trustworthy packet state"
+    }
+  ],
+  "notes": [
+    "expected_authored_from_spectrum_contract",
+    "hard_stale_state_expected",
+    "observed_side_models_stale_but_plausible_attestation_reuse"
+  ]
+}

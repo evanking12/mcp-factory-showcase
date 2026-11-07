@@ -1,0 +1,25 @@
+{
+  "id": "RB-2026-04-02-soundtouch-local-bridge-auth-mismatch",
+  "title": "SoundTouch local lane API inherited stale bridge secret and failed /execute auth",
+  "class": "state",
+  "layer": "local 8201 API to 8090 bridge execution auth wiring",
+  "symptom": "The fresh local lane reported healthy API and bridge endpoints, but SoundTouch run ef19f959 failed with repeated 401 Unauthorized responses on bridge /execute because .env GUI_BRIDGE_SECRET and scripts/bridge/.bridge.env BRIDGE_SECRET were both present and not equal.",
+  "smallest_reproducer": "Start the local 8201 API with .tmp/start_local_api_8201.py while .env GUI_BRIDGE_SECRET is stale, then call any bridge-backed execute path through api.services.executor._call_execute_bridge against the 8090 bridge.",
+  "trust_impact": "SoundTouch reruns on the current lane are not semantically interpretable until API and bridge execution auth agree end to end.",
+  "allowed_next_actions": [
+    "restart only the local 8201 API and 8090 bridge pair with aligned secrets",
+    "verify /execute auth with one bounded bridge-backed sanity call before rerunning SoundTouch",
+    "treat ef19f959 only as an auth-broken run and exclude it from semantic comparison"
+  ],
+  "disallowed_next_actions": [
+    "new SoundTouch-specific heuristics",
+    "full DLL comparison claims based on ef19f959",
+    "multi-run retries before execute auth is proven clean"
+  ],
+  "exit_criteria": [
+    "The restarted 8201 API uses the bridge secret from scripts/bridge/.bridge.env for GUI_BRIDGE_SECRET",
+    "A bounded bridge-backed execute call succeeds on the 8201 -> 8090 lane",
+    "A subsequent SoundTouch rerun completes without bridge 401 Unauthorized errors"
+  ],
+  "next_move": "fix"
+}

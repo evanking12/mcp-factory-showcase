@@ -1,0 +1,78 @@
+{
+  "artifact_type": "spectrum-observer-summary.json",
+  "schema_version": "1.0.0",
+  "case_id": "medium-01",
+  "observer_results": [
+    {
+      "observer_name": "split_quality",
+      "subject_ids": [
+        "reservation_stage.issue_release_hold",
+        "dispatch_preview.prepare_release_preview",
+        "settlement_reconcile.verify_reserved_release"
+      ],
+      "focus": "reservation_producer_and_first_validator_coupling",
+      "expected_outputs": [
+        "split_verdict",
+        "preserved_primary_blocker",
+        "false_clarity_risk",
+        "next_action"
+      ],
+      "example_output": {
+        "split_verdict": "warn",
+        "preserved_primary_blocker": true,
+        "false_clarity_risk": "medium",
+        "next_action": "keep_validator_coupled_to_reservation_reasoning_unit"
+      }
+    },
+    {
+      "observer_name": "lineage_preservation",
+      "subject_ids": [
+        "reservation_stage.issue_release_hold",
+        "dispatch_preview.prepare_release_preview",
+        "fee_quote.stage_release_fee_quote"
+      ],
+      "focus": "reservation_handle_survival",
+      "expected_outputs": [
+        "lineage_verdict",
+        "missing_lineage_edges",
+        "trusted_artifact_family",
+        "next_action"
+      ],
+      "example_output": {
+        "lineage_verdict": "partial",
+        "missing_lineage_edges": [
+          "reservation_stage.issue_release_hold -> fee_quote.stage_release_fee_quote::hold_token"
+        ],
+        "trusted_artifact_family": "reservation_handle",
+        "next_action": "strengthen_shared_handle_carryover_before_claiming_clean_fanout"
+      }
+    },
+    {
+      "observer_name": "false_green",
+      "subject_ids": [
+        "dispatch_preview.prepare_release_preview",
+        "fee_quote.stage_release_fee_quote",
+        "settlement_reconcile.verify_reserved_release"
+      ],
+      "focus": "consumer_green_vs_late_validation",
+      "expected_outputs": [
+        "false_green_verdict",
+        "affected_paths",
+        "late_truth_conflict",
+        "next_action"
+      ],
+      "example_output": {
+        "false_green_verdict": "warn",
+        "affected_paths": [
+          "dispatch_preview.prepare_release_preview"
+        ],
+        "late_truth_conflict": "preview_ticket_can_look_valid_before_verify_reserved_release_confirms_shared_handle_trust",
+        "next_action": "treat_preview_green_as_local_only_until_settlement_validation_clears"
+      }
+    }
+  ],
+  "notes": [
+    "authored_from_spectrum_split_contract",
+    "medium_01_observers_now_model_false_green_and_lineage_carryover"
+  ]
+}

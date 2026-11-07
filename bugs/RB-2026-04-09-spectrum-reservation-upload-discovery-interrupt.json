@@ -1,0 +1,215 @@
+{
+  "id": "RB-2026-04-09-spectrum-reservation-upload-discovery-interrupt",
+  "title": "Spectrum reservation_stage intermittently dies in upload discovery with Windows control-event exit",
+  "class": "measurement",
+  "layer": "api/analyze upload worker and discovery subprocess boundary",
+  "symptom": "The same reservation_stage DLL sometimes fails in the live upload lane with `Discovery produced no output files`, return code `3221225786` (`0xC000013A`), and a Python `KeyboardInterrupt` during subprocess startup.",
+  "smallest_reproducer": "The same `spectrum_reservation_stage.dll` succeeds via direct discovery CLI, direct `_run_discovery()`, direct `_analyze_worker()`, `/api/analyze-path`, isolated `/api/analyze`, and stable API port `8201` upload. It fails in the Spectrum easy-01 upload run on API `8210` when handled by one reload-worker process (`pid=52044`), where the discovery child exits with `0xC000013A` before producing output files.",
+  "trust_impact": "Spectrum easy-01 and medium-01 cannot currently be treated as trustworthy semantic specimens because the authored chain stops at Reservation Stage before meaningful findings, validation, or later chain behavior can be emitted.",
+  "allowed_next_actions": [
+    "Instrument the live `/api/analyze` upload path and worker thread around subprocess launch, process-group inheritance, and console-control handling.",
+    "Compare failing `8210` reload-worker uploads against successful `8201` stable-worker uploads for parent process, worker pid, and reload-state differences.",
+    "Route around the blocker temporarily by using `analyze-path` for controlled Spectrum debugging until the upload-lane interrupt is understood."
+  ],
+  "disallowed_next_actions": [
+    "Interpreting Spectrum medium-01 as a semantic lineage failure before Reservation Stage upload discovery is stable.",
+    "More end-to-end Spectrum reruns that do not isolate the upload worker hidden variable.",
+    "UI or diagnosis ranking changes that pretend the upload lane is trustworthy."
+  ],
+  "exit_criteria": [
+    "The same reservation_stage DLL succeeds through `/api/analyze` upload under the Spectrum chain runner without `0xC000013A` or `KeyboardInterrupt`.",
+    "A failing and succeeding run can be explained by one controlled hidden variable, or the interrupt path is removed entirely.",
+    "Spectrum easy-01 reaches a fully emitted downstream review surface after Reservation Stage."
+  ],
+  "next_move": "fix",
+  "comparison_results": [
+    {
+      "variant": "A direct discovery CLI",
+      "outcome": "success",
+      "hidden_variables_controlled": [
+        "same DLL",
+        "same strict_dll profile",
+        "no API upload worker involved"
+      ],
+      "next_decision": "Discovery core is healthy outside the upload worker boundary."
+    },
+    {
+      "variant": "B direct _run_discovery import",
+      "outcome": "success",
+      "hidden_variables_controlled": [
+        "same DLL",
+        "same Python environment",
+        "no API route or worker dispatch"
+      ],
+      "next_decision": "_run_discovery itself is not deterministically broken."
+    },
+    {
+      "variant": "C direct _analyze_worker invocation",
+      "outcome": "success",
+      "hidden_variables_controlled": [
+        "same DLL",
+        "same worker code path",
+        "no live upload request boundary"
+      ],
+      "next_decision": "Worker logic can complete when process context is clean."
+    },
+    {
+      "variant": "D isolated /api/analyze upload on 8210",
+      "job_id": "4e26853d",
+      "outcome": "success",
+      "hidden_variables_controlled": [
+        "same DLL",
+        "same upload route",
+        "same analysis profile"
+      ],
+      "next_decision": "Upload route is not universally broken."
+    },
+    {
+      "variant": "E Spectrum easy-01 /api/analyze upload on 8210",
+      "job_id": "0c1b8dac",
+      "outcome": "failure",
+      "hidden_variables_controlled": [
+        "same DLL",
+        "same strict_dll profile",
+        "same lane metadata as Spectrum"
+      ],
+      "next_decision": "Failure reproduced with reload-worker pid=52044 and discovery child exit 0xC000013A."
+    },
+    {
+      "variant": "E-control direct /api/analyze upload on 8201 with Spectrum tags",
+      "job_id": "161e5d63",
+      "outcome": "success",
+      "hidden_variables_controlled": [
+        "same DLL",
+        "same Spectrum-style lane_id and playbook_step tags",
+        "same upload semantics",
+        "stable non-reload API process"
+      ],
+      "next_decision": "Spectrum tags are not the blocker; stable API process context succeeds."
+    },
+    {
+      "variant": "E-control direct /api/analyze upload on 8210 with Spectrum tags and skip_cache=true",
+      "job_id": "c91f4288",
+      "outcome": "success",
+      "hidden_variables_controlled": [
+        "same DLL",
+        "same Spectrum-style lane_id and playbook_step tags",
+        "same upload semantics",
+        "forced real discovery subprocess"
+      ],
+      "next_decision": "8210 can also succeed; the remaining hidden variable is the specific reload-worker process context, not tags alone."
+    }
+  ],
+  "isolated_hidden_variable": "The failing path is tied to one API `8210` reload-worker process context (`pid=52044`) rather than to the DLL, the upload route in general, or the Spectrum metadata. Stable API `8201` and another `8210` worker (`pid=26340`) both succeed with the same DLL and tags.",
+  "current_measurement_fabric_row": {
+    "campaign": "reservation_stage_analyzer_runtime_stall_v1",
+    "signal_key": "worker_startup_stall",
+    "parent_signal_key": "analyzer_timeout",
+    "family": "runner terminalization / API lane health",
+    "owner": "API worker startup / discovery worker scheduling",
+    "claim_ceiling": "analyzer-runtime stall authority only; no hard01 maturity claim",
+    "current_state": "active_blocker after latest current-code proof",
+    "latest_evidence": {
+      "child_interrupt_route": "child_nested_subprocess_interrupt and child_import_bootstrap_interrupt are now classifier-covered known signals",
+      "bounded_hard01_root": "dynamic_campaigns/reservation_stage_analyzer_runtime_stall_v1/outputs/evaluations/proving_runs/hard01/20260421-225425",
+      "observation": "reservation_stage stalled at analyze progress 10 with message Discovery started for spectrum_reservation_stage.dll; analyzer-runtime authority recorded worker_progress_10_persisted, but worker_before_discovery, _run_discovery, child launch, bridge, and Ghidra markers were absent"
+    },
+    "next_decision": "Run reservation_stage_worker_startup_stall_v1 to distinguish active-analysis lock contention, worker scheduling, status persistence ordering, stale queue state, or an exception before _run_discovery entry."
+  },
+  "current_worker_startup_split": {
+    "campaign": "reservation_stage_worker_startup_stall_v1",
+    "parent_signal_key": "worker_startup_stall",
+    "owner": "API worker startup / discovery worker scheduling",
+    "claim_ceiling": "worker-startup/status-persistence authority only; no hard01 maturity claim",
+    "new_subsignals": [
+      "post_progress_10_control_stall",
+      "progress_30_persist_stall",
+      "worker_pre_discovery_exception",
+      "active_analysis_lock_contention"
+    ],
+    "diagnostic_boundary": "after progress 10 and analyzer-runtime authority writeback, before progress 30 persistence and _run_discovery entry",
+    "bounded_hard01_root": "dynamic_campaigns/reservation_stage_worker_startup_stall_v1/outputs/evaluations/proving_runs/hard01/20260422-002126",
+    "bounded_hard01_result": "worker startup stall did not reproduce; worker advanced through progress 30, worker_before_discovery, _run_discovery, discovery child launch, and discovery child completion.",
+    "next_decision": "Latest-proof-wins reactivates child_import_bootstrap_interrupt as the active blocker."
+  },
+  "current_measurement_fabric_active_blocker": {
+    "signal_key": "post_explore_verdict_fetch_connection_reset",
+    "parent_signal_key": "runner_terminalization_gap",
+    "family": "Ghidra/static analyzer boundedness",
+    "owner": "runner post-explore artifact retrieval / API lane health",
+    "claim_ceiling": "runner post-explore artifact-fetch fail-closed authority only; no hard01 maturity claim",
+    "latest_evidence": {
+      "bounded_hard01_root": ".tmp/reservation-stage-post-progress-10-control-stall",
+      "observation": "session_bootstrap reached terminal explore status, then the runner crashed fetching /api/jobs/b452d371/verdict after ConnectionResetError(10054), before run-authority and suite summary writeback."
+    },
+    "next_decision": "Run hard_family_post_explore_artifact_fetch_fail_closed_v1; resume progress-10 proof only after post-explore artifact fetch failures close durably."
+  },
+  "current_progress_10_control_stall_split": {
+    "campaign": "reservation_stage_post_progress_10_control_stall_v1",
+    "parent_signal_key": "post_progress_10_control_stall",
+    "owner": "API worker progress-10 authority return boundary",
+    "claim_ceiling": "analyzer-runtime progress-10 control-flow authority only; no hard01 maturity claim",
+    "new_source_keys": [
+      "progress_10_status_persist_stall",
+      "progress_10_authority_emit_stall",
+      "progress_10_authority_return_marker_missing",
+      "progress_30_persist_start_missing",
+      "worker_pre_progress_30_exception",
+      "status_persistence_stale",
+      "unknown_post_progress_10_control_stall"
+    ],
+    "bounded_hard01_root": ".tmp/reservation-stage-post-progress-10-control-stall",
+    "bounded_hard01_result": "progress-10 proof was non-authoritative because the run did not reach reservation_stage; session_bootstrap hit post_explore_verdict_fetch_connection_reset after terminal explore.",
+    "next_decision": "Keep progress-10 breadcrumbs installed; rerun the progress-10 proof only after the post-explore artifact fetch gap fails closed."
+  },
+  "current_child_runtime_no_output_split": {
+    "campaign": "reservation_stage_discovery_child_runtime_no_output_v1",
+    "parent_signal_key": "discovery_child_running_no_output",
+    "owner": "discovery child runtime/output boundary",
+    "claim_ceiling": "discovery child runtime/no-output authority only; no hard01 maturity claim",
+    "new_source_keys": [
+      "child_bootstrap_import_hung",
+      "child_main_entry_missing",
+      "child_main_running_no_output",
+      "child_analysis_phase_hung",
+      "child_output_write_hung",
+      "child_wrapper_process_wait_stall",
+      "child_runtime_diagnostic_missing",
+      "unknown_child_runtime_no_output"
+    ],
+    "bounded_hard01_root": ".tmp/reservation-stage-discovery-child-runtime-no-output-proof3",
+    "bounded_hard01_result": "child-runtime/no-output did not reproduce as the active stop in the final current-code proof; reservation_stage stopped at progress 10 before progress-30 persistence or child launch.",
+    "known_child_wrapper_observation": "Corrective proof `.tmp/reservation-stage-discovery-child-runtime-no-output-proof2` found a real Python child runtime packet with `bootstrap_main_returned` and MCP output while the wrapper/Popen process did not return; this remains a mapped known signal but is not the active blocker after proof3.",
+    "next_decision": "Latest-proof-wins moves the active blocker to post_progress_10_control_stall."
+  },
+  "current_child_import_bootstrap_split": {
+    "campaign": "reservation_stage_child_import_bootstrap_interrupt_source_v1",
+    "parent_signal_key": "child_import_bootstrap_interrupt",
+    "owner": "discovery child process launch/import bootstrap",
+    "claim_ceiling": "discovery child import/bootstrap interrupt authority only; no hard01 maturity claim",
+    "new_source_keys": [
+      "child_bootstrap_import_interrupted",
+      "child_bootstrap_path_stat_interrupted",
+      "child_bootstrap_module_load_interrupted",
+      "child_bootstrap_no_diagnostic",
+      "unknown_child_import_bootstrap_interrupt"
+    ],
+    "bounded_hard01_root": "dynamic_campaigns/reservation_stage_child_import_bootstrap_interrupt_source_v1/outputs/evaluations/proving_runs/hard01/20260422-100718",
+    "bounded_hard01_result": "child_import_bootstrap_interrupt did not reproduce as the active stop; reservation_stage produced a discovery output file, then stalled at bridge_stream_no_heartbeat.",
+    "next_decision": "Latest-proof-wins moves the active blocker to bridge_stream_no_heartbeat."
+  },
+  "current_child_launch_boundary_split": {
+    "campaign": "reservation_stage_discovery_child_launch_boundary_v1",
+    "parent_signal_key": "discovery_child_launch_missing",
+    "owner": "discovery child process launch boundary",
+    "claim_ceiling": "discovery child launch boundary authority only; no hard01 maturity claim",
+    "new_source_keys": [
+      "discovery_child_popen_stall",
+      "discovery_child_popen_exception",
+      "discovery_child_running_no_output"
+    ],
+    "bounded_hard01_root": ".tmp/reservation-stage-discovery-child-launch-boundary",
+    "bounded_hard01_result": "child launch missing did not remain active; Popen returned and child pid 38940 was captured, but the child did not complete or emit output before timeout.",
+    "next_decision": "Latest-proof-wins moves the active blocker to discovery_child_running_no_output."
+  }
+}

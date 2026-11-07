@@ -1,0 +1,95 @@
+{
+  "contract_id": "local_runtime_contract_v1",
+  "trust_contract_version": "trust_contract_v1",
+  "systems": {
+    "api": {
+      "component": "api",
+      "role": "pipeline_control_plane",
+      "runtime_mode": "strict_local",
+      "scheme": "http",
+      "host": "127.0.0.1",
+      "port": 8201,
+      "alive_path": "/alive",
+      "health_path": "/health",
+      "identity_path": "/identity",
+      "readiness_path": "/readiness",
+      "local_lane_admission_path": "/local-lane-admission",
+      "start_mode": "ApiOnly",
+      "operator_home": "runtime/api/README.md",
+      "start_wrapper": "runtime/api/start.ps1",
+      "check_wrapper": "runtime/api/check.ps1",
+      "required_env_keys": [
+        "OPENAI_API_KEY",
+        "MCP_STORAGE_BACKEND",
+        "GUI_BRIDGE_URL",
+        "GUI_BRIDGE_SECRET"
+      ],
+      "failure_meanings": {
+        "identity_unavailable": "The process on the API lane is not exposing the owned MCP Factory API contract.",
+        "identity_role_mismatch": "The process on the API lane is not the pipeline control plane.",
+        "readiness_unavailable": "The API is present but not publishing explicit readiness.",
+        "bridge_not_ready": "The API cannot safely execute local runs because its bridge dependency is not ready."
+      }
+    },
+    "bridge": {
+      "component": "bridge",
+      "role": "execution_bridge",
+      "runtime_mode": "strict_local",
+      "scheme": "http",
+      "host": "127.0.0.1",
+      "port": 8090,
+      "alive_path": "/alive",
+      "health_path": "/health",
+      "identity_path": "/identity",
+      "readiness_path": "/readiness",
+      "local_lane_admission_path": "/local-lane-admission",
+      "auth_header": "X-Bridge-Key",
+      "required_capabilities": [
+        "execute",
+        "flush_dll_cache"
+      ],
+      "start_mode": "BridgeOnly",
+      "operator_home": "runtime/bridge/README.md",
+      "start_wrapper": "runtime/bridge/start.ps1",
+      "check_wrapper": "runtime/bridge/check.ps1",
+      "required_env_keys": [
+        "GUI_BRIDGE_URL",
+        "GUI_BRIDGE_SECRET"
+      ],
+      "failure_meanings": {
+        "identity_unavailable": "The process on the bridge lane is not exposing the owned MCP Factory bridge contract.",
+        "identity_capabilities_incomplete": "The bridge is missing required execution or cache-reset capability.",
+        "readiness_unavailable": "The bridge is present but not publishing explicit readiness.",
+        "bridge_secret_missing": "The bridge process does not have a configured shared secret, so execution trust is red."
+      }
+    },
+    "runner": {
+      "component": "runner",
+      "runner_name": "run_proving_lane_canary",
+      "phase": "phase_1",
+      "entry_script": "scripts/runs/run_proving_lane_canary.py",
+      "operator_home": "runtime/runners/proving-lane-canary/README.md",
+      "run_wrapper": "runtime/runners/proving-lane-canary/run.ps1",
+      "consumes": [
+        "api",
+        "bridge"
+      ],
+      "authoritative_output_packets": [
+        "lane-identity.json",
+        "lane-readiness.json",
+        "analyze-only-canary.json",
+        "bridge-execution-canary.json",
+        "lane-trust-packet.json"
+      ],
+      "pass_verdict": "passed",
+      "failure_meanings": {
+        "canary_verdict_failed": "The bounded lane-trust floor failed and the managed local lane should not steer a broader local run.",
+        "packet_missing": "The proving runner did not emit one or more required trust artifacts.",
+        "api_identity_invalid": "The runner did not observe a trustworthy API identity on the managed lane.",
+        "bridge_identity_invalid": "The runner did not observe a trustworthy bridge identity on the managed lane.",
+        "analyze_only_failed": "The lane could not complete the deterministic analyze-only trust check for the canonical canary DLL.",
+        "bridge_execution_failed": "The bridge could not complete the bounded cache-reset execution canary."
+      }
+    }
+  }
+}

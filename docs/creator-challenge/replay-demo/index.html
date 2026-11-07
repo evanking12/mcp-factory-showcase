@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MCP Factory Creator Replay</title>
+    <link rel="stylesheet" href="assets/replay.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="nav">
+        <div class="brand">MCP Factory</div>
+        <div class="nav-links">
+          <a href="#replay">Replay</a>
+          <a href="#telemetry">Telemetry</a>
+          <a href="#local">Run locally</a>
+        </div>
+      </nav>
+      <section class="hero-grid">
+        <div>
+          <p class="eyebrow">Creator Challenge static replay</p>
+          <h1>Compiled DLLs into staged, reviewable, agent-ready evidence.</h1>
+          <p class="lede">
+            This demo replays real MCP Factory run artifacts. It does not call a live backend,
+            expose an API key, or execute arbitrary binaries in the browser.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="#replay">Explore replay</a>
+            <a class="button ghost" href="#local">Run locally</a>
+          </div>
+        </div>
+        <aside class="claim-card">
+          <span class="label">Claim ceiling</span>
+          <strong>Static replay of real artifacts</strong>
+          <p>
+            The public page is evidence playback. Live execution remains a local workflow
+            with your own credentials, Ghidra/bridge setup, and pipeline services.
+          </p>
+        </aside>
+      </section>
+    </header>
+
+    <main>
+      <section class="section intro">
+        <div>
+          <h2>What this is showing</h2>
+          <p>
+            MCP Factory starts from compiled/no-source inputs, recovers callable surfaces
+            through Ghidra-backed analysis, captures durable evidence, and decides what
+            can safely be compared or exposed to downstream agents.
+          </p>
+        </div>
+        <div class="intro-grid">
+          <div class="mini-card">
+            <span>Input</span>
+            <strong>Compiled DLL</strong>
+            <p>No source is given to the product route.</p>
+          </div>
+          <div class="mini-card">
+            <span>Pipeline</span>
+            <strong>S00-S07</strong>
+            <p>Admission, evidence, probing, reconciliation, and closeout.</p>
+          </div>
+          <div class="mini-card">
+            <span>Output</span>
+            <strong>Artifacts</strong>
+            <p>Invocables, authority packets, compare reports, and claim ceilings.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="replay" class="section replay-layout">
+        <aside class="run-panel">
+          <div class="section-head">
+            <p class="eyebrow">Replay ladder</p>
+            <h2>Runs</h2>
+          </div>
+          <div id="run-list" class="run-list"></div>
+        </aside>
+
+        <section class="run-detail">
+          <div class="section-head">
+            <p class="eyebrow" id="run-tier">Loading</p>
+            <h2 id="run-title">Loading replay data</h2>
+            <p id="run-summary" class="muted"></p>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric-card">
+              <span>Targets</span>
+              <strong id="metric-targets">-</strong>
+            </div>
+            <div class="metric-card">
+              <span>Duration</span>
+              <strong id="metric-duration">-</strong>
+            </div>
+            <div class="metric-card">
+              <span>Safe to compare</span>
+              <strong id="metric-compare">-</strong>
+            </div>
+            <div class="metric-card">
+              <span>Green level</span>
+              <strong id="metric-green">-</strong>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <section class="panel">
+              <h3>Stage Replay</h3>
+              <div id="span-list" class="span-list"></div>
+            </section>
+            <section id="telemetry" class="panel">
+              <h3>OpenTelemetry-Shaped Metrics</h3>
+              <p class="muted small">Diagnostic evidence only. These metrics route engineering work; they do not prove product green by themselves.</p>
+              <div id="metric-list" class="telemetry-list"></div>
+            </section>
+          </div>
+
+          <div class="content-grid">
+            <section class="panel">
+              <h3>Recovered / Expected Flow</h3>
+              <div id="flow-list" class="flow-list"></div>
+            </section>
+            <section class="panel">
+              <h3>Artifacts</h3>
+              <div id="artifact-list" class="artifact-list"></div>
+            </section>
+          </div>
+
+          <section class="panel">
+            <h3>Target Evidence</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Target</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Evidence</th>
+                  </tr>
+                </thead>
+                <tbody id="target-table"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <section id="local" class="section local">
+        <div>
+          <p class="eyebrow">Run it yourself</p>
+          <h2>Live runs stay local</h2>
+          <p>
+            The public site is static for safety. To execute real analysis, clone the repo,
+            provide your own model provider key, install the local bridge/Ghidra dependencies, and
+            start the managed local stack.
+          </p>
+        </div>
+        <pre><code>git clone &lt;repo-url&gt;
+cd mcp-factory
+copy .env.example .env
+# add your own model provider key in .env
+powershell -ExecutionPolicy Bypass -File .\start.ps1 -NoBrowser
+open http://127.0.0.1:8082/simple</code></pre>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Static replay. No live backend. No bundled API key. No browser-side binary execution.</span>
+      <a href="data/index.json">Replay index JSON</a>
+    </footer>
+
+    <script src="assets/replay.js"></script>
+  </body>
+</html>

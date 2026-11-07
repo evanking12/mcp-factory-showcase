@@ -1,0 +1,39 @@
+{
+  "case_id": "hard-02",
+  "case_name": "stale_attestation_reconciliation",
+  "band": "hard",
+  "primary_blocker_family": "lineage_materialization",
+  "pressure_class": "stale_plausible_state",
+  "active_modules": [
+    "session_bootstrap",
+    "reservation_stage",
+    "attestation_stage",
+    "invoice_sync",
+    "entitlement_sync",
+    "settlement_reconcile",
+    "audit_trace"
+  ],
+  "entry_surface": "session_bootstrap.open_operator_session",
+  "execution_flow": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "attestation_stage.emit_release_attestation",
+    "invoice_sync.stage_release_invoice",
+    "entitlement_sync.stage_customer_entitlement_update",
+    "settlement_reconcile.invalidate_stale_attested_release",
+    "audit_trace.record_stale_attestation_invalidation"
+  ],
+  "shared_state": [
+    "operator_token",
+    "session_nonce",
+    "attestation_packet",
+    "attestation_nonce",
+    "attestation_epoch"
+  ],
+  "wrong_split": "detach attestation freshness evidence from the late stale-state validator and review consumer reuse in isolation",
+  "right_split": "keep attestation production, downstream reuse, stale-state reconciliation, and audit invalidation in one reasoning unit",
+  "expected_current_failure_mode": "local consumers keep accepting an attestation packet whose freshness window has already expired by the time global reconciliation runs",
+  "missing_system_candidate": "freshness-aware lineage observer and stale-state provenance evidence",
+  "product_lesson_if_green": "hard can distinguish locally reusable state from globally trustworthy state without inventing a new blocker family",
+  "product_lesson_if_red": "the next missing system is stale-state lineage evidence, freshness-aware validation, or split-quality evaluation around late invalidation"
+}

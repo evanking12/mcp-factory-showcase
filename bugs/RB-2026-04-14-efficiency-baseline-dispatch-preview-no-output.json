@@ -1,0 +1,41 @@
+{
+  "id": "RB-2026-04-14-efficiency-baseline-dispatch-preview-no-output",
+  "title": "Compiled efficiency baseline reaches benchmark execution but fails in dispatch_preview analyze because discovery emits no output files",
+  "status": "active",
+  "class": "contract",
+  "layer": "compiled efficiency proving pipeline / dispatch_preview discovery-to-analyze handoff",
+  "symptom": "After rerunning on the trusted API and bridge lane, the compiled efficiency baseline completed session_bootstrap, captured reservation_stage as a valid but non-authoritative failed run, and then died in dispatch_preview analyze with \"Discovery produced no output files.\" and a trailing KeyboardInterrupt.",
+  "smallest_reproducer": ".venv\\Scripts\\python.exe scripts\\runs\\run_spectrum_efficiency_activation.py --api-url http://localhost:8201 --bridge-url http://localhost:8090 --bridge-key <configured-bridge-secret> --output-root dynamic_campaigns\\efficiency_workflow_architect_v1\\outputs\\evaluations\\proving_runs\\compiled-efficiency-baseline-01",
+  "trust_impact": "This is no longer a startup or bridge-auth lane-trust blocker. The trusted lane was exercised, but the compiled efficiency proving surface is still blocked inside the proving pipeline, so the workflow-architect campaign still lacks a trustworthy baseline packet for coordinator claims.",
+  "allowed_next_actions": [
+    "inspect the dispatch_preview discovery-to-analyze producer-consumer boundary only",
+    "confirm why discovery emitted no output files for the trusted-lane reproducer",
+    "localize whether the interruption is a reproducible pipeline defect or a capture/materialization defect",
+    "rerun only after a bounded repair or tighter instrumented reproducer exists"
+  ],
+  "disallowed_next_actions": [
+    "reclassify this as API lane-trust without contradictory evidence",
+    "rank coordinator workflow seams from this incomplete baseline packet",
+    "start stage or iteration experiments inside the workflow-architect campaign",
+    "use archived hard-family runs as substitute proof"
+  ],
+  "exit_criteria": [
+    "the same trusted-lane reproducer completes dispatch_preview with interpretable discovery outputs",
+    "a proving-authority review can judge a compiled-efficiency baseline packet rather than a pipeline failure",
+    "the baseline becomes safe enough to steer coordinator blocker ranking"
+  ],
+  "next_move": "escalate",
+  "owner_shift": "compiled proving pipeline / runner owner",
+  "evidence_anchor_integrity": {
+    "anchors": [
+      "dynamic_campaigns/efficiency_workflow_architect_v1/outputs/evaluations/proving_runs/compiled-efficiency-baseline-01/pass_one/01-session_bootstrap/run_result.json",
+      "dynamic_campaigns/efficiency_workflow_architect_v1/outputs/evaluations/proving_runs/compiled-efficiency-baseline-01/pass_one/02-reservation_stage/run_result.json",
+      "dynamic_campaigns/efficiency_workflow_architect_v1/outputs/evaluations/proving_runs/compiled-efficiency-baseline-01/pass_one/03-dispatch_preview/job-status-analyze.json",
+      "dynamic_campaigns/efficiency_workflow_architect_v1/outputs/reviews/proving_authority/PROVING-AUTHORITY-compiled-efficiency-baseline-01-attempt-03.md"
+    ],
+    "anchor_status": "strong enough for blocker classification and owner shift, but not for coordinator seam ranking",
+    "staleness_state": "current"
+  },
+  "class_confidence": "medium_high",
+  "prompt_refinement": "The honest blocker is now a lower-level compiled-pipeline contract failure in dispatch_preview discovery/output materialization on the trusted compiled-efficiency lane. The workflow-architect campaign should stop on owner shift instead of inventing a coordinator tranche without a trustworthy proving surface."
+}

@@ -1,0 +1,22 @@
+{
+  "id": "RB-2026-04-11-spectrum-fee-quote-safe-entry-contract",
+  "title": "Compiled fee-quote call surface collapses the SP_StageReleaseFeeQuote contract",
+  "class": "contract",
+  "layer": "compiled fee-quote discovery / execution contract",
+  "status": "active",
+  "symptom": "After Prompt 09 restored trusted bootstrap, reservation, and dispatch predecessors, the remaining sibling consumer is SP_StageReleaseFeeQuote, but the compiled fee-quote artifacts still present the function as argless stdcall while the fixture header/source declare a four-parameter cdecl entrypoint.",
+  "smallest_reproducer": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\medium-01\\20260411-103804 plus source/header surfaces in tests/fixtures/spectrum_transaction_release_settlement_suite/include/spectrum_suite.h and src/spectrum_fee_quote.c.",
+  "trust_impact": "The last unresolved direct consumer in compiled medium-01 cannot yet be interpreted honestly because fee-quote failure may still be caused by a collapsed call contract rather than a real fee-state prerequisite.",
+  "allowed_next_actions": [
+    "inspect the owning contract source for why compiled discovery emits zero parameters and stdcall for SP_StageReleaseFeeQuote",
+    "make one bounded repair or truthful fixture-local override for this one fee-quote entrypoint",
+    "rerun only the fee-quote seam with the trusted bootstrap, reservation, and dispatch predecessors"
+  ],
+  "disallowed_next_actions": [
+    "skip directly to settlement_reconcile",
+    "spend a full medium rerun before fee-quote truth is repaired",
+    "resume medium-02 or hard-mode work before the last direct consumer seam is trustworthy"
+  ],
+  "exit_criteria": "The compiled SP_StageReleaseFeeQuote call surface is no longer argless stdcall and the targeted fee-quote rerun yields a semantic or sentinel result that is not explained solely by contract collapse.",
+  "next_move": "fix"
+}

@@ -1,0 +1,8 @@
+{
+  "job_id": "fixture-job-001",
+  "component": "contoso_cs",
+  "analysis_profile": "strict_dll",
+  "functions_total": 2,
+  "contract_version": "1.0.0",
+  "auditor_version": "1.0.0"
+}

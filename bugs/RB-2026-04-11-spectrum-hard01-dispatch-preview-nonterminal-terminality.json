@@ -1,0 +1,22 @@
+{
+  "id": "RB-2026-04-11-spectrum-hard01-dispatch-preview-nonterminal-terminality",
+  "title": "Hard-01 package rerun can misclassify dispatch-preview awaiting_clarification as terminal completion",
+  "class": "state",
+  "layer": "compiled hard-01 proving runner terminal-state interpretation",
+  "status": "narrowed",
+  "symptom": "The fresh hard-01 package rerun under sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/hard-01/20260411-174320 stopped at dispatch-preview with run_result status=ok and phase=awaiting_clarification while job-status-final.json still recorded status=running, empty verdict, and success_rate=0.0. After the runner fix, the next hard-01 rerun under sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/hard-01/20260411-180431 advanced through dispatch-preview with phase=done and valid_run=true, so the contradiction is narrowed out of dispatch-preview and the package gate now remains downstream.",
+  "smallest_reproducer": "Inspect sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/hard-01/20260411-174320/runs/03-dispatch_preview/run_result.json and job-status-final.json, then run the terminal-state polling seam covered by tests/test_nightly_preflight.py::test_wait_job_keeps_polling_when_awaiting_clarification_is_still_running.",
+  "trust_impact": "Package-scale hard-01 interpretation is untrustworthy if a still-running awaiting_clarification child can be recorded as an ok predecessor, because the family can stop early, mis-rank the next blocker, and spend proving budget on polluted package truth. The direct dispatch-preview contradiction is now narrowed by live rerun evidence, but hard-01 still is not closed because the interrupted package rerun had only reached settlement_reconcile.",
+  "allowed_next_actions": [
+    "patch only the runner terminal-state interpretation seam that decides when explore jobs are complete",
+    "rerun the focused terminal-state regression tests and Tier A sync checks",
+    "recycle the local lane and rerun exactly one fresh hard-01 package proof to see whether the contradiction disappears"
+  ],
+  "disallowed_next_actions": [
+    "advance to hard-02 while hard-01 package truth is still ambiguous",
+    "treat awaiting_clarification as terminal solely from explore_phase without terminal job status",
+    "classify a new semantic owner seam from the 20260411-174320 package run before the runner contradiction is cleared"
+  ],
+  "exit_criteria": "The runner no longer records a running awaiting_clarification child as terminal package truth, the focused regression tests stay green, and one fresh hard-01 package rerun either closes honestly or exposes a new first failed checkpoint from terminal evidence.",
+  "next_move": "fix"
+}

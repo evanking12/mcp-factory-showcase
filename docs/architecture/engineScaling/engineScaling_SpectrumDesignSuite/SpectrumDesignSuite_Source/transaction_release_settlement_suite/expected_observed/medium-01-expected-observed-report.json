@@ -1,0 +1,94 @@
+{
+  "artifact_type": "spectrum-expected-observed-report.json",
+  "contract_version": "1.0.0",
+  "case_id": "medium-01",
+  "slice_id": "spectrum:medium-01",
+  "module_family": [
+    "session_bootstrap",
+    "reservation_stage",
+    "dispatch_preview",
+    "fee_quote",
+    "settlement_reconcile"
+  ],
+  "expected_blockers": [
+    "lineage_materialization"
+  ],
+  "expected_producers": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold"
+  ],
+  "expected_consumers": [
+    "dispatch_preview.prepare_release_preview",
+    "fee_quote.stage_release_fee_quote",
+    "settlement_reconcile.verify_reserved_release"
+  ],
+  "expected_shared_state": [
+    "operator_token",
+    "reservation_handle",
+    "hold_token"
+  ],
+  "expected_family_groups": [
+    "lineage_materialization"
+  ],
+  "expected_confirmation_sites": [
+    "settlement_reconcile.verify_reserved_release"
+  ],
+  "expected_lineage_branches": [],
+  "expected_accepted_branches": [],
+  "observed_blockers": [
+    "lineage_materialization"
+  ],
+  "observed_producers": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold"
+  ],
+  "observed_consumers": [
+    "dispatch_preview.prepare_release_preview",
+    "fee_quote.stage_release_fee_quote",
+    "settlement_reconcile.verify_reserved_release"
+  ],
+  "observed_shared_state": [
+    "operator_token",
+    "reservation_handle"
+  ],
+  "observed_family_groups": [
+    "lineage_materialization"
+  ],
+  "observed_confirmation_sites": [
+    "settlement_reconcile.verify_reserved_release"
+  ],
+  "observed_lineage_branches": [],
+  "observed_accepted_branches": [],
+  "mismatches": [
+    {
+      "field": "shared_state",
+      "expected": "hold_token",
+      "observed": "missing_from_fee_quote_path",
+      "meaning": "one shared reservation artifact survives locally, but downstream validation still lacks complete lineage continuity"
+    }
+  ],
+  "overclaims": [
+    {
+      "path": "dispatch_preview.prepare_release_preview",
+      "reason": "preview can look locally green before the shared-handle lineage is validated across both fanout consumers"
+    }
+  ],
+  "underclaims": [
+    {
+      "path": "settlement_reconcile.verify_reserved_release",
+      "reason": "late validation still carries the real trust decision and should not be flattened into a mere downstream consumer"
+    }
+  ],
+  "misgroups": [],
+  "deferred": [
+    {
+      "surface": "fee_quote.stage_release_fee_quote",
+      "reason": "fanout remains partially unlockable, but shared-state carryover is still insufficient for a clean late-validation verdict"
+    }
+  ],
+  "notes": [
+    "expected_authored_from_spectrum_contract",
+    "medium_fanout_expected",
+    "observed_side_models_direct_fanout_false_green_risk"
+  ]
+}

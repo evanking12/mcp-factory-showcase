@@ -1,0 +1,22 @@
+{
+  "id": "RB-2026-04-11-spectrum-reservation-stage-safe-entry-contract",
+  "title": "Compiled reservation-stage call surface collapses the SP_IssueReleaseHold contract",
+  "class": "contract",
+  "layer": "compiled reservation-stage discovery / execution contract",
+  "status": "resolved",
+  "symptom": "After Prompt 07 restored a trusted bootstrap predecessor, the earliest failed downstream checkpoint is SP_IssueReleaseHold, but the compiled reservation-stage artifacts still present the function as argless stdcall while the fixture header/source declare a seven-parameter cdecl entrypoint.",
+  "smallest_reproducer": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\medium-01\\20260411-103804 plus source/header surfaces in tests/fixtures/spectrum_transaction_release_settlement_suite/include/spectrum_suite.h and src/spectrum_reservation_stage.c.",
+  "trust_impact": "The first failed downstream checkpoint in compiled medium-01 cannot yet be interpreted honestly because reservation-stage failure may still be caused by a collapsed call contract rather than a real reservation-state prerequisite.",
+  "allowed_next_actions": [
+    "inspect the owning contract source for why compiled discovery emits zero parameters and stdcall for SP_IssueReleaseHold",
+    "make one bounded repair or truthful fixture-local override for this one reservation-stage entrypoint",
+    "rerun only the reservation-stage seam with the trusted bootstrap predecessor after the contract repair"
+  ],
+  "disallowed_next_actions": [
+    "skip directly to dispatch_preview, fee_quote, or settlement_reconcile",
+    "treat the current continuation packet as authoritative while it skips the earliest failed checkpoint",
+    "resume medium-02 or hard-mode work before reservation-stage truth is repaired"
+  ],
+  "exit_criteria": "The compiled SP_IssueReleaseHold call surface is no longer argless stdcall and the targeted reservation-stage rerun yields a semantic or sentinel result that is not explained solely by contract collapse.",
+  "next_move": "resolved"
+}

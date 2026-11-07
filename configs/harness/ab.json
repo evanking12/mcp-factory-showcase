@@ -1,0 +1,24 @@
+﻿{
+  "campaign": {
+    "mode": "ab"
+  },
+  "targets": {
+    "dll": "tests/fixtures/contoso_legacy/contoso_cs.dll",
+    "hints_file": "sessions/contoso_cs/contoso_cs.txt"
+  },
+  "api": {
+    "url": "http://127.0.0.1:8201",
+    "key": ""
+  },
+  "execution": {
+    "mode": "dev",
+    "model": "gpt-4o",
+    "max_rounds": 2,
+    "max_tool_calls": 5,
+    "snapshot_profile": "full"
+  },
+  "capture": {
+    "mode": "strict",
+    "snapshot_profile": "full"
+  }
+}

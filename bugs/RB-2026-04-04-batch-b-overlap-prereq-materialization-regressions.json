@@ -1,0 +1,80 @@
+{
+  "id": "RB-2026-04-04-batch-b-overlap-prereq-materialization-regressions",
+  "title": "Batch B overlap plateaued at -15 after bounded replay and discovery fixes; next move requires a broader state-continuity system decision",
+  "class": "architecture",
+  "layer": "cross_target_state_continuity_and_rehydration",
+  "symptom": "Trusted, overlap-comparable Batch B reruns plateaued at overlap_verified_delta = -15 across campaigns b53cce73, a17d4492, b2bc709c, and f6ba985b. The previous placeholder/default contamination seam is no longer dominant, and bounded fixes for report-id family inference and misclassified numeric prereq slots passed locally and closed parts of the trace-level failure surface, but they produced no material overlap improvement. The latest traces show a deeper pattern: one target in a DLL family can still produce live runtime state, yet sibling targets later in the same package re-enter the same prerequisite chain and fail to reconstruct enough side-effect continuity after reinitialize. In workflow, WF_ConfirmWorkflow can still produce a live reservation/handle/nonce chain, while WF_GetReservationEcho, WF_GetWorkflowState, WF_CancelWorkflow, and WF_CommitShipment remain regressed. In reporting and pricing, later prereq chains still block or fail after earlier family producers succeed elsewhere in the same run. This means the current blocker is no longer just replay hygiene or slot repair; the missing capability is durable same-family state continuity across target boundaries under dense package context.",
+  "smallest_reproducer": {
+    "wave_id": "wave-2-batch-b",
+    "campaign_id": "f6ba985b",
+    "package_id": "contoso-business-suite",
+    "overlap_verified_delta": -15,
+    "target_functions": [
+      "WF_GetReservationEcho",
+      "WF_GetWorkflowState",
+      "WF_CancelWorkflow",
+      "WF_CommitShipment",
+      "RP_RenderPreview",
+      "PR_ApplyBundleOverride",
+      "PR_ApplyTierDiscount",
+      "PR_SealQuote"
+    ],
+    "failed_detour": {
+      "campaign_id": "c1c34168",
+      "overlap_verified_delta": -21,
+      "regressed_functions": [
+        "TP_FreeBlobToken",
+        "TP_AllocBlobToken",
+        "TP_ReadSessionState",
+        "WF_GetWorkflowNonce",
+        "WF_ConfirmWorkflow",
+        "WF_OpenFulfillment"
+      ],
+      "reading": "same-job continuity reuse skipped too much replay and degraded already-recovered transport and workflow surfaces"
+    },
+    "flat_reproofs": [
+      {
+        "campaign_id": "a17d4492",
+        "overlap_verified_delta": -15,
+        "reading": "report-id family repair landed locally but did not shrink the trusted overlap regression set"
+      },
+      {
+        "campaign_id": "b2bc709c",
+        "overlap_verified_delta": -15,
+        "reading": "adjacent discovery-opacity numeric-slot repair improved local proofs but not Batch B overlap"
+      },
+      {
+        "campaign_id": "f6ba985b",
+        "overlap_verified_delta": -15,
+        "reading": "exact workflow quantity-overwrite fix still did not move the overlap frontier"
+      }
+    ]
+  },
+  "trust_impact": "The run is trustworthy enough to block promotion and to justify an architecture-level pivot. Batch C remains blocked until the carried-forward 6-DLL overlap survives dense package context again.",
+  "allowed_next_actions": [
+    "treat the repeated -15 reruns as a plateau and stop spending live runs on the same replay-hygiene lane",
+    "document the current adjacent-system reevaluation from the flat -15 frontier",
+    "prototype a state-continuity rehydration system or a documented adjacent system that can preserve successful family state across target boundaries after reinitialize",
+    "add local proofs for cross-target same-family state reuse after one target already produced a live reservation/report/quote chain",
+    "inspect how generalized runtime artifact materializer and prerequisite/state-machine classifier boundaries should interact for the remaining workflow/reporting/pricing bundle",
+    "rerun only wave-2-batch-b after a new system-level local proof is green"
+  ],
+  "disallowed_next_actions": [
+    "continue same-job continuity reuse as the current lane",
+    "keep spending trusted Batch B reruns on isolated slot-repair tweaks with no new system boundary",
+    "run Batch C",
+    "promote a new architecture tranche from the current Batch B package read",
+    "spend another full Batch B rerun before adding local proofs",
+    "treat the remaining regressions as pure measurement noise",
+    "hardcode Contoso-specific identifiers or function exceptions into pipeline core"
+  ],
+  "exit_criteria": [
+    "local cross-target state continuity proofs pass",
+    "workflow, reporting, or pricing consumers can resume from already-produced same-family runtime state without rerunning fragile producer chains blindly",
+    "the overlap regression bundle shrinks materially from the current eight-function set",
+    "a new Batch B rerun stays trusted and overlap-baseline comparable",
+    "the overlap slice no longer plateaus at -15 under the same dense package",
+    "the next system-level fix does not reintroduce the transport/workflow regressions seen on c1c34168"
+  ],
+  "next_move": "freeze f6ba985b as the current trustworthy plateau, document the adjacent-system reevaluation and the emerging state-continuity rehydrator candidate, add local proofs for cross-target same-family state rehydration, then rerun only wave-2-batch-b"
+}

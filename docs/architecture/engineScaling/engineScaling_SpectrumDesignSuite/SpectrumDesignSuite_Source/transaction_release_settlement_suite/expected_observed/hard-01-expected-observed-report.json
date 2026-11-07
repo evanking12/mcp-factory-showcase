@@ -1,0 +1,111 @@
+{
+  "artifact_type": "spectrum-expected-observed-report.json",
+  "contract_version": "1.0.0",
+  "case_id": "hard-01",
+  "slice_id": "spectrum:hard-01",
+  "module_family": [
+    "session_bootstrap",
+    "reservation_stage",
+    "attestation_stage",
+    "release_commit",
+    "replay_branch",
+    "settlement_reconcile",
+    "audit_trace"
+  ],
+  "expected_blockers": [
+    "interwoven_lineage_ambiguity"
+  ],
+  "expected_producers": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "attestation_stage.emit_release_attestation",
+    "release_commit.commit_release",
+    "replay_branch.replay_release_branch"
+  ],
+  "expected_consumers": [
+    "settlement_reconcile.select_trusted_branch",
+    "audit_trace.invalidate_untrusted_branch"
+  ],
+  "expected_shared_state": [
+    "reservation_handle",
+    "hold_token",
+    "attestation_packet",
+    "replay_attestation_packet"
+  ],
+  "expected_family_groups": [
+    "interwoven_lineage_ambiguity"
+  ],
+  "expected_confirmation_sites": [
+    "settlement_reconcile.select_trusted_branch",
+    "audit_trace.invalidate_untrusted_branch"
+  ],
+  "expected_lineage_branches": [
+    "primary",
+    "replay"
+  ],
+  "expected_accepted_branches": [
+    "primary"
+  ],
+  "observed_blockers": [
+    "interwoven_lineage_ambiguity"
+  ],
+  "observed_producers": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "attestation_stage.emit_release_attestation",
+    "release_commit.commit_release",
+    "replay_branch.replay_release_branch"
+  ],
+  "observed_consumers": [
+    "settlement_reconcile.select_trusted_branch",
+    "audit_trace.invalidate_untrusted_branch"
+  ],
+  "observed_shared_state": [
+    "reservation_handle",
+    "hold_token",
+    "attestation_packet",
+    "replay_attestation_packet"
+  ],
+  "observed_family_groups": [
+    "interwoven_lineage_ambiguity"
+  ],
+  "observed_confirmation_sites": [
+    "settlement_reconcile.select_trusted_branch",
+    "audit_trace.invalidate_untrusted_branch"
+  ],
+  "observed_lineage_branches": [
+    "primary",
+    "replay"
+  ],
+  "observed_accepted_branches": [
+    "primary"
+  ],
+  "mismatches": [
+    {
+      "field": "branch_provenance",
+      "expected": "late_truth_keeps_branch_ambiguity_visible_until_selection",
+      "observed": "replay_branch_looks_locally_valid_before_reconciliation",
+      "meaning": "the hard case still centers on preserving ambiguity rather than forcing an early clean story"
+    }
+  ],
+  "overclaims": [
+    {
+      "path": "replay_branch.replay_release_branch",
+      "reason": "replay outputs can look executable and self-consistent before branch-trust evidence rejects them"
+    }
+  ],
+  "underclaims": [
+    {
+      "path": "audit_trace.invalidate_untrusted_branch",
+      "reason": "audit invalidation is the late truth surface that prevents local replay success from being mistaken for global correctness"
+    }
+  ],
+  "misgroups": [],
+  "deferred": [],
+  "notes": [
+    "expected_authored_from_spectrum_contract",
+    "hard_diagnostic_expected",
+    "observed_side_models_replay_branch_false_green_and_late_rejection",
+    "branch_trust_observer_should_now_be_materialized_as_a_runtime_verdict_surface"
+  ]
+}

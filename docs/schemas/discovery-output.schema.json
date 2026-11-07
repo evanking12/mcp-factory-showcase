@@ -1,0 +1,145 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MCP Factory Discovery Output",
+  "description": "Stable JSON schema for binary discovery pipeline output. Consumed by Section 4 (MCP generation) and Section 5 (verification UI).",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "Information about the analyzed binary and pipeline execution",
+      "properties": {
+        "target_path": {
+          "type": "string",
+          "description": "Full path to analyzed binary"
+        },
+        "target_name": {
+          "type": "string",
+          "description": "Filename (e.g., 'kernel32.dll')"
+        },
+        "target_type": {
+          "type": "string",
+          "enum": ["dll", "exe", "sys", "ocx", "tlb", "olb", "unknown"],
+          "description": "Binary type"
+        },
+        "architecture": {
+          "type": ["string", "null"],
+          "enum": ["x86", "x64", "arm64", "unknown", null],
+          "description": "Target architecture"
+        },
+        "file_size_bytes": {
+          "type": "integer",
+          "description": "Binary size in bytes"
+        },
+        "is_signed": {
+          "type": "boolean",
+          "description": "Whether binary has valid digital signature"
+        },
+        "publisher": {
+          "type": ["string", "null"],
+          "description": "Publisher from digital certificate (null if unsigned)"
+        },
+        "analysis_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When analysis was performed (ISO 8601)"
+        },
+        "pipeline_version": {
+          "type": "string",
+          "description": "Discovery pipeline version"
+        }
+      },
+      "required": ["target_path", "target_name", "analysis_timestamp"]
+    },
+    "invocables": {
+      "type": "array",
+      "description": "List of discovered invocable functions/commands",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Function or command name"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["export", "cli", "com", "dotnet", "rpc", "cli_command", "unknown"],
+            "description": "Type of invocable"
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["guaranteed", "high", "medium", "low"],
+            "description": "Invocability confidence. guaranteed=full header match; high=partial match; medium=name/pattern only; low=name only"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what this invocable does. Empty string if not available."
+          },
+          "return_type": {
+            "type": ["string", "null"],
+            "description": "Return type (e.g. 'size_t', 'HRESULT', 'string', null if unknown)"
+          },
+          "parameters": {
+            "type": "array",
+            "description": "Ordered list of parameters. Empty array if none or unknown.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string", "description": "Parameter name" },
+                "type": { "type": "string", "description": "JSON-compatible type: string, integer, number, boolean" },
+                "required": { "type": "boolean", "description": "Whether parameter is required" },
+                "description": { "type": "string", "description": "Original C/native type or description" }
+              },
+              "required": ["name", "type"]
+            }
+          },
+          "execution": {
+            "type": "object",
+            "description": "How to invoke this function. Section 4 uses this to construct the actual call.",
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": ["subprocess", "dll_import", "dotnet_reflection", "com_dispatch", "rpc_call", "unknown"],
+                "description": "Invocation mechanism"
+              },
+              "executable_path": { "type": ["string", "null"], "description": "Path to executable (subprocess only)" },
+              "arg_style": { "type": ["string", "null"], "description": "Argument passing style: 'flag', 'positional' (subprocess only)" },
+              "dll_path": { "type": ["string", "null"], "description": "Path to DLL (dll_import only)" },
+              "function_name": { "type": ["string", "null"], "description": "Exported function name (dll_import / dotnet_reflection / com_dispatch)" },
+              "calling_convention": { "type": ["string", "null"], "description": "Calling convention; null on x64 (single ABI)" },
+              "assembly_path": { "type": ["string", "null"], "description": "Path to .NET assembly (dotnet_reflection only)" },
+              "type_name": { "type": ["string", "null"], "description": "Fully qualified .NET type name (dotnet_reflection only)" },
+              "is_static": { "type": ["boolean", "null"], "description": "Whether .NET method is static (dotnet_reflection only)" },
+              "clsid": { "type": ["string", "null"], "description": "COM class GUID (com_dispatch only)" },
+              "interface": { "type": ["string", "null"], "description": "COM interface name (com_dispatch only)" }
+            },
+            "required": ["method"]
+          }
+        },
+        "required": ["name", "kind", "confidence", "description", "parameters", "execution"]
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "Summary counts for quick assessment",
+      "properties": {
+        "total_invocables": { "type": "integer" },
+        "by_confidence": {
+          "type": "object",
+          "description": "Count per confidence level",
+          "additionalProperties": { "type": "integer" }
+        },
+        "by_source_type": {
+          "type": "object",
+          "description": "Count per source type (export, com, cli, dotnet, rpc)",
+          "additionalProperties": { "type": "integer" }
+        },
+        "source_groups": {
+          "type": "object",
+          "description": "Present only in merged hybrid outputs — count per analysis pass",
+          "additionalProperties": { "type": "integer" }
+        }
+      }
+    }
+  },
+  "required": ["metadata", "invocables"]
+}

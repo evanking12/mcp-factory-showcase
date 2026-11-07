@@ -1,0 +1,55 @@
+# sample.jndi  —  Contoso Customer Service JNDI configuration fixture
+# Used by MCP Factory jndi_analyzer.py demo.
+#
+# Format: Java .properties (java.naming.* + binding.* entries)
+# Each "binding.*" entry declares a logical name (right of the dot)
+# and its JNDI path (the value).  The analyzer discovers these as
+# callable invocables that an application resolves via InitialContext.lookup().
+
+# ── InitialContext bootstrap ─────────────────────────────────────────────────
+java.naming.factory.initial=com.sun.jndi.ldap.LdapCtxFactory
+java.naming.provider.url=ldap://contoso-directory.contoso.com:389
+java.naming.security.authentication=simple
+java.naming.security.principal=cn=serviceaccount,dc=contoso,dc=com
+java.naming.security.credentials=changeit
+
+# ── JDBC DataSources ─────────────────────────────────────────────────────────
+# Primary customer database
+binding.CustomerDB=jdbc/ContosoCustomerDB
+
+# Read replica for analytics queries
+binding.AnalyticsDB=jdbc/ContosoAnalyticsReadReplica
+
+# Audit trail database
+binding.AuditDB=jdbc/ContosoAuditLog
+
+# ── JMS Messaging ────────────────────────────────────────────────────────────
+# Order placement queue
+binding.OrderQueue=jms/ContosoOrderInbound
+
+# Customer notification topic
+binding.NotificationTopic=jms/ContosoCustomerNotifications
+
+# Dead-letter queue for failed messages
+binding.DeadLetterQueue=jms/ContosoDeadLetterQueue
+
+# ── Mail Session ─────────────────────────────────────────────────────────────
+# SMTP relay for transactional email
+binding.MailRelay=mail/ContosoSMTPRelay
+
+# ── RMI / EJB Remote Services ────────────────────────────────────────────────
+# Pricing engine microservice (RMI)
+binding.PricingEngine=rmi://pricing-service.contoso.com:1099/ContosoPricingEngine
+
+# Fraud detection service (RMI)
+binding.FraudDetection=rmi://fraud-service.contoso.com:1099/ContosoFraudDetector
+
+# EJB: customer session bean
+binding.CustomerSessionBean=ejb/ContosoCustomerSessionBean
+
+# ── LDAP Directory Lookups ───────────────────────────────────────────────────
+# Active Directory user store
+binding.UserDirectory=ldap://contoso-directory.contoso.com:389/ou=Users,dc=contoso,dc=com
+
+# Product catalogue stored in LDAP (legacy)
+binding.ProductCatalogue=ldap://contoso-directory.contoso.com:389/ou=Products,dc=contoso,dc=com

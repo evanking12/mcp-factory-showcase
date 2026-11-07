@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "triggers": [
+    {
+      "trigger_id": "lane_runtime_reliability_classification",
+      "title": "Lane/runtime reliability classification",
+      "fires_when": "A lane, runner, runtime, dependency-install, or workflow-adjacent failure cannot be distinguished from product regression.",
+      "path_patterns": [
+        "runtime/**",
+        ".github/workflows/required-regression-gates.yml",
+        ".github/workflows/medium01-checkpoints.yml",
+        "scripts/regression/**",
+        "scripts/ops/nightly_groundtruth.py",
+        "docs/architecture/testing_strategy/LIVE-CHECKPOINT-OBSERVABILITY.md",
+        "configs/regression/regression_gate_v1.json"
+      ],
+      "system_ids": [
+        "runner_topology",
+        "regression_gate_contract",
+        "ci_eligibility"
+      ],
+      "required_tier_at_or_above": "tier1",
+      "recommended_next_system": "lane_runtime_reliability_classification",
+      "claim_effect": "Do not widen runtime or proving claims until red results can distinguish infrastructure failure from product regression."
+    },
+    {
+      "trigger_id": "baseline_breakage_map_generation",
+      "title": "Baseline-relative breakage map generation",
+      "fires_when": "A migration tranche changes behavior, artifacts, packets, or consumers and failure ownership still requires human synthesis.",
+      "path_patterns": [
+        "api/pipeline/**",
+        "api/routes/**",
+        "api/infra/**",
+        "api/services/**",
+        "dynamic_campaigns/*migration*/**",
+        "dynamic_campaigns/*handoff*/**"
+      ],
+      "system_ids": [
+        "stage_handoff_packets",
+        "session_routes",
+        "worker_persistence",
+        "stage_live_truth_governance"
+      ],
+      "recommended_next_system": "baseline_relative_breakage_map_generation",
+      "claim_effect": "Migration can continue only if changed surfaces, expected drift, regressions, owners, and next fix targets stay explicit."
+    },
+    {
+      "trigger_id": "scheduled_or_manual_heavier_baselines",
+      "title": "Scheduled or manual heavier baseline suites",
+      "fires_when": "Tier 0 or Tier 1 is green but the claim needs compiled-suite or baseline-relative proof.",
+      "path_patterns": [
+        "api/analysis/**",
+        "scripts/runs/**",
+        "configs/regression/baseline_registry.json",
+        "configs/regression/regression_gate_v1.json"
+      ],
+      "system_ids": [
+        "regression_gate_contract",
+        "checkpoint_aggregation"
+      ],
+      "required_tier_at_or_above": "tier2",
+      "recommended_next_system": "scheduled_or_manual_heavier_baseline_suites",
+      "claim_effect": "Do not claim compiled-suite or broad baseline-relative non-regression from Fast Checks alone."
+    }
+  ]
+}

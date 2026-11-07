@@ -1,0 +1,46 @@
+{
+  "trace_id": "creator-easy01",
+  "spans": [
+    {
+      "span_id": "admission",
+      "name": "Compiled/no-source admission",
+      "stage": "S00",
+      "duration_sec": 0,
+      "status": "pass",
+      "message": "Fixture accepted as compiled binary input; source is not used by the product route."
+    },
+    {
+      "span_id": "route_authority",
+      "name": "Ghidra-backed route authority",
+      "stage": "S00B-S02",
+      "duration_sec": 115.52,
+      "status": "pass",
+      "message": "Route authority proves the intended compiled analysis path was entered."
+    },
+    {
+      "span_id": "target_runs",
+      "name": "Target analysis runs",
+      "stage": "S02-S05",
+      "duration_sec": 330.05,
+      "status": "pass",
+      "message": "4 target runs replayed from pinned baseline artifacts."
+    },
+    {
+      "span_id": "semantic_compare",
+      "name": "Semantic checkpoint comparison",
+      "stage": "S03-S06",
+      "duration_sec": 16.5,
+      "status": "pass",
+      "message": "Expected semantic checkpoints were compared against recovered symbols and run evidence."
+    },
+    {
+      "span_id": "final_claim",
+      "name": "Claim ceiling and closeout",
+      "stage": "S07",
+      "duration_sec": 0,
+      "status": "pass",
+      "message": "product-green baseline replay"
+    }
+  ],
+  "claim_ceiling": "telemetry is diagnostic evidence only"
+}

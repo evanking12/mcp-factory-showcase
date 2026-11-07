@@ -1,0 +1,27 @@
+{
+  "id": "RB-2026-04-03-batch-b-wave-comparison-not-comparable",
+  "title": "Batch B architecture read is blocked by cross-wave comparison drift",
+  "class": "measurement",
+  "layer": "campaign comparison surface",
+  "symptom": "Wave 2 Batch B completed with trusted package truth, but comparison against the trusted Batch A package is not defensible because the graph epoch changed and the expanded cross-DLL seeded surface shows large apparent verified-count drops on previously trusted DLLs.",
+  "smallest_reproducer": "Compare trusted Batch A campaign 538f7e84 against trusted Batch B campaign 53575f28 on the same lane/profile. Batch B adds contoso_events.dll and contoso_cs_interwoven.dll, changes graph_epoch, and shows workflow/reporting/pricing drops under cross-DLL seeding.",
+  "trust_impact": "Next-system selection is untrustworthy because apparent frontier change may be caused by uncontrolled comparison variables rather than real architecture shift.",
+  "allowed_next_actions": [
+    "audit wave-to-wave comparability using graph_epoch, seeding_mode, and package composition",
+    "reduce the issue to the smallest trustworthy 6-DLL or 8-DLL comparison boundary",
+    "fix or explicitly model graph epoch and cross-DLL seeding for package-wave comparisons",
+    "rerun Batch B only after the comparison surface is controlled"
+  ],
+  "disallowed_next_actions": [
+    "Batch C expansion",
+    "select the next architecture tranche from Batch B as-is",
+    "treat the Batch B family ranking as authoritative without fixing comparability",
+    "expand to external packages"
+  ],
+  "exit_criteria": [
+    "wave-to-wave package comparison uses an authoritative comparable surface",
+    "apparent regressions on the prior trusted Batch A slice are either explained or eliminated",
+    "Batch B can be compared to its baseline without graph-epoch or cross-DLL hidden-variable ambiguity"
+  ],
+  "next_move": "fix"
+}

@@ -1,0 +1,33 @@
+{
+  "case_id": "medium-02",
+  "case_name": "attestation_reuse_confirmation",
+  "band": "medium",
+  "primary_blocker_family": "lineage_materialization",
+  "active_modules": [
+    "session_bootstrap",
+    "reservation_stage",
+    "attestation_stage",
+    "invoice_sync",
+    "entitlement_sync",
+    "settlement_reconcile"
+  ],
+  "entry_surface": "session_bootstrap.open_operator_session",
+  "execution_flow": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "attestation_stage.emit_release_attestation",
+    "invoice_sync.stage_release_invoice",
+    "entitlement_sync.stage_customer_entitlement_update",
+    "settlement_reconcile.confirm_attested_release"
+  ],
+  "shared_state": [
+    "operator_token",
+    "attestation_packet",
+    "attestation_nonce"
+  ],
+  "wrong_split": "split by shallow module ownership and compare modules instead of artifact lineage",
+  "right_split": "keep the attestation producer, reused packet, and late validator in one comparison unit",
+  "reproducibility_claim": "the same lineage_materialization doctrine should survive a delayed attestation shape",
+  "product_lesson_if_green": "the blocker family reproduces across multiple transactional shapes",
+  "product_lesson_if_red": "the doctrine must split before claiming medium-band generality"
+}

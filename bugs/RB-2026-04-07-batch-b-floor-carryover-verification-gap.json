@@ -1,0 +1,28 @@
+{
+  "id": "RB-2026-04-07-batch-b-floor-carryover-verification-gap",
+  "title": "Batch B floor-to-ceiling package runs reach frontier probes but fail to preserve direct target truth into final findings or verification",
+  "class": "contract",
+  "layer": "package floor carryover / verification handoff",
+  "symptom": "The full Batch B floor-to-ceiling campaign on 2026-04-07 reached frontier target probes for config, reporting, and pricing, but final findings or verification still regressed on CFG_OpenLicensedWindow, CFG_RunCustomerSync, RP_SelectFormat, PR_ApplyBundleOverride, and PR_BeginQuote.",
+  "smallest_reproducer": "Campaign 8e9a12f9 reduced-frontier rerun on 2026-04-07 with active frontier contoso_config.dll, contoso_reporting.dll, and contoso_pricing.dll under floor_to_ceiling mode; inspect 88d563b7, 800ce1a1, and 5648f889 plus campaign-attribution-report.json regression_summary.",
+  "trust_impact": "Package-scale confirmation is not promotion-safe because direct target success and verification truth can be lost after the right frontier function is reached, leaving overlap regressions that are not DLL-behavior regressions.",
+  "allowed_next_actions": [
+    "inspect direct probe to finding persistence for CFG_OpenLicensedWindow and RP_SelectFormat",
+    "inspect direct probe to verification persistence for CFG_RunCustomerSync and PR_ApplyBundleOverride",
+    "audit why PR_BeginQuote remains unexplained despite package verification being present",
+    "run one narrow same-DLL reproducer per affected frontier function after code changes"
+  ],
+  "disallowed_next_actions": [
+    "another blind full Batch B rerun without fixing persistence",
+    "new ceiling planner work",
+    "broad cross-DLL expansion",
+    "promotion of the current campaign as a stable baseline"
+  ],
+  "exit_criteria": [
+    "direct target probe success is preserved into final finding status when present",
+    "verification-report entries exist for frontier targets that reach direct probe surfaces",
+    "the carryover regression summary clears or shrinks without introducing verified regressions elsewhere",
+    "a rerun of the Batch B floor-to-ceiling campaign no longer reports verifier_disagreement or finding_recording_conflict for the current frontier functions"
+  ],
+  "next_move": "fix"
+}

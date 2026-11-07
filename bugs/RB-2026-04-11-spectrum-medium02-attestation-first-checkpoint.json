@@ -1,0 +1,22 @@
+{
+  "id": "RB-2026-04-11-spectrum-medium02-attestation-first-checkpoint",
+  "title": "Compiled medium-02 first active checkpoint fails at attestation stage",
+  "class": "contract",
+  "layer": "compiled medium-02 attestation-stage owner seam",
+  "status": "resolved",
+  "symptom": "The first compiled medium-02 family proof at sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-02/20260411-125905 succeeded at binary embodiment and support lanes, but the first active semantic checkpoint SP_EmitReleaseAttestation failed because its compiled contract/spec surface had collapsed to an argless stdcall export with no attestation truth manifest.",
+  "smallest_reproducer": "Original reproducer: sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-02/20260411-125905/runs/05-attestation_stage. Resolved by adding tests/fixtures/spectrum_transaction_release_settlement_suite/attestation_stage_contract_overlay/truth_manifest.json and rerunning the attestation seam at sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-02/attestation-first-active-checkpoint/20260411-133033.",
+  "trust_impact": "Continuing to downstream medium-02 consumers before narrowing the attestation checkpoint would have spent proving budget on potentially inherited failures and weakened first-failed-checkpoint discipline. That risk is now removed for the attestation seam.",
+  "allowed_next_actions": [
+    "inspect only the attestation-stage run artifact and the smallest likely owning contract or predecessor-truth seam",
+    "patch only the owner seam justified by evidence",
+    "rerun only the narrowest attestation proof surface before any broader medium-02 rerun"
+  ],
+  "disallowed_next_actions": [
+    "treat invoice, entitlement, or confirm as independent next blockers before attestation is narrowed",
+    "spend a broader medium-02 rerun before the attestation checkpoint is locally trustworthy",
+    "jump to hard-01 or hard-02 while the first active medium-02 checkpoint is still unresolved"
+  ],
+  "exit_criteria": "Satisfied on 2026-04-11: the attestation checkpoint was narrowed to the compiled contract/spec owner seam, a targeted attestation proof surface was executed, and the branch now advances from truthful attestation evidence.",
+  "next_move": "advance"
+}

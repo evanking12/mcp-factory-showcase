@@ -1,0 +1,26 @@
+{
+  "id": "RB-2026-03-31-transport-clean-execution-surface",
+  "title": "Transport clean lane inherited stale DLL execution metadata",
+  "class": "measurement",
+  "layer": "discovery cache and probe handoff",
+  "symptom": "Clean analyze-path transport runs carried stale dll_import arg_types from a copied-run artifact, causing mixed-call bridge failures to remain even after local pointer fixes.",
+  "smallest_reproducer": "Analyze-path contoso_transport.dll strict_dll run on a warm cache surface, then inspect TP_OpenSession execution.arg_types in invocables_map.json",
+  "trust_impact": "Comparable transport reruns become misleading because parameter truth and execution truth disagree.",
+  "allowed_next_actions": [
+    "refresh DLL execution arg_types from current parameter truth",
+    "force structured preflight mixed-call out-slot completion",
+    "run one clean comparable transport rerun"
+  ],
+  "disallowed_next_actions": [
+    "new struct architecture work",
+    "new campaign heuristics",
+    "broad callback or gateway changes",
+    "multi-run brute force without fixing the handoff"
+  ],
+  "exit_criteria": [
+    "TP_OpenSession and TP_SubmitPacket execution.arg_types match current parameter truth",
+    "Structured preflight emits explicit scalar out slots for mixed transport calls",
+    "One clean transport rerun is interpretable against the 4/12 control"
+  ],
+  "next_move": "fix"
+}

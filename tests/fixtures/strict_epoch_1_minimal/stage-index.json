@@ -1,0 +1,121 @@
+{
+  "version": "1.0",
+  "contract_version": "1.0.0",
+  "auditor_version": "1.0.0",
+  "stages": [
+    {
+      "id": "S-00",
+      "name": "setup",
+      "status": "completed",
+      "artifacts": [
+        "evidence/stage-00-setup/schema-t0.json",
+        "evidence/stage-00-setup/invocables-map.json",
+        "evidence/stage-00-setup/stage-checks.json"
+      ],
+      "errors": []
+    },
+    {
+      "id": "S-01",
+      "name": "write-unlock",
+      "status": "completed",
+      "artifacts": [
+        "evidence/stage-00-setup/invocables-map.json",
+        "evidence/stage-01-pre-probe/vocab.json",
+        "evidence/stage-01-pre-probe/static-analysis.json",
+        "evidence/stage-01-pre-probe/sentinel-calibration.json",
+        "evidence/stage-01-pre-probe/write-unlock-probe.json"
+      ],
+      "errors": []
+    },
+    {
+      "id": "S-02",
+      "name": "probe-loop",
+      "status": "completed",
+      "artifacts": [
+        "evidence/stage-01-pre-probe/vocab.json",
+        "evidence/stage-01-pre-probe/static-analysis.json",
+        "evidence/stage-02-probe-loop/probe-log.json",
+        "evidence/stage-02-probe-loop/findings.json",
+        "diagnostics/chat-model-context.txt",
+        "diagnostics/chat-system-context-turn0.txt",
+        "evidence/stage-02-probe-loop/probe-round-reasoning.json",
+        "evidence/stage-02-probe-loop/probe-stop-reasons.json",
+        "evidence/stage-02-probe-loop/probe-strategy-summary.json"
+      ],
+      "errors": []
+    },
+    {
+      "id": "S-03",
+      "name": "reconcile",
+      "status": "completed",
+      "artifacts": [
+        "evidence/stage-02-probe-loop/findings.json",
+        "evidence/stage-03-post-probe/sentinel-catalog.json",
+        "evidence/mc-decisions/mc3-post-reconcile.json"
+      ],
+      "errors": []
+    },
+    {
+      "id": "S-04",
+      "name": "synthesis",
+      "status": "completed",
+      "artifacts": [
+        "evidence/stage-02-probe-loop/findings.json",
+        "evidence/stage-04-synthesis/api-reference.md",
+        "evidence/stage-04-synthesis/synthesis-input-snapshot.json",
+        "evidence/stage-04-synthesis/synthesis-coverage-check.json",
+        "evidence/mc-decisions/mc4-post-synthesis.json",
+        "evidence/stage-04-synthesis/stage-context.txt"
+      ],
+      "errors": []
+    },
+    {
+      "id": "S-05",
+      "name": "enrichment",
+      "status": "completed",
+      "artifacts": [
+        "evidence/stage-04-synthesis/api-reference.md",
+        "evidence/stage-05-backfill/backfill-report.json",
+        "evidence/stage-05-backfill/schema-post-backfill.json",
+        "evidence/mc-decisions/mc5-post-verification.json",
+        "evidence/mc-decisions/verification-report.json"
+      ],
+      "errors": []
+    },
+    {
+      "id": "S-06",
+      "name": "gap-resolution",
+      "status": "completed",
+      "artifacts": [
+        "evidence/stage-05-backfill/schema-post-backfill.json",
+        "evidence/stage-06-gap-resolution/gap-resolution-log.json",
+        "evidence/stage-06-gap-resolution/schema-pre-mini-session.json",
+        "evidence/stage-06-gap-resolution/schema-post-mini-session.json",
+        "evidence/mc-decisions/mc6-post-gap-resolution.json"
+      ],
+      "errors": []
+    },
+    {
+      "id": "S-04R",
+      "name": "synthesis-refresh",
+      "status": "completed",
+      "artifacts": [
+        "evidence/stage-06-gap-resolution/schema-post-mini-session.json",
+        "evidence/stage-04-synthesis/api-reference.md"
+      ],
+      "errors": []
+    },
+    {
+      "id": "S-07",
+      "name": "finalize",
+      "status": "completed",
+      "artifacts": [
+        "evidence/stage-04-synthesis/api-reference.md",
+        "evidence/stage-07-finalize/behavioral-spec.py",
+        "evidence/stage-07-finalize/schema-final.json",
+        "checkpoints/s07_finalize.json"
+      ],
+      "errors": []
+    }
+  ]
+}

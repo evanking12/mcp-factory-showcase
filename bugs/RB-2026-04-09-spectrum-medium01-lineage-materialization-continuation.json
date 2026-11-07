@@ -1,0 +1,31 @@
+{
+  "id": "RB-2026-04-09-spectrum-medium01-lineage-materialization-continuation",
+  "title": "Compiled Spectrum medium-01 requires semantic continuation for lineage materialization",
+  "class": "architecture",
+  "layer": "compiled spectrum medium-01 continuation",
+  "status": "superseded",
+  "symptom": "Compiled medium-01 binary ingest succeeds, but semantic checkpoint alignment still fails at SP_IssueReleaseHold, SP_PrepareReleasePreview, SP_StageReleaseFeeQuote, SP_VerifyReservedRelease.",
+  "smallest_reproducer": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\medium-01\\20260411-103804",
+  "trust_impact": "The pipeline can identify the medium fanout blocker honestly, but cannot yet preserve that semantic obligation as a retryable continuation unit.",
+  "allowed_next_actions": [
+    "rerun only the retry_scope_targets with preserved trusted predecessors",
+    "tighten compiled medium-01 fanout lineage embodiment",
+    "compare the continued semantic gap against the original semantic gap"
+  ],
+  "disallowed_next_actions": [
+    "full-suite rerun before the medium fanout seam is narrowed",
+    "medium-02 expansion before medium-01 continuation evidence exists",
+    "generic semantic invention outside the authored case contract"
+  ],
+  "exit_criteria": [
+    "semantic checkpoint gap narrows from the original packet baseline",
+    "dispatch_preview, fee_quote, or settlement_reconcile gains a success-like semantic checkpoint",
+    "the next continuation decision is evidence-bearing rather than restart-from-zero"
+  ],
+  "next_move": "superseded",
+  "superseded_by": "RB-2026-04-11-spectrum-reservation-stage-safe-entry-contract",
+  "continuation_id": "sc-f3c4b09b77ac",
+  "continuation_packet": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\medium-01\\20260411-103804\\semantic-continuation.json",
+  "blocker_family_primary": "lineage_materialization",
+  "superseded_reason": "Prompt 07 repaired the root predecessor and proved the earliest failed checkpoint is reservation_stage / SP_IssueReleaseHold. The continuation packet's retry_scope_targets now skip the first failed checkpoint and are no longer trustworthy as the primary next branch."
+}

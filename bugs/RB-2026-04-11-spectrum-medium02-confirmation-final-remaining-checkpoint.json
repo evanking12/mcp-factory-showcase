@@ -1,0 +1,22 @@
+{
+  "id": "RB-2026-04-11-spectrum-medium02-confirmation-final-remaining-checkpoint",
+  "title": "Compiled medium-02 confirmation checkpoint still collapses after attestation, invoice, and entitlement repair",
+  "class": "contract",
+  "layer": "compiled medium-02 confirmation-stage owner seam",
+  "status": "active",
+  "symptom": "After Prompt 17 repaired the entitlement checkpoint, the original medium-02 confirmation artifact still shows SP_ConfirmAttestedRelease as an argless stdcall export with zero parameter coverage and failure -7104. Confirmation is now the final remaining checkpoint that must be narrowed before a broader medium-02 reproof is honest.",
+  "smallest_reproducer": "Inspect sessions/design_suite/compiled_ingest/spectrum_transaction_release_settlement_suite/medium-02/20260411-125905/runs/08-settlement_reconcile/session/invocables_map.json together with tests/fixtures/spectrum_transaction_release_settlement_suite/src/spectrum_settlement_reconcile.c and the repaired attestation/invoice/entitlement reruns.",
+  "trust_impact": "Spending a broader medium-02 rerun before confirmation is narrowed would over-credit the family and weaken first-remaining-checkpoint discipline right before the package-scale reproof decision.",
+  "allowed_next_actions": [
+    "inspect only the confirmation-stage run artifact and the smallest likely contract/spec owner seam",
+    "patch only the owner seam justified by evidence",
+    "rerun only the confirmation checkpoint with repaired predecessors"
+  ],
+  "disallowed_next_actions": [
+    "spend a broader medium-02 rerun before the confirmation checkpoint is locally trustworthy",
+    "jump to hard-01 or hard-02 while the final remaining medium-02 checkpoint is still unresolved",
+    "treat the original package-scale medium-02 failure report as still current after three repaired predecessor seams"
+  ],
+  "exit_criteria": "The confirmation checkpoint is narrowed to one owner seam or tightly coupled pair, a targeted confirmation proof surface is executed, and the next branch can be chosen from truthful confirmation evidence instead of the stale original package run.",
+  "next_move": "fix"
+}

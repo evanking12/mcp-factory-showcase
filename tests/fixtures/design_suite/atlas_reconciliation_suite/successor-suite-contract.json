@@ -1,0 +1,31 @@
+{
+  "artifact_type": "successor-suite-contract.json",
+  "schema_version": "1.0.0",
+  "suite_name": "Atlas Reconciliation Suite",
+  "suite_id": "atlas_reconciliation_suite",
+  "suite_purpose": "Prove that the reusable design-suite campaign pathway survives a harder mutual-pressure family where two provisional upstream truths must be jointly confirmed before either is trustworthy.",
+  "suite_non_purpose": "It is not a raw unlock-count suite, not a compare-bearing campaign surface, and not a replacement for Northstar.",
+  "inherited_surfaces": [
+    "campaign truth projection",
+    "campaign cohesion projection",
+    "campaign attribution preservation",
+    "local runtime and package projection shape",
+    "expected-observed comparison shape"
+  ],
+  "non_inherited_surfaces": [
+    "Northstar story and module names",
+    "Northstar-specific campaign artifact naming",
+    "Northstar-specific branch review wording",
+    "compare or promotion readiness"
+  ],
+  "first_harder_pressure_family": "mutual_pressure_blocker",
+  "first_bounded_slice": [
+    "batch",
+    "identity",
+    "ledger",
+    "reconcile"
+  ],
+  "expected_observed_contract_present": true,
+  "compare_ready": false,
+  "promotion_ready": false
+}

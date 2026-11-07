@@ -1,0 +1,341 @@
+{
+  "suite_id": "northstar_transaction_suite",
+  "suite_name": "Northstar Transaction Suite",
+  "suite_kind": "design_suite",
+  "schema_version": "1.0.0",
+  "active_modules": [
+    "session",
+    "inventory",
+    "billing"
+  ],
+  "deferred_modules": [
+    {
+      "module": "audit",
+      "reason": "Late confirmer reserved for overlap-pressure expansion."
+    },
+    {
+      "module": "fulfillment",
+      "reason": "Staged-chain pressure reserved for a later tranche."
+    },
+    {
+      "module": "notifications",
+      "reason": "Noisy side consumer stays last so it does not distort early grouping."
+    }
+  ],
+  "preferred_expansion_order": [
+    "audit",
+    "fulfillment",
+    "notifications"
+  ],
+  "module_sources": {
+    "session": "tests/fixtures/design_suite/northstar_transaction_suite/src/session.py",
+    "inventory": "tests/fixtures/design_suite/northstar_transaction_suite/src/inventory.py",
+    "billing": "tests/fixtures/design_suite/northstar_transaction_suite/src/billing.py",
+    "audit": "tests/fixtures/design_suite/northstar_transaction_suite/src/audit.py",
+    "fulfillment": "tests/fixtures/design_suite/northstar_transaction_suite/src/fulfillment.py",
+    "notifications": "tests/fixtures/design_suite/northstar_transaction_suite/src/notifications.py"
+  },
+  "execution_inputs": {
+    "customer_id": "cust-001",
+    "sku": "SKU-001",
+    "amount_cents": 4999
+  },
+  "blocker_families": [
+    {
+      "family_id": "bootstrap_family_blocker",
+      "kind": "bootstrap_family_blocker",
+      "subjects": [
+        "session.bootstrap_session",
+        "inventory.reserve_item",
+        "billing.authorize_charge"
+      ],
+      "upstream_requirements": [
+        "session.bootstrap_session"
+      ],
+      "shared_state_carriers": [
+        "session_token"
+      ],
+      "failure_or_pressure_sites": [
+        "inventory.reserve_item",
+        "billing.authorize_charge"
+      ],
+      "contradiction_state": "none",
+      "confidence": 0.9,
+      "explanation": "The session bootstrap emits the token and customer context that both downstream families need before their local work is honest."
+    }
+  ],
+  "shared_state_carriers": [
+    {
+      "carrier_id": "session_token",
+      "carrier_kind": "shared_state_carrier",
+      "state_tokens": [
+        "session_token",
+        "customer_context",
+        "sequence_nonce"
+      ],
+      "downstream_consumers": [
+        "inventory.reserve_item",
+        "billing.authorize_charge"
+      ],
+      "exporting_seams": [
+        "session.bootstrap_session"
+      ],
+      "importing_seams": [
+        "inventory.reserve_item",
+        "billing.authorize_charge"
+      ],
+      "staleness_risk": "medium",
+      "confidence": 0.83
+    }
+  ],
+  "expected_relationships": {
+    "producer_consumers": [
+      {
+        "family": "session_bootstrap_to_inventory_reserve",
+        "blocker_family": "bootstrap_family_blocker",
+        "producer_module": "session",
+        "producer_step": "bootstrap_session",
+        "consumer_module": "inventory",
+        "consumer_step": "reserve_item",
+        "state_tokens": [
+          "session_token",
+          "customer_context"
+        ],
+        "evidence_edges": [
+          "session.bootstrap_session->inventory.reserve_item"
+        ],
+        "dependency_mode": "shared_state_mediated",
+        "confidence": 0.91
+      },
+      {
+        "family": "session_bootstrap_to_billing_authorize",
+        "blocker_family": "bootstrap_family_blocker",
+        "producer_module": "session",
+        "producer_step": "bootstrap_session",
+        "consumer_module": "billing",
+        "consumer_step": "authorize_charge",
+        "state_tokens": [
+          "session_token",
+          "sequence_nonce"
+        ],
+        "evidence_edges": [
+          "session.bootstrap_session->billing.authorize_charge"
+        ],
+        "dependency_mode": "shared_state_mediated",
+        "confidence": 0.9
+      }
+    ]
+  },
+  "overlap_pressure": {
+    "module": "audit",
+    "producer_consumer": {
+      "family": "billing_authorize_to_audit_commit",
+      "blocker_family": "two_family_overlap_blocker",
+      "producer_module": "billing",
+      "producer_step": "authorize_charge",
+      "consumer_module": "audit",
+      "consumer_step": "commit_receipt",
+      "state_tokens": [
+        "session_token",
+        "authorization_receipt",
+        "reservation_id"
+      ],
+      "evidence_edges": [
+        "billing.authorize_charge->audit.commit_receipt",
+        "inventory.reserve_item->audit.commit_receipt"
+      ],
+      "dependency_mode": "staged",
+      "confidence": 0.82
+    },
+    "shared_state_carrier": {
+      "carrier_id": "authorization_receipt",
+      "carrier_kind": "shared_state_carrier",
+      "state_tokens": [
+        "authorization_receipt",
+        "session_token"
+      ],
+      "downstream_consumers": [
+        "audit.commit_receipt"
+      ],
+      "exporting_seams": [
+        "billing.authorize_charge"
+      ],
+      "importing_seams": [
+        "audit.commit_receipt"
+      ],
+      "staleness_risk": "low",
+      "confidence": 0.78
+    },
+    "family_group": {
+      "family_id": "two_family_overlap_blocker",
+      "kind": "two_family_overlap_blocker",
+      "subjects": [
+        "billing.authorize_charge",
+        "inventory.reserve_item",
+        "audit.commit_receipt"
+      ],
+      "upstream_requirements": [
+        "billing.authorize_charge",
+        "inventory.reserve_item"
+      ],
+      "shared_state_carriers": [
+        "session_token",
+        "authorization_receipt"
+      ],
+      "failure_or_pressure_sites": [
+        "audit.commit_receipt"
+      ],
+      "contradiction_state": "none",
+      "confidence": 0.8,
+      "explanation": "Audit commit overlaps the bootstrap family and a later order-commit family, so it is the first bounded misgroup pressure seam."
+    },
+    "execution_rule": "Run the base chain, then run audit.commit_receipt using the standard authorization_receipt and reservation_id outputs.",
+    "expected_misgroup_risk": "audit.commit_receipt can misgroup into the bootstrap family because it reuses session_token while actually confirming a later order-commit alignment."
+  },
+  "late_confirmation_pressure": {
+    "module": "audit",
+    "producer_consumers": [
+      {
+        "family": "inventory_reserve_to_audit_confirmation",
+        "blocker_family": "late_confirmation_blocker",
+        "producer_module": "inventory",
+        "producer_step": "reserve_item",
+        "consumer_module": "audit",
+        "consumer_step": "commit_receipt",
+        "state_tokens": [
+          "session_token",
+          "reservation_id"
+        ],
+        "evidence_edges": [
+          "inventory.reserve_item->audit.commit_receipt"
+        ],
+        "dependency_mode": "staged",
+        "confidence": 0.84
+      },
+      {
+        "family": "billing_authorize_to_audit_confirmation",
+        "blocker_family": "late_confirmation_blocker",
+        "producer_module": "billing",
+        "producer_step": "authorize_charge",
+        "consumer_module": "audit",
+        "consumer_step": "commit_receipt",
+        "state_tokens": [
+          "session_token",
+          "authorization_receipt"
+        ],
+        "evidence_edges": [
+          "billing.authorize_charge->audit.commit_receipt"
+        ],
+        "dependency_mode": "staged",
+        "confidence": 0.85
+      }
+    ],
+    "family_group": {
+      "family_id": "late_confirmation_blocker",
+      "kind": "late_confirmation_blocker",
+      "subjects": [
+        "inventory.reserve_item",
+        "billing.authorize_charge",
+        "audit.commit_receipt"
+      ],
+      "upstream_requirements": [
+        "inventory.reserve_item",
+        "billing.authorize_charge"
+      ],
+      "shared_state_carriers": [
+        "session_token",
+        "reservation_id",
+        "authorization_receipt"
+      ],
+      "failure_or_pressure_sites": [
+        "inventory.reserve_item",
+        "billing.authorize_charge"
+      ],
+      "provisional_subjects": [
+        "inventory.reserve_item",
+        "billing.authorize_charge"
+      ],
+      "confirmation_sites": [
+        "audit.commit_receipt"
+      ],
+      "contradiction_state": "none",
+      "confidence": 0.86,
+      "explanation": "Inventory reserve and billing authorize are only locally green until audit commit confirms the reservation and authorization stayed aligned through one downstream confirmation seam."
+    },
+    "execution_rule": "Run the base chain, then run audit.commit_receipt and keep inventory.reserve_item and billing.authorize_charge provisional until audit succeeds.",
+    "expected_deferred_reason": "Inventory and billing remain provisional until audit.commit_receipt confirms the aligned transaction footprint."
+  },
+  "forked_state_pressure": {
+    "module": "audit",
+    "producer_consumers": [
+      {
+        "family": "billing_authorize_primary_branch_to_audit_commit",
+        "blocker_family": "forked_state_blocker",
+        "producer_module": "billing",
+        "producer_step": "authorize_charge",
+        "consumer_module": "audit",
+        "consumer_step": "commit_receipt",
+        "state_tokens": [
+          "session_token",
+          "authorization_receipt_primary",
+          "reservation_id"
+        ],
+        "evidence_edges": [
+          "billing.authorize_charge->audit.commit_receipt:primary_branch"
+        ],
+        "dependency_mode": "staged",
+        "confidence": 0.84
+      }
+    ],
+    "shared_state_carrier": {
+      "carrier_id": "authorization_receipt_branch",
+      "carrier_kind": "shared_state_carrier",
+      "state_tokens": [
+        "authorization_receipt_primary",
+        "authorization_receipt_shadow"
+      ],
+      "downstream_consumers": [
+        "audit.commit_receipt"
+      ],
+      "exporting_seams": [
+        "billing.authorize_charge"
+      ],
+      "importing_seams": [
+        "audit.commit_receipt"
+      ],
+      "staleness_risk": "high",
+      "confidence": 0.81
+    },
+    "family_group": {
+      "family_id": "forked_state_blocker",
+      "kind": "forked_state_blocker",
+      "subjects": [
+        "billing.authorize_charge",
+        "audit.commit_receipt"
+      ],
+      "upstream_requirements": [
+        "billing.authorize_charge"
+      ],
+      "shared_state_carriers": [
+        "authorization_receipt_branch",
+        "reservation_id"
+      ],
+      "failure_or_pressure_sites": [
+        "audit.commit_receipt"
+      ],
+      "lineage_branches": [
+        "authorization_receipt_primary",
+        "authorization_receipt_shadow"
+      ],
+      "accepted_branch": "authorization_receipt_primary",
+      "rejected_branches": [
+        "authorization_receipt_shadow"
+      ],
+      "contradiction_state": "none",
+      "confidence": 0.85,
+      "explanation": "Billing emits two plausible authorization branches, but only the primary lineage branch is acceptable for audit commit; the shadow branch looks valid but should be rejected."
+    },
+    "execution_rule": "Run the base chain, then call audit.commit_receipt once with authorization_receipt_primary and once with authorization_receipt_shadow; record primary as accepted and shadow as rejected.",
+    "expected_branch_risk": "audit.commit_receipt must reject the shadow authorization branch even though it looks syntactically valid."
+  }
+}

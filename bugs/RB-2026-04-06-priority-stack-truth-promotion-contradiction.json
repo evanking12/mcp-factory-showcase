@@ -1,0 +1,25 @@
+{
+  "id": "RB-2026-04-06-priority-stack-truth-promotion-contradiction",
+  "title": "Generic reusable-truth gate still admits empty producer output on real pricing proof",
+  "class": "contradiction",
+  "layer": "api/pipeline/core/reusable_truth.py and prompt-01 truth-promotion policy",
+  "symptom": "A real pricing producer finding from package job 7aeff7a8 remains seed-eligible under assess_reusable_truth(...) even though the verified_success row still carries pOutQuoteId = \"\" and later bounded pricing work required a stricter seed-trust gate to reject that shape.",
+  "smallest_reproducer": "Load PR_BeginQuote from local-data/artifacts/7aeff7a8/findings.json and local-data/artifacts/7aeff7a8/invocables_map.json, then run assess_reusable_truth(...) on that finding; current result is seed_eligible = true despite empty quote output.",
+  "trust_impact": "The foundational truth-promotion layer is weaker than the bounded cluster seed gate, so later seeded rerun and convergence work would build on an inconsistent base.",
+  "allowed_next_actions": [
+    "tighten assess_reusable_truth(...) so output-producing successes with empty or placeholder exported artifact slots are not seed-eligible without stronger corroboration",
+    "add a focused regression test using the real PR_BeginQuote finding shape from job 7aeff7a8",
+    "rerun the prompt-04 integrity truth challenge after the prompt-01 layer is repaired"
+  ],
+  "disallowed_next_actions": [
+    "continue to prompt 05 seeded reruns and convergence",
+    "treat the existing package carryover audit as sufficient evidence that the base is healthy",
+    "launch broader package or Batch B confirmation work on top of the current generic truth-promotion gate"
+  ],
+  "exit_criteria": [
+    "the real PR_BeginQuote finding shape from job 7aeff7a8 is no longer seed-eligible under assess_reusable_truth(...) without stronger corroboration",
+    "prompt-04 integrity verdict can honestly mark truth promotion as holding on the bounded pricing challenge surface",
+    "the generic truth gate and the bounded pricing seed-trust gate no longer disagree on this producer-output case"
+  ],
+  "next_move": "fix"
+}

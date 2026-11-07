@@ -1,0 +1,76 @@
+{
+  "schema_version": "creator_replay_index_v1",
+  "generated_at": "static-replay-bundle-v1",
+  "generated_from": "real artifacts; sanitized static replay",
+  "claim_ceiling": "Static replay of real run artifacts, not live product execution.",
+  "telemetry_claim_ceiling": "Telemetry is diagnostic evidence only and cannot by itself prove product green.",
+  "docs_consulted": [
+    "docs/architecture/OpenTelemetry/OpenTelemetryInitialization.md",
+    "docs/architecture/testing_strategy/COMPILED-SUITE-GREEN-CONTRACT.md",
+    "docs/architecture/testing_strategy/BREAKPOINT-TIER-RUBRIC.md",
+    "docs/architecture/testing_strategy/SUITE-FAMILY-ROADMAP.md"
+  ],
+  "local_run_command": "python -m http.server 8088 --directory docs/creator-challenge/replay-demo",
+  "runs": [
+    {
+      "id": "easy01",
+      "label": "Easy01",
+      "tier": "easy01",
+      "difficulty": "Happy-path product proof",
+      "claim_ceiling": "product-green baseline replay",
+      "safe_to_compare": true,
+      "product_green_eligible": true,
+      "target_count": 4,
+      "duration_sec": 330.05,
+      "path": "data/runs/easy01/run.json"
+    },
+    {
+      "id": "medium01",
+      "label": "Medium01",
+      "tier": "medium01",
+      "difficulty": "More realistic shared-code pressure",
+      "claim_ceiling": "product-green baseline replay",
+      "safe_to_compare": true,
+      "product_green_eligible": true,
+      "target_count": 5,
+      "duration_sec": 472.52,
+      "path": "data/runs/medium01/run.json"
+    },
+    {
+      "id": "medium02",
+      "label": "Medium02",
+      "tier": "medium02",
+      "difficulty": "Current product-route anchor",
+      "claim_ceiling": "product-green baseline replay",
+      "safe_to_compare": true,
+      "product_green_eligible": true,
+      "target_count": 8,
+      "duration_sec": 812.61,
+      "path": "data/runs/medium02/run.json"
+    },
+    {
+      "id": "hard01",
+      "label": "Hard01",
+      "tier": "hard01",
+      "difficulty": "Enterprise survivability pressure",
+      "claim_ceiling": "product-green baseline replay",
+      "safe_to_compare": true,
+      "product_green_eligible": true,
+      "target_count": 9,
+      "duration_sec": 1221.16,
+      "path": "data/runs/hard01/run.json"
+    },
+    {
+      "id": "batch_b",
+      "label": "Batch B",
+      "tier": "package-scale",
+      "difficulty": "Package realism and blocker harvest",
+      "claim_ceiling": "package-scale diagnostic replay",
+      "safe_to_compare": false,
+      "product_green_eligible": false,
+      "target_count": 8,
+      "duration_sec": 0,
+      "path": "data/runs/batch_b/run.json"
+    }
+  ]
+}

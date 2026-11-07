@@ -1,0 +1,89 @@
+{
+  "_comment": "Overnight run config — 6 variants, 50 max runs, gpt-4o-mini. Codex loops: run -> audit -> compare -> triage -> fix/investigate -> repeat.",
+  "campaign": {
+    "mode": "nightly",
+    "hours": 6,
+    "max_runs": 50,
+    "max_cases": 0,
+    "max_workers": 1
+  },
+  "targets": {
+    "names": ["contoso_cs"],
+    "dll": "tests/fixtures/contoso_legacy/contoso_cs.dll",
+    "hints_file": ""
+  },
+  "api": {
+    "url": "http://127.0.0.1:8201",
+    "key": ""
+  },
+  "bridge": {
+    "url": "http://127.0.0.1:8090",
+    "key": ""
+  },
+  "explore_defaults": {
+    "analysis_profile": "strict_dll",
+    "model": "gpt-4o-mini"
+  },
+  "variants": {
+    "enabled": true,
+    "parallel_runs": 1,
+    "variant_configs": [
+      {
+        "variant_id": "control-warm",
+        "explore_settings": {}
+      },
+      {
+        "variant_id": "control-cold",
+        "explore_settings": {
+          "skip_cache": true
+        }
+      },
+      {
+        "variant_id": "context-minimal",
+        "explore_settings": {
+          "context_density": "minimal"
+        }
+      },
+      {
+        "variant_id": "budget-low",
+        "explore_settings": {
+          "max_llm_calls": 80,
+          "max_probe_attempts": 3
+        }
+      },
+      {
+        "variant_id": "seeded-prior",
+        "_comment": "Seeds from the previous run's findings — tests whether prior context improves discovery",
+        "explore_settings": {
+          "prior_job_id": "__PREVIOUS_JOB_ID__"
+        }
+      },
+      {
+        "variant_id": "curriculum-reverse",
+        "_comment": "Probes functions in reverse order — tests whether pipeline depends on hitting easy functions first",
+        "explore_settings": {
+          "curriculum_order": "reverse"
+        }
+      }
+    ]
+  },
+  "execution": {
+    "mode": "dev",
+    "max_rounds": 2,
+    "max_tool_calls": 5,
+    "snapshot_profile": "full"
+  },
+  "capture": {
+    "snapshot_profile": "full",
+    "mode": "strict"
+  },
+  "validity_gates": {
+    "strict_contract": true,
+    "hard_fail_blocks_baseline": true,
+    "profile_allowed_for_fixture": true
+  },
+  "reporting": {
+    "depth": ["l1", "l2", "l3"],
+    "machine_outputs": ["run-validity.json", "kpi_run.json", "artifact-index.json"]
+  }
+}

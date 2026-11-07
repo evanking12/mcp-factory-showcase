@@ -1,0 +1,905 @@
+{
+  "schema_version": "1.0.0",
+  "suite_id": "spectrum_transaction_release_settlement_suite",
+  "case_id": "easy-01",
+  "entry_surface": "upload",
+  "api_identity": "api_ok:routes=35",
+  "bridge_identity": "bridge_ok:routes=8",
+  "compiled_targets": [
+    {
+      "staged_name": "spectrum_session_bootstrap.dll",
+      "source_path": "tests/fixtures/spectrum_transaction_release_settlement_suite/bin/spectrum_session_bootstrap.dll",
+      "target_name": "session_bootstrap",
+      "required_semantic_checkpoint": "SP_OpenOperatorSession"
+    },
+    {
+      "staged_name": "spectrum_reservation_stage.dll",
+      "source_path": "tests/fixtures/spectrum_transaction_release_settlement_suite/bin/spectrum_reservation_stage.dll",
+      "target_name": "reservation_stage",
+      "required_semantic_checkpoint": "SP_IssueReleaseHold"
+    },
+    {
+      "staged_name": "spectrum_release_commit.dll",
+      "source_path": "tests/fixtures/spectrum_transaction_release_settlement_suite/bin/spectrum_release_commit.dll",
+      "target_name": "release_commit",
+      "required_semantic_checkpoint": "SP_CommitRelease"
+    },
+    {
+      "staged_name": "spectrum_audit_trace.dll",
+      "source_path": "tests/fixtures/spectrum_transaction_release_settlement_suite/bin/spectrum_audit_trace.dll",
+      "target_name": "audit_trace",
+      "required_semantic_checkpoint": "SP_RecordReleaseReceipt"
+    }
+  ],
+  "run_records": [
+    {
+      "run_id": "01-session_bootstrap",
+      "target": "session_bootstrap",
+      "target_dll": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\bin\\spectrum_session_bootstrap.dll",
+      "variant": "compiled_easy01",
+      "variant_id": "compiled_easy01",
+      "lane_id": "spectrum-easy01-1",
+      "explore_settings": {
+        "mode": "normal",
+        "cap_profile": "deploy",
+        "max_rounds": 4,
+        "max_tool_calls": 8,
+        "gap_resolution_enabled": true,
+        "skip_documented": true,
+        "deterministic_fallback_enabled": true,
+        "context_density": "full",
+        "analysis_profile": "strict_dll",
+        "parallel_runs": 1,
+        "variant_id": "compiled_easy01",
+        "lane_id": "spectrum-easy01-1",
+        "binary_fixture_suite": "spectrum_transaction_release_settlement_suite",
+        "entry_surface": "upload",
+        "prior_job_id": "",
+        "chain_step_target": "session_bootstrap",
+        "required_semantic_checkpoint": "SP_OpenOperatorSession",
+        "selected_invocable_names": [
+          "SP_OpenOperatorSession"
+        ]
+      },
+      "started_at": "2026-04-10T12:23:34.709317Z",
+      "status": "ok",
+      "job_id": "98113b8b",
+      "phase": "done",
+      "ended_at": "2026-04-10T12:25:26.398867Z",
+      "duration_sec": 111.69,
+      "save_session_exit": 1,
+      "run_validity": {
+        "version": "1.0",
+        "contract_version": "1.0.0",
+        "auditor_version": "1.0.0",
+        "valid": false,
+        "reasons": [
+          "cohesion.hard_fail",
+          "transition_contract.fail_count:2"
+        ],
+        "profile": "strict_dll",
+        "component": "spectrum_session_bootstrap",
+        "invocable_count": 1,
+        "gate_results": {
+          "contract_valid": true,
+          "hard_fail_clear": false,
+          "invocable_band": true,
+          "profile_allowed_for_fixture": true,
+          "status_payload_present": true,
+          "schema_handoff_consistent": true,
+          "stage_handoff_valid": true,
+          "transition_contract_valid": false
+        },
+        "verified_rate": 1.0,
+        "discovered_rate": 1.0,
+        "schema_handoff_drop_to_zero_count": 0,
+        "schema_handoff_regression_count": 0,
+        "schema_handoff_silent_loss_count": 0,
+        "stage_handoff_fail_count": 0,
+        "transition_contract_fail_count": 2,
+        "forward_gap_kpi_artifacts": {
+          "llm_usage.json": false,
+          "stage_events.json": false,
+          "queue_metrics.json": false,
+          "variant_contributions.json": false
+        }
+      },
+      "valid_run": false,
+      "kpi_run": {
+        "version": "1.0",
+        "contract_version": "1.0.0",
+        "auditor_version": "1.0.0",
+        "date": "2026-04-10",
+        "saved_at": "2026-04-10T08:25:26.271562-04:00",
+        "folder": "session",
+        "job_id": "98113b8b",
+        "component": "spectrum_session_bootstrap",
+        "valid_run": false,
+        "analysis_profile": "strict_dll",
+        "totals": {
+          "total_functions": 1,
+          "verified_success": 1,
+          "functional_precondition_unmet": 0,
+          "inferred_success": 0,
+          "failure": 0,
+          "unknown": 0,
+          "discovered": 1
+        },
+        "rates": {
+          "verified_rate": 1.0,
+          "discovered_rate": 1.0,
+          "verified_vs_inferred": 1.0
+        },
+        "verification": {
+          "verified": 1,
+          "inferred": 0,
+          "error": 0
+        },
+        "runtime": {
+          "total_sec": null,
+          "stage_p95_sec": null
+        },
+        "cost": {
+          "run_usd": null,
+          "per_verified_function_usd": null
+        },
+        "flake_inputs": {
+          "function_statuses": {
+            "SP_OpenOperatorSession": "verified_success"
+          }
+        },
+        "gaps": {
+          "stage_runtime": "not_available",
+          "cost_run": "not_available"
+        }
+      },
+      "latest_status_map": {
+        "SP_OpenOperatorSession": "verified_success"
+      },
+      "metrics": {
+        "success_rate": 1.0,
+        "verified_count": 1,
+        "discovered_count": 1,
+        "total_count": 1,
+        "verification_verified": 1,
+        "verification_inferred": 0,
+        "verification_error": 0,
+        "runtime_total_sec": 91.81,
+        "runtime_stage_p95_sec": null,
+        "cost_run_usd": null,
+        "cost_per_verified_function_usd": null
+      },
+      "verdict": {
+        "status": "done",
+        "coverage_pct": 100.0,
+        "verified_count": 1,
+        "total_count": 1,
+        "verified_rate": 100.0,
+        "discovered_rate": 100.0,
+        "functional_count": 0,
+        "inferred_count": 0,
+        "unresolved_functions": [],
+        "strategy_adjustments": {},
+        "clarification_questions": [
+          "[SP_OpenOperatorSession] SP_OpenOperatorSession returned success with an empty session identifier \u2014 what format or constraints must be followed for the session identifier string?"
+        ],
+        "floor_verdict": {},
+        "reasoning": "Full coverage: 1/1 functions verified.",
+        "timestamp": 1775823920.6244638
+      },
+      "job_status_snapshot": {
+        "status": "done",
+        "explore_phase": "done",
+        "explore_message": "Complete \u2014 done (100.0% coverage)"
+      },
+      "dll_name": "spectrum_session_bootstrap.dll",
+      "dll_path": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\bin\\spectrum_session_bootstrap.dll",
+      "run_dir": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\easy-01\\20260410-082334\\runs\\01-session_bootstrap",
+      "binary_hash": "cc2c00f32e32d71f31f3f192fb4b9aed000918a0cf32232ed50752ddad254b46",
+      "entry_surface": "upload",
+      "chain_context": {
+        "target_name": "session_bootstrap",
+        "predecessor_targets": [],
+        "prior_job_id": "",
+        "cross_dll_prior_job_ids": [],
+        "required_semantic_checkpoint": "SP_OpenOperatorSession"
+      }
+    },
+    {
+      "run_id": "02-reservation_stage",
+      "target": "reservation_stage",
+      "target_dll": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\bin\\spectrum_reservation_stage.dll",
+      "variant": "compiled_easy01",
+      "variant_id": "compiled_easy01",
+      "lane_id": "spectrum-easy01-2",
+      "explore_settings": {
+        "mode": "normal",
+        "cap_profile": "deploy",
+        "max_rounds": 4,
+        "max_tool_calls": 8,
+        "gap_resolution_enabled": true,
+        "skip_documented": true,
+        "deterministic_fallback_enabled": true,
+        "context_density": "full",
+        "analysis_profile": "strict_dll",
+        "parallel_runs": 1,
+        "variant_id": "compiled_easy01",
+        "lane_id": "spectrum-easy01-2",
+        "binary_fixture_suite": "spectrum_transaction_release_settlement_suite",
+        "entry_surface": "upload",
+        "prior_job_id": "98113b8b",
+        "chain_step_target": "reservation_stage",
+        "required_semantic_checkpoint": "SP_IssueReleaseHold",
+        "selected_invocable_names": [
+          "SP_IssueReleaseHold"
+        ],
+        "cross_dll_prior_job_ids": [
+          "98113b8b"
+        ]
+      },
+      "started_at": "2026-04-10T12:25:26.400947Z",
+      "status": "ok",
+      "job_id": "518b98f0",
+      "phase": "done",
+      "ended_at": "2026-04-10T12:28:28.441899Z",
+      "duration_sec": 182.04,
+      "save_session_exit": 1,
+      "run_validity": {
+        "version": "1.0",
+        "contract_version": "1.0.0",
+        "auditor_version": "1.0.0",
+        "valid": false,
+        "reasons": [
+          "schema.handoff_regression"
+        ],
+        "profile": "strict_dll",
+        "component": "spectrum_reservation_stage",
+        "invocable_count": 1,
+        "gate_results": {
+          "contract_valid": true,
+          "hard_fail_clear": true,
+          "invocable_band": true,
+          "profile_allowed_for_fixture": true,
+          "status_payload_present": true,
+          "schema_handoff_consistent": false,
+          "stage_handoff_valid": true,
+          "transition_contract_valid": true
+        },
+        "verified_rate": 1.0,
+        "discovered_rate": 1.0,
+        "schema_handoff_drop_to_zero_count": 0,
+        "schema_handoff_regression_count": 1,
+        "schema_handoff_silent_loss_count": 0,
+        "stage_handoff_fail_count": 0,
+        "transition_contract_fail_count": 0,
+        "forward_gap_kpi_artifacts": {
+          "llm_usage.json": false,
+          "stage_events.json": false,
+          "queue_metrics.json": false,
+          "variant_contributions.json": false
+        }
+      },
+      "valid_run": false,
+      "kpi_run": {
+        "version": "1.0",
+        "contract_version": "1.0.0",
+        "auditor_version": "1.0.0",
+        "date": "2026-04-10",
+        "saved_at": "2026-04-10T08:28:28.320233-04:00",
+        "folder": "session",
+        "job_id": "518b98f0",
+        "component": "spectrum_reservation_stage",
+        "valid_run": false,
+        "analysis_profile": "strict_dll",
+        "totals": {
+          "total_functions": 1,
+          "verified_success": 1,
+          "functional_precondition_unmet": 0,
+          "inferred_success": 0,
+          "failure": 0,
+          "unknown": 0,
+          "discovered": 1
+        },
+        "rates": {
+          "verified_rate": 1.0,
+          "discovered_rate": 1.0,
+          "verified_vs_inferred": 1.0
+        },
+        "verification": {
+          "verified": 1,
+          "inferred": 0,
+          "error": 0
+        },
+        "runtime": {
+          "total_sec": null,
+          "stage_p95_sec": null
+        },
+        "cost": {
+          "run_usd": null,
+          "per_verified_function_usd": null
+        },
+        "flake_inputs": {
+          "function_statuses": {
+            "SP_IssueReleaseHold": "verified_success"
+          }
+        },
+        "gaps": {
+          "stage_runtime": "not_available",
+          "cost_run": "not_available"
+        }
+      },
+      "latest_status_map": {
+        "SP_IssueReleaseHold": "verified_success"
+      },
+      "metrics": {
+        "success_rate": 1.0,
+        "verified_count": 1,
+        "discovered_count": 1,
+        "total_count": 1,
+        "verification_verified": 1,
+        "verification_inferred": 0,
+        "verification_error": 0,
+        "runtime_total_sec": 164.11,
+        "runtime_stage_p95_sec": null,
+        "cost_run_usd": null,
+        "cost_per_verified_function_usd": null
+      },
+      "verdict": {
+        "status": "done",
+        "coverage_pct": 100.0,
+        "verified_count": 1,
+        "total_count": 1,
+        "verified_rate": 100.0,
+        "discovered_rate": 100.0,
+        "functional_count": 0,
+        "inferred_count": 0,
+        "unresolved_functions": [],
+        "strategy_adjustments": {},
+        "clarification_questions": [
+          "[SP_OpenOperatorSession] SP_OpenOperatorSession returned success with a session identifier string \u2014 what specific formats or constraints must be followed for this identifier?",
+          "[SP_IssueReleaseHold] SP_IssueReleaseHold returned success with two session identifier parameters \u2014 what are the differences in format or purpose for param_4 and param_6?"
+        ],
+        "floor_verdict": {},
+        "reasoning": "Full coverage: 1/1 functions verified.",
+        "timestamp": 1775824102.5837028
+      },
+      "job_status_snapshot": {
+        "status": "done",
+        "explore_phase": "done",
+        "explore_message": "Complete \u2014 done (100.0% coverage)"
+      },
+      "dll_name": "spectrum_reservation_stage.dll",
+      "dll_path": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\bin\\spectrum_reservation_stage.dll",
+      "run_dir": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\easy-01\\20260410-082334\\runs\\02-reservation_stage",
+      "binary_hash": "ce27b2c37755acc75bb030d16b0338aa91a7f609da7dc1975efae9d31d5a931b",
+      "entry_surface": "upload",
+      "chain_context": {
+        "target_name": "reservation_stage",
+        "predecessor_targets": [
+          "session_bootstrap"
+        ],
+        "prior_job_id": "98113b8b",
+        "cross_dll_prior_job_ids": [
+          "98113b8b"
+        ],
+        "required_semantic_checkpoint": "SP_IssueReleaseHold"
+      }
+    },
+    {
+      "run_id": "03-release_commit",
+      "target": "release_commit",
+      "target_dll": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\bin\\spectrum_release_commit.dll",
+      "variant": "compiled_easy01",
+      "variant_id": "compiled_easy01",
+      "lane_id": "spectrum-easy01-3",
+      "explore_settings": {
+        "mode": "normal",
+        "cap_profile": "deploy",
+        "max_rounds": 4,
+        "max_tool_calls": 8,
+        "gap_resolution_enabled": true,
+        "skip_documented": true,
+        "deterministic_fallback_enabled": true,
+        "context_density": "full",
+        "analysis_profile": "strict_dll",
+        "parallel_runs": 1,
+        "variant_id": "compiled_easy01",
+        "lane_id": "spectrum-easy01-3",
+        "binary_fixture_suite": "spectrum_transaction_release_settlement_suite",
+        "entry_surface": "upload",
+        "prior_job_id": "518b98f0",
+        "chain_step_target": "release_commit",
+        "required_semantic_checkpoint": "SP_CommitRelease",
+        "selected_invocable_names": [
+          "SP_CommitRelease"
+        ],
+        "cross_dll_prior_job_ids": [
+          "98113b8b",
+          "518b98f0"
+        ]
+      },
+      "started_at": "2026-04-10T12:28:28.444404Z",
+      "status": "ok",
+      "job_id": "85e7dbc3",
+      "phase": "done",
+      "ended_at": "2026-04-10T12:32:30.822727Z",
+      "duration_sec": 242.38,
+      "save_session_exit": 0,
+      "run_validity": {
+        "version": "1.0",
+        "contract_version": "1.0.0",
+        "auditor_version": "1.0.0",
+        "valid": true,
+        "reasons": [],
+        "profile": "strict_dll",
+        "component": "spectrum_release_commit",
+        "invocable_count": 1,
+        "gate_results": {
+          "contract_valid": true,
+          "hard_fail_clear": true,
+          "invocable_band": true,
+          "profile_allowed_for_fixture": true,
+          "status_payload_present": true,
+          "schema_handoff_consistent": true,
+          "stage_handoff_valid": true,
+          "transition_contract_valid": true
+        },
+        "verified_rate": 1.0,
+        "discovered_rate": 1.0,
+        "schema_handoff_drop_to_zero_count": 0,
+        "schema_handoff_regression_count": 0,
+        "schema_handoff_silent_loss_count": 0,
+        "stage_handoff_fail_count": 0,
+        "transition_contract_fail_count": 0,
+        "forward_gap_kpi_artifacts": {
+          "llm_usage.json": false,
+          "stage_events.json": false,
+          "queue_metrics.json": false,
+          "variant_contributions.json": false
+        }
+      },
+      "valid_run": true,
+      "kpi_run": {
+        "version": "1.0",
+        "contract_version": "1.0.0",
+        "auditor_version": "1.0.0",
+        "date": "2026-04-10",
+        "saved_at": "2026-04-10T08:32:30.700581-04:00",
+        "folder": "session",
+        "job_id": "85e7dbc3",
+        "component": "spectrum_release_commit",
+        "valid_run": true,
+        "analysis_profile": "strict_dll",
+        "totals": {
+          "total_functions": 1,
+          "verified_success": 1,
+          "functional_precondition_unmet": 0,
+          "inferred_success": 0,
+          "failure": 0,
+          "unknown": 0,
+          "discovered": 1
+        },
+        "rates": {
+          "verified_rate": 1.0,
+          "discovered_rate": 1.0,
+          "verified_vs_inferred": 1.0
+        },
+        "verification": {
+          "verified": 2,
+          "inferred": 0,
+          "error": 0
+        },
+        "runtime": {
+          "total_sec": null,
+          "stage_p95_sec": null
+        },
+        "cost": {
+          "run_usd": null,
+          "per_verified_function_usd": null
+        },
+        "flake_inputs": {
+          "function_statuses": {
+            "SP_CommitRelease": "verified_success"
+          }
+        },
+        "gaps": {
+          "stage_runtime": "not_available",
+          "cost_run": "not_available"
+        }
+      },
+      "latest_status_map": {
+        "SP_CommitRelease": "verified_success"
+      },
+      "metrics": {
+        "success_rate": 1.0,
+        "verified_count": 1,
+        "discovered_count": 1,
+        "total_count": 1,
+        "verification_verified": 2,
+        "verification_inferred": 0,
+        "verification_error": 0,
+        "runtime_total_sec": 222.81,
+        "runtime_stage_p95_sec": null,
+        "cost_run_usd": null,
+        "cost_per_verified_function_usd": null
+      },
+      "verdict": {
+        "status": "done",
+        "coverage_pct": 100.0,
+        "verified_count": 1,
+        "total_count": 1,
+        "verified_rate": 100.0,
+        "discovered_rate": 100.0,
+        "functional_count": 0,
+        "inferred_count": 0,
+        "unresolved_functions": [],
+        "strategy_adjustments": {},
+        "clarification_questions": [
+          "[SP_CommitRelease] SP_CommitRelease returned success with various session identifiers \u2014 what are the formats and meanings of these identifiers?",
+          "[SP_IssueReleaseHold] SP_IssueReleaseHold was called with a session identifier for the hold \u2014 what is its purpose and how should it be formatted?",
+          "[SP_CommitRelease] SP_CommitRelease returned success under various conditions \u2014 what prerequisites must be met before this function is called?",
+          "[general] What units are expected for the numeric parameters in the functions, particularly those that involve limits or quantities?",
+          "[general] What are the different statuses that can be returned by the functions, and what does each status indicate?"
+        ],
+        "floor_verdict": {},
+        "reasoning": "Full coverage: 1/1 functions verified.",
+        "timestamp": 1775824343.317848
+      },
+      "job_status_snapshot": {
+        "status": "done",
+        "explore_phase": "done",
+        "explore_message": "Complete \u2014 done (100.0% coverage)"
+      },
+      "dll_name": "spectrum_release_commit.dll",
+      "dll_path": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\bin\\spectrum_release_commit.dll",
+      "run_dir": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\easy-01\\20260410-082334\\runs\\03-release_commit",
+      "binary_hash": "e8638a110e54094058cef7f3a43c6cf3e2d8f74d2126cc40c46cbf7e5d03e357",
+      "entry_surface": "upload",
+      "chain_context": {
+        "target_name": "release_commit",
+        "predecessor_targets": [
+          "session_bootstrap",
+          "reservation_stage"
+        ],
+        "prior_job_id": "518b98f0",
+        "cross_dll_prior_job_ids": [
+          "98113b8b",
+          "518b98f0"
+        ],
+        "required_semantic_checkpoint": "SP_CommitRelease"
+      }
+    },
+    {
+      "run_id": "04-audit_trace",
+      "target": "audit_trace",
+      "target_dll": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\bin\\spectrum_audit_trace.dll",
+      "variant": "compiled_easy01",
+      "variant_id": "compiled_easy01",
+      "lane_id": "spectrum-easy01-4",
+      "explore_settings": {
+        "mode": "normal",
+        "cap_profile": "deploy",
+        "max_rounds": 4,
+        "max_tool_calls": 8,
+        "gap_resolution_enabled": true,
+        "skip_documented": true,
+        "deterministic_fallback_enabled": true,
+        "context_density": "full",
+        "analysis_profile": "strict_dll",
+        "parallel_runs": 1,
+        "variant_id": "compiled_easy01",
+        "lane_id": "spectrum-easy01-4",
+        "binary_fixture_suite": "spectrum_transaction_release_settlement_suite",
+        "entry_surface": "upload",
+        "prior_job_id": "85e7dbc3",
+        "chain_step_target": "audit_trace",
+        "required_semantic_checkpoint": "SP_RecordReleaseReceipt",
+        "selected_invocable_names": [
+          "SP_RecordReleaseReceipt"
+        ],
+        "cross_dll_prior_job_ids": [
+          "98113b8b",
+          "518b98f0",
+          "85e7dbc3"
+        ]
+      },
+      "started_at": "2026-04-10T12:32:30.825646Z",
+      "status": "ok",
+      "job_id": "240d4549",
+      "phase": "done",
+      "ended_at": "2026-04-10T12:35:20.917203Z",
+      "duration_sec": 170.09,
+      "save_session_exit": 0,
+      "run_validity": {
+        "version": "1.0",
+        "contract_version": "1.0.0",
+        "auditor_version": "1.0.0",
+        "valid": true,
+        "reasons": [],
+        "profile": "strict_dll",
+        "component": "spectrum_audit_trace",
+        "invocable_count": 1,
+        "gate_results": {
+          "contract_valid": true,
+          "hard_fail_clear": true,
+          "invocable_band": true,
+          "profile_allowed_for_fixture": true,
+          "status_payload_present": true,
+          "schema_handoff_consistent": true,
+          "stage_handoff_valid": true,
+          "transition_contract_valid": true
+        },
+        "verified_rate": 1.0,
+        "discovered_rate": 1.0,
+        "schema_handoff_drop_to_zero_count": 0,
+        "schema_handoff_regression_count": 0,
+        "schema_handoff_silent_loss_count": 0,
+        "stage_handoff_fail_count": 0,
+        "transition_contract_fail_count": 0,
+        "forward_gap_kpi_artifacts": {
+          "llm_usage.json": false,
+          "stage_events.json": false,
+          "queue_metrics.json": false,
+          "variant_contributions.json": false
+        }
+      },
+      "valid_run": true,
+      "kpi_run": {
+        "version": "1.0",
+        "contract_version": "1.0.0",
+        "auditor_version": "1.0.0",
+        "date": "2026-04-10",
+        "saved_at": "2026-04-10T08:35:20.789692-04:00",
+        "folder": "session",
+        "job_id": "240d4549",
+        "component": "spectrum_audit_trace",
+        "valid_run": true,
+        "analysis_profile": "strict_dll",
+        "totals": {
+          "total_functions": 1,
+          "verified_success": 1,
+          "functional_precondition_unmet": 0,
+          "inferred_success": 0,
+          "failure": 0,
+          "unknown": 0,
+          "discovered": 1
+        },
+        "rates": {
+          "verified_rate": 1.0,
+          "discovered_rate": 1.0,
+          "verified_vs_inferred": 1.0
+        },
+        "verification": {
+          "verified": 1,
+          "inferred": 0,
+          "error": 0
+        },
+        "runtime": {
+          "total_sec": null,
+          "stage_p95_sec": null
+        },
+        "cost": {
+          "run_usd": null,
+          "per_verified_function_usd": null
+        },
+        "flake_inputs": {
+          "function_statuses": {
+            "SP_RecordReleaseReceipt": "verified_success"
+          }
+        },
+        "gaps": {
+          "stage_runtime": "not_available",
+          "cost_run": "not_available"
+        }
+      },
+      "latest_status_map": {
+        "SP_RecordReleaseReceipt": "verified_success"
+      },
+      "metrics": {
+        "success_rate": 1.0,
+        "verified_count": 1,
+        "discovered_count": 1,
+        "total_count": 1,
+        "verification_verified": 1,
+        "verification_inferred": 0,
+        "verification_error": 0,
+        "runtime_total_sec": 152.76,
+        "runtime_stage_p95_sec": null,
+        "cost_run_usd": null,
+        "cost_per_verified_function_usd": null
+      },
+      "verdict": {
+        "status": "done",
+        "coverage_pct": 100.0,
+        "verified_count": 1,
+        "total_count": 1,
+        "verified_rate": 100.0,
+        "discovered_rate": 100.0,
+        "functional_count": 0,
+        "inferred_count": 0,
+        "unresolved_functions": [],
+        "strategy_adjustments": {},
+        "clarification_questions": [
+          "[general] What is the required format for session identifiers used in SP_OpenOperatorSession and SP_IssueReleaseHold, and are there any constraints on their values?",
+          "[general] What do the parameters with values 64 and 256 represent in SP_IssueReleaseHold, and are there any specific constraints or meanings associated with these values?",
+          "[general] What is the expected format for the receipt identifiers in SP_RecordReleaseReceipt, and are there any specific rules for their creation?",
+          "[general] What conditions must be satisfied before calling SP_IssueReleaseHold, and are there any required prior function calls?",
+          "[general] What is the specific meaning of param_4 in SP_IssueReleaseHold and SP_CommitRelease, and are there any constraints on its value?"
+        ],
+        "floor_verdict": {},
+        "reasoning": "Full coverage: 1/1 functions verified.",
+        "timestamp": 1775824515.641685
+      },
+      "job_status_snapshot": {
+        "status": "done",
+        "explore_phase": "done",
+        "explore_message": "Complete \u2014 done (100.0% coverage)"
+      },
+      "dll_name": "spectrum_audit_trace.dll",
+      "dll_path": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\bin\\spectrum_audit_trace.dll",
+      "run_dir": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\easy-01\\20260410-082334\\runs\\04-audit_trace",
+      "binary_hash": "e18460d5c90aa623c98dabcbf8167f4e3f2708947fb68ef4364bf5cb3904a62a",
+      "entry_surface": "upload",
+      "chain_context": {
+        "target_name": "audit_trace",
+        "predecessor_targets": [
+          "session_bootstrap",
+          "reservation_stage",
+          "release_commit"
+        ],
+        "prior_job_id": "85e7dbc3",
+        "cross_dll_prior_job_ids": [
+          "98113b8b",
+          "518b98f0",
+          "85e7dbc3"
+        ],
+        "required_semantic_checkpoint": "SP_RecordReleaseReceipt"
+      }
+    }
+  ],
+  "comparison_report": {
+    "schema_version": "1.0.0",
+    "suite_id": "spectrum_transaction_release_settlement_suite",
+    "case_id": "easy-01",
+    "proof_class": "compiled_local_binary",
+    "entry_surface": "upload",
+    "compiled_fixture_root": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite",
+    "compiled_targets": [
+      "spectrum_session_bootstrap.dll",
+      "spectrum_reservation_stage.dll",
+      "spectrum_release_commit.dll",
+      "spectrum_audit_trace.dll"
+    ],
+    "expected_active_modules": [
+      "session_bootstrap",
+      "reservation_stage",
+      "release_commit",
+      "audit_trace"
+    ],
+    "expected_execution_flow": [
+      "session_bootstrap.open_operator_session",
+      "reservation_stage.issue_release_hold",
+      "release_commit.commit_release",
+      "audit_trace.record_release_receipt"
+    ],
+    "expected_symbol_flow": [
+      "SP_OpenOperatorSession",
+      "SP_IssueReleaseHold",
+      "SP_CommitRelease",
+      "SP_RecordReleaseReceipt"
+    ],
+    "discovered_symbol_flow": [
+      "SP_OpenOperatorSession",
+      "SP_IssueReleaseHold",
+      "SP_CommitRelease",
+      "SP_RecordReleaseReceipt",
+      "SP_InvalidateUntrustedBranch",
+      "SP_RecordStaleAttestationInvalidation"
+    ],
+    "semantic_symbol_flow": [
+      "SP_OpenOperatorSession",
+      "SP_IssueReleaseHold",
+      "SP_CommitRelease",
+      "SP_RecordReleaseReceipt"
+    ],
+    "binary_ingest_proof_succeeded": true,
+    "binary_embodiment_gap": [],
+    "semantic_checkpoint_alignment_succeeded": true,
+    "semantic_checkpoint_gap": [],
+    "per_run": [
+      {
+        "dll_name": "spectrum_session_bootstrap.dll",
+        "job_id": "98113b8b",
+        "entry_surface": "upload",
+        "binary_hash": "cc2c00f32e32d71f31f3f192fb4b9aed000918a0cf32232ed50752ddad254b46",
+        "expected_exports": [
+          "SP_OpenOperatorSession"
+        ],
+        "discovered_invocables": [
+          "SP_OpenOperatorSession",
+          "entry"
+        ],
+        "export_contract_match": true,
+        "semantic_checkpoint_statuses": {
+          "SP_OpenOperatorSession": "verified_success"
+        },
+        "semantic_checkpoint_match": true,
+        "session_artifacts_present": true
+      },
+      {
+        "dll_name": "spectrum_reservation_stage.dll",
+        "job_id": "518b98f0",
+        "entry_surface": "upload",
+        "binary_hash": "ce27b2c37755acc75bb030d16b0338aa91a7f609da7dc1975efae9d31d5a931b",
+        "expected_exports": [
+          "SP_IssueReleaseHold"
+        ],
+        "discovered_invocables": [
+          "SP_IssueReleaseHold",
+          "entry"
+        ],
+        "export_contract_match": true,
+        "semantic_checkpoint_statuses": {
+          "SP_IssueReleaseHold": "verified_success"
+        },
+        "semantic_checkpoint_match": true,
+        "session_artifacts_present": true
+      },
+      {
+        "dll_name": "spectrum_release_commit.dll",
+        "job_id": "85e7dbc3",
+        "entry_surface": "upload",
+        "binary_hash": "e8638a110e54094058cef7f3a43c6cf3e2d8f74d2126cc40c46cbf7e5d03e357",
+        "expected_exports": [
+          "SP_CommitRelease"
+        ],
+        "discovered_invocables": [
+          "SP_CommitRelease",
+          "entry"
+        ],
+        "export_contract_match": true,
+        "semantic_checkpoint_statuses": {
+          "SP_CommitRelease": "verified_success"
+        },
+        "semantic_checkpoint_match": true,
+        "session_artifacts_present": true
+      },
+      {
+        "dll_name": "spectrum_audit_trace.dll",
+        "job_id": "240d4549",
+        "entry_surface": "upload",
+        "binary_hash": "e18460d5c90aa623c98dabcbf8167f4e3f2708947fb68ef4364bf5cb3904a62a",
+        "expected_exports": [
+          "SP_RecordReleaseReceipt",
+          "SP_InvalidateUntrustedBranch",
+          "SP_RecordStaleAttestationInvalidation"
+        ],
+        "discovered_invocables": [
+          "SP_InvalidateUntrustedBranch",
+          "SP_RecordReleaseReceipt",
+          "SP_RecordStaleAttestationInvalidation",
+          "entry"
+        ],
+        "export_contract_match": true,
+        "semantic_checkpoint_statuses": {
+          "SP_RecordReleaseReceipt": "verified_success",
+          "SP_InvalidateUntrustedBranch": "",
+          "SP_RecordStaleAttestationInvalidation": ""
+        },
+        "semantic_checkpoint_match": false,
+        "session_artifacts_present": true
+      }
+    ],
+    "comparison_note": "compiled binary ingest proof succeeded and easy-01 semantic checkpoints aligned",
+    "generated_at": "2026-04-10T08:35:20",
+    "output_dir": ".\\sessions\\design_suite\\compiled_ingest\\spectrum_transaction_release_settlement_suite\\easy-01\\20260410-082334",
+    "authored_truth_manifest": ".\\docs\\architecture\\engineScaling\\engineScaling_SpectrumDesignSuite\\SpectrumDesignSuite_Source\\transaction_release_settlement_suite\\truth_manifest.json",
+    "compiled_truth_manifest": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\truth_manifest.json",
+    "package_manifest": ".\\tests\\fixtures\\spectrum_transaction_release_settlement_suite\\package_manifest.json",
+    "product_validity": "compiled_local_binary",
+    "northstar_classification": "architecture-proof",
+    "spectrum_source_classification": "architecture-proof",
+    "spectrum_compiled_classification": "product-valid",
+    "authored_suite_id": "spectrum_transaction_release_settlement_suite"
+  }
+}

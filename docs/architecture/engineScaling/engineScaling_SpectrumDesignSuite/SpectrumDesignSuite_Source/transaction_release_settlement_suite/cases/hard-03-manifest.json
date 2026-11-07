@@ -1,0 +1,43 @@
+{
+  "case_id": "hard-03",
+  "case_name": "unsupported_target_quarantine_authority",
+  "band": "hard",
+  "primary_blocker_family": "object_bound_corrective_authority",
+  "pressure_class": "unsafe_path_denial_and_quarantine",
+  "active_modules": [
+    "session_bootstrap",
+    "reservation_stage",
+    "attestation_stage",
+    "invoice_sync",
+    "entitlement_sync",
+    "settlement_reconcile",
+    "audit_trace",
+    "quarantine_gate",
+    "quarantine_audit"
+  ],
+  "entry_surface": "session_bootstrap.open_operator_session",
+  "execution_flow": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "attestation_stage.emit_release_attestation",
+    "invoice_sync.stage_release_invoice",
+    "entitlement_sync.stage_customer_entitlement_update",
+    "settlement_reconcile.invalidate_stale_attested_release",
+    "audit_trace.record_stale_attestation_invalidation",
+    "quarantine_gate.quarantine_unsupported_target",
+    "quarantine_audit.record_unsupported_target_quarantine"
+  ],
+  "shared_state": [
+    "operator_token",
+    "reservation_handle",
+    "unsupported_target_id",
+    "quarantine_token",
+    "quarantine_audit_token"
+  ],
+  "wrong_split": "treat unsafe-path denial as a local error or generic blocked route without preserving the target object that was denied",
+  "right_split": "bind unsupported target identity, denial/quarantine token, audit recording, and final closeout authority in one survivability proof unit",
+  "expected_current_failure_mode": "pipeline may record that an unsafe path was denied while failing to prove which unsupported target was quarantined",
+  "missing_system_candidate": "object-bound quarantine authority and unsafe-path denial provenance",
+  "product_lesson_if_green": "hard can deny and quarantine an unsupported target while carrying object-bound corrective authority into final audit closeout",
+  "product_lesson_if_red": "the next missing system is unsafe-path object lineage, quarantine token forwarding, or final closeout authority for corrective denial actions"
+}

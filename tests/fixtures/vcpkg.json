@@ -1,0 +1,9 @@
+{
+  "name": "mcp-factory-fixtures",
+  "version-string": "0.1.0",
+  "description": "Test fixtures for mcp-factory DLL analysis pipeline",
+  "dependencies": [
+    "zstd",
+    "sqlite3"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "artifact_type": "spectrum-observer-summary.json",
+  "schema_version": "1.0.0",
+  "case_id": "medium-02",
+  "observer_results": [
+    {
+      "observer_name": "blocker_stability",
+      "subject_ids": [
+        "attestation_stage.emit_release_attestation",
+        "invoice_sync.stage_release_invoice",
+        "entitlement_sync.stage_customer_entitlement_update",
+        "settlement_reconcile.confirm_attested_release"
+      ],
+      "focus": "same_family_confidence_vs_medium_01",
+      "expected_outputs": [
+        "blocker_stability_verdict",
+        "same_family_confidence",
+        "candidate_doctrine_split",
+        "next_action"
+      ],
+      "example_output": {
+        "blocker_stability_verdict": "tentative_same_family",
+        "same_family_confidence": "medium",
+        "candidate_doctrine_split": "split_immediate_fanout_lineage_loss_from_delayed_attestation_lineage_loss_only_if_late_validator_stops_pointing_at_attestation_materialization",
+        "next_action": "keep_medium_02_as_reproducibility_probe_until_runtime_evidence_disproves_same-family_claim"
+      }
+    },
+    {
+      "observer_name": "lineage_preservation",
+      "subject_ids": [
+        "attestation_stage.emit_release_attestation",
+        "invoice_sync.stage_release_invoice",
+        "entitlement_sync.stage_customer_entitlement_update"
+      ],
+      "focus": "attestation_packet_survival",
+      "expected_outputs": [
+        "lineage_verdict",
+        "missing_lineage_edges",
+        "trusted_artifact_family",
+        "next_action"
+      ],
+      "example_output": {
+        "lineage_verdict": "partial",
+        "missing_lineage_edges": [
+          "attestation_stage.emit_release_attestation -> entitlement_sync.stage_customer_entitlement_update::attestation_nonce"
+        ],
+        "trusted_artifact_family": "attestation_packet",
+        "next_action": "preserve_packet_lineage_and_nonce_reuse_before_claiming_clean_delayed_confirmation"
+      }
+    }
+  ],
+  "notes": [
+    "authored_from_spectrum_split_contract",
+    "medium_02_observers_now_model_reproducibility_decision_surface"
+  ]
+}

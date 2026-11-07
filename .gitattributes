@@ -1,0 +1,3 @@
+configs/regression/pinned_baselines/**/compiled-ingest-*.json -text
+docs/creator-challenge/replay-demo/inputs/*.json -text
+docs/creator-challenge/replay-demo/data/** text eol=lf

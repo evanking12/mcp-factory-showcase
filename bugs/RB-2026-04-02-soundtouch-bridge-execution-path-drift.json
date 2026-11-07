@@ -1,0 +1,25 @@
+{
+  "id": "RB-2026-04-02-soundtouch-bridge-execution-path-drift",
+  "title": "Focused SoundTouch rerun contaminated by stale bridge execution DLL path",
+  "class": "measurement",
+  "layer": "bridge execution metadata for local analyze-path DLLs",
+  "symptom": "Focused rerun 01367970 executed SoundTouch tools against C:\\mcp-factory\\uploads\\SoundTouchDLL_x64.dll after that staged file no longer existed, producing FileNotFoundError results that looked like semantic failures.",
+  "smallest_reproducer": "Analyze-path a local SoundTouch DLL through the 8201 -> 8090 lane, then run a focused explore after the legacy upload-path copy disappears; invocable execution.dll_path still points at the vanished upload filename.",
+  "trust_impact": "Focused findings for setters and sample-buffer functions become untrustworthy because bridge load-path errors masquerade as DLL semantic failures.",
+  "allowed_next_actions": [
+    "use a stable existing runtime DLL copy for focused reruns",
+    "inspect bridge-side upload path persistence and execution.dll_path refresh logic",
+    "add a durable content-addressed execution path for local analyze-path DLLs"
+  ],
+  "disallowed_next_actions": [
+    "treat FileNotFoundError-focused runs as semantic evidence",
+    "spend more broad SoundTouch reruns on the contaminated job",
+    "rank architectural systems based on the stale-path run"
+  ],
+  "exit_criteria": [
+    "focused reruns execute against a stable on-disk DLL path that still exists during probe execution",
+    "bridge breadcrumbs stop reporting FileNotFoundError for the staged SoundTouch path",
+    "targeted SoundTouch conclusions are based on semantic outcomes instead of loader failures"
+  ],
+  "next_move": "fix"
+}

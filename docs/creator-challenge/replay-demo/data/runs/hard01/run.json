@@ -1,0 +1,400 @@
+{
+  "schema_version": "creator_replay_run_v1",
+  "id": "hard01",
+  "label": "Hard01",
+  "family": "spectrum_transaction_release_settlement_suite",
+  "tier": "hard01",
+  "difficulty": "Enterprise survivability pressure",
+  "why_it_matters": "Exercises branch trust, replay/invalidation evidence, and multi-target semantic continuity.",
+  "source_root": "configs/regression/pinned_baselines/spectrum_transaction_release_settlement_suite/hard-01/20260425-111313",
+  "generated_from": "real pinned baseline artifacts",
+  "claim_ceiling": "product-green baseline replay",
+  "green_contract_level": "product_green",
+  "safe_to_compare": true,
+  "route_authority_present": true,
+  "next_action": "compare/replay evidence",
+  "summary": {
+    "suite_id": "spectrum_transaction_release_settlement_suite",
+    "case_id": "hard-01-product-route",
+    "entry_surface": "upload",
+    "green_contract_level": "product_green",
+    "product_green_eligible": true,
+    "route_authority_present": true,
+    "safe_to_compare": true,
+    "semantic_proof_satisfied": true,
+    "authoritative_proving": true,
+    "blocking_signal": "",
+    "target_count": 9,
+    "total_duration_sec": 1221.16,
+    "verified_total": 9,
+    "discovered_total": 9,
+    "first_failed_boundary": "none"
+  },
+  "targets": [
+    {
+      "run_id": "01-session_bootstrap",
+      "target": "session_bootstrap",
+      "binary_name": "spectrum_session_bootstrap",
+      "job_id": "db298a7c",
+      "status": "ok",
+      "duration_sec": 100.87,
+      "valid_run": true,
+      "safe_to_compare": true,
+      "authoritative_proving": true,
+      "route_authority_present": true,
+      "semantic_proof_satisfied": true,
+      "required_semantic_checkpoint": "SP_OpenOperatorSession",
+      "verified_count": 1,
+      "total_count": 1,
+      "coverage_pct": 100.0,
+      "failure_domain": "",
+      "binary_hash": "63319bdfc837ab50",
+      "claim_ceiling": "decision-bearing run replay"
+    },
+    {
+      "run_id": "02-reservation_stage",
+      "target": "reservation_stage",
+      "binary_name": "spectrum_reservation_stage",
+      "job_id": "0d3f6bbd",
+      "status": "ok",
+      "duration_sec": 117.34,
+      "valid_run": true,
+      "safe_to_compare": true,
+      "authoritative_proving": true,
+      "route_authority_present": true,
+      "semantic_proof_satisfied": true,
+      "required_semantic_checkpoint": "SP_IssueReleaseHold",
+      "verified_count": 1,
+      "total_count": 1,
+      "coverage_pct": 100.0,
+      "failure_domain": "",
+      "binary_hash": "359ed9a93e7234e5",
+      "claim_ceiling": "decision-bearing run replay"
+    },
+    {
+      "run_id": "03-dispatch_preview",
+      "target": "dispatch_preview",
+      "binary_name": "spectrum_dispatch_preview",
+      "job_id": "b2dfccf9",
+      "status": "ok",
+      "duration_sec": 116.89,
+      "valid_run": true,
+      "safe_to_compare": true,
+      "authoritative_proving": true,
+      "route_authority_present": true,
+      "semantic_proof_satisfied": true,
+      "required_semantic_checkpoint": "SP_PrepareReleasePreview",
+      "verified_count": 1,
+      "total_count": 1,
+      "coverage_pct": 100.0,
+      "failure_domain": "",
+      "binary_hash": "78c3cadd20d4dedb",
+      "claim_ceiling": "decision-bearing run replay"
+    },
+    {
+      "run_id": "04-fee_quote",
+      "target": "fee_quote",
+      "binary_name": "spectrum_fee_quote",
+      "job_id": "654ae76b",
+      "status": "ok",
+      "duration_sec": 113.34,
+      "valid_run": true,
+      "safe_to_compare": true,
+      "authoritative_proving": true,
+      "route_authority_present": true,
+      "semantic_proof_satisfied": true,
+      "required_semantic_checkpoint": "SP_StageReleaseFeeQuote",
+      "verified_count": 1,
+      "total_count": 1,
+      "coverage_pct": 100.0,
+      "failure_domain": "",
+      "binary_hash": "b5f770c7479daad0",
+      "claim_ceiling": "decision-bearing run replay"
+    },
+    {
+      "run_id": "05-attestation_stage",
+      "target": "attestation_stage",
+      "binary_name": "spectrum_attestation_stage",
+      "job_id": "03936c3f",
+      "status": "ok",
+      "duration_sec": 155.8,
+      "valid_run": true,
+      "safe_to_compare": true,
+      "authoritative_proving": true,
+      "route_authority_present": true,
+      "semantic_proof_satisfied": true,
+      "required_semantic_checkpoint": "SP_EmitReleaseAttestation",
+      "verified_count": 1,
+      "total_count": 1,
+      "coverage_pct": 100.0,
+      "failure_domain": "",
+      "binary_hash": "cf2fa3013ecef68a",
+      "claim_ceiling": "decision-bearing run replay"
+    },
+    {
+      "run_id": "06-release_commit",
+      "target": "release_commit",
+      "binary_name": "spectrum_release_commit",
+      "job_id": "58175314",
+      "status": "ok",
+      "duration_sec": 153.79,
+      "valid_run": true,
+      "safe_to_compare": true,
+      "authoritative_proving": true,
+      "route_authority_present": true,
+      "semantic_proof_satisfied": true,
+      "required_semantic_checkpoint": "SP_CommitRelease",
+      "verified_count": 1,
+      "total_count": 1,
+      "coverage_pct": 100.0,
+      "failure_domain": "",
+      "binary_hash": "36a23a111a2de857",
+      "claim_ceiling": "decision-bearing run replay"
+    },
+    {
+      "run_id": "07-replay_branch",
+      "target": "replay_branch",
+      "binary_name": "spectrum_replay_branch",
+      "job_id": "47f7f132",
+      "status": "ok",
+      "duration_sec": 177.96,
+      "valid_run": true,
+      "safe_to_compare": true,
+      "authoritative_proving": true,
+      "route_authority_present": true,
+      "semantic_proof_satisfied": true,
+      "required_semantic_checkpoint": "SP_ReplayReleaseBranch",
+      "verified_count": 1,
+      "total_count": 1,
+      "coverage_pct": 100.0,
+      "failure_domain": "",
+      "binary_hash": "8057807df4732a49",
+      "claim_ceiling": "decision-bearing run replay"
+    },
+    {
+      "run_id": "08-settlement_reconcile",
+      "target": "settlement_reconcile",
+      "binary_name": "spectrum_settlement_reconcile",
+      "job_id": "9b113aec",
+      "status": "ok",
+      "duration_sec": 164.28,
+      "valid_run": true,
+      "safe_to_compare": true,
+      "authoritative_proving": true,
+      "route_authority_present": true,
+      "semantic_proof_satisfied": true,
+      "required_semantic_checkpoint": "SP_SelectTrustedBranch",
+      "verified_count": 1,
+      "total_count": 1,
+      "coverage_pct": 100.0,
+      "failure_domain": "",
+      "binary_hash": "26a0abed588b9197",
+      "claim_ceiling": "decision-bearing run replay"
+    },
+    {
+      "run_id": "09-audit_trace",
+      "target": "audit_trace",
+      "binary_name": "spectrum_audit_trace",
+      "job_id": "29156ec8",
+      "status": "ok",
+      "duration_sec": 120.89,
+      "valid_run": true,
+      "safe_to_compare": true,
+      "authoritative_proving": true,
+      "route_authority_present": true,
+      "semantic_proof_satisfied": true,
+      "required_semantic_checkpoint": "SP_InvalidateUntrustedBranch",
+      "verified_count": 1,
+      "total_count": 1,
+      "coverage_pct": 100.0,
+      "failure_domain": "",
+      "binary_hash": "27f98ec4ea26e876",
+      "claim_ceiling": "decision-bearing run replay"
+    }
+  ],
+  "symbol_flow": {
+    "expected": [
+      "SP_OpenOperatorSession",
+      "SP_IssueReleaseHold",
+      "SP_EmitReleaseAttestation",
+      "SP_CommitRelease",
+      "SP_ReplayReleaseBranch",
+      "SP_SelectTrustedBranch",
+      "SP_InvalidateUntrustedBranch"
+    ],
+    "discovered": [
+      "SP_OpenOperatorSession",
+      "SP_IssueReleaseHold",
+      "SP_EmitReleaseAttestation",
+      "SP_CommitRelease",
+      "SP_ReplayReleaseBranch",
+      "SP_SelectTrustedBranch",
+      "SP_InvalidateUntrustedBranch"
+    ],
+    "semantic": [
+      "SP_OpenOperatorSession",
+      "SP_IssueReleaseHold",
+      "SP_EmitReleaseAttestation",
+      "SP_CommitRelease",
+      "SP_ReplayReleaseBranch",
+      "SP_SelectTrustedBranch",
+      "SP_InvalidateUntrustedBranch"
+    ],
+    "support_targets": [
+      "dispatch_preview",
+      "fee_quote"
+    ]
+  },
+  "artifact_summary": [
+    {
+      "name": "compiled-ingest-summary.json",
+      "kind": "summary",
+      "path": "configs/regression/pinned_baselines/spectrum_transaction_release_settlement_suite/hard-01/20260425-111313/compiled-ingest-summary.json",
+      "included": "derived fields only",
+      "bytes": 678028
+    },
+    {
+      "name": "compiled-ingest-compare-report.json",
+      "kind": "comparison",
+      "path": "configs/regression/pinned_baselines/spectrum_transaction_release_settlement_suite/hard-01/20260425-111313/compiled-ingest-compare-report.json",
+      "included": "derived fields only",
+      "bytes": 268708
+    }
+  ],
+  "ground_truth_note": "Synthetic fixture source exists for evaluation, but this replay represents a compiled/no-source product route.",
+  "otel": {
+    "trace_id": "creator-hard01",
+    "claim_ceiling": "telemetry is diagnostic evidence only",
+    "spans": [
+      {
+        "span_id": "admission",
+        "name": "Compiled/no-source admission",
+        "stage": "S00",
+        "duration_sec": 0,
+        "status": "pass",
+        "message": "Fixture accepted as compiled binary input; source is not used by the product route."
+      },
+      {
+        "span_id": "route_authority",
+        "name": "Ghidra-backed route authority",
+        "stage": "S00B-S02",
+        "duration_sec": 427.41,
+        "status": "pass",
+        "message": "Route authority proves the intended compiled analysis path was entered."
+      },
+      {
+        "span_id": "target_runs",
+        "name": "Target analysis runs",
+        "stage": "S02-S05",
+        "duration_sec": 1221.16,
+        "status": "pass",
+        "message": "9 target runs replayed from pinned baseline artifacts."
+      },
+      {
+        "span_id": "semantic_compare",
+        "name": "Semantic checkpoint comparison",
+        "stage": "S03-S06",
+        "duration_sec": 61.06,
+        "status": "pass",
+        "message": "Expected semantic checkpoints were compared against recovered symbols and run evidence."
+      },
+      {
+        "span_id": "final_claim",
+        "name": "Claim ceiling and closeout",
+        "stage": "S07",
+        "duration_sec": 0,
+        "status": "pass",
+        "message": "product-green baseline replay"
+      }
+    ],
+    "metrics": [
+      {
+        "name": "mcp_factory.pipeline.stage_span.duration",
+        "value": 1221.16,
+        "unit": "sec",
+        "status": "pass",
+        "why": "Shows where time is spent so expensive reruns are not used blindly.",
+        "labels": {
+          "run": "hard01",
+          "span": "target_runs"
+        }
+      },
+      {
+        "name": "mcp_factory.run.status_staleness",
+        "value": 0,
+        "unit": "sec",
+        "status": "pass",
+        "why": "Tells an operator whether a run is alive, stale, or misleading.",
+        "labels": {
+          "terminal": "true"
+        }
+      },
+      {
+        "name": "mcp_factory.artifacts.required_emission_lag.duration",
+        "value": 0,
+        "unit": "sec",
+        "status": "pass",
+        "why": "Separates a completed stage from evidence that is actually readable.",
+        "labels": {
+          "source": "pinned_baseline_artifacts"
+        }
+      },
+      {
+        "name": "first_failed_boundary",
+        "value": "none",
+        "unit": "boundary",
+        "status": "pass",
+        "why": "Prevents downstream missing artifacts from being mistaken for the root cause.",
+        "labels": {
+          "semantic_gap_count": "0",
+          "embodiment_gap_count": "0"
+        }
+      },
+      {
+        "name": "root_blocker",
+        "value": "none",
+        "unit": "blocker",
+        "status": "pass",
+        "why": "Names the owning layer for the next bounded fix.",
+        "labels": {
+          "case_id": "hard-01-product-route"
+        }
+      },
+      {
+        "name": "candidate_comparability_state",
+        "value": "comparable",
+        "unit": "state",
+        "status": "pass",
+        "why": "Distinguishes diagnostic output from evidence that can support comparison.",
+        "labels": {
+          "authoritative_proving": "true"
+        }
+      },
+      {
+        "name": "safe_to_compare",
+        "value": true,
+        "unit": "bool",
+        "status": "pass",
+        "why": "Protects against false benchmark or regression claims.",
+        "labels": {
+          "green_contract_level": "product_green"
+        }
+      },
+      {
+        "name": "next_action_confidence",
+        "value": "high",
+        "unit": "confidence",
+        "status": "pass",
+        "why": "Tells the operator whether to fix, rerun, inspect, or stop.",
+        "labels": {
+          "next_action": "compare/replay evidence"
+        }
+      }
+    ]
+  },
+  "links": {
+    "run_trace": "data/runs/hard01/run-trace.json",
+    "run_metrics": "data/runs/hard01/run-metrics.json",
+    "run_trace_md": "data/runs/hard01/run-trace.md"
+  }
+}

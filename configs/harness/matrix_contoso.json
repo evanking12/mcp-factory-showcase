@@ -1,0 +1,44 @@
+{
+  "targets": [
+    {
+      "name": "contoso_cs",
+      "dll_path": "tests/fixtures/contoso_legacy/contoso_cs.dll",
+      "hints_file": "tests/fixtures/contoso_legacy/hints.txt"
+    },
+    {
+      "name": "contoso_payments",
+      "dll_path": "tests/fixtures/contoso_legacy/contoso_payments.dll",
+      "hints_file": "tests/fixtures/contoso_legacy/hints.txt"
+    }
+  ],
+  "cache_states": ["warm", "cold"],
+  "seeding_modes": ["none", "warm", "cross_dll"],
+  "variants": [
+    {
+      "variant_id": "control",
+      "explore_settings": {
+        "mode": "normal",
+        "cap_profile": "deploy",
+        "max_rounds": 5,
+        "max_tool_calls": 8,
+        "gap_resolution_enabled": true,
+        "skip_documented": true,
+        "deterministic_fallback_enabled": true,
+        "context_density": "full"
+      }
+    }
+  ],
+  "execution": {
+    "analyze_timeout_sec": 1800,
+    "explore_timeout_sec": 5400,
+    "poll_sec": 10,
+    "stuck_seconds": 900,
+    "snapshot_profile": "full",
+    "analysis_profile": "strict_dll"
+  },
+  "validation_criteria": {
+    "warm_cold_parity_threshold": 0.05,
+    "cross_dll_min_lift_per_target": 1,
+    "regression_tolerance": 0
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "id": "RB-2026-04-04-batch-b-overlap-evidence-contamination",
+  "title": "Expanded Batch B package displaces trusted overlap-path evidence with cross-DLL lookalikes",
+  "class": "measurement",
+  "layer": "pipeline intelligence",
+  "symptom": "Wave-2 Batch B is internally trusted and overlap-baseline comparable, but 18 previously verified overlap functions regress because denser cross-DLL context introduces plausible-but-wrong artifacts that outrank or replace the trusted overlap-path evidence.",
+  "smallest_reproducer": {
+    "wave_id": "wave-2-batch-b",
+    "campaign_id": "66d39d1d",
+    "package_id": "contoso-business-suite",
+    "overlap_baseline_source_wave": "wave-2-batch-a",
+    "focus_functions": [
+      "WF_GetWorkflowState",
+      "WF_CancelWorkflow",
+      "PR_BeginQuote",
+      "PR_GetQuoteState",
+      "PR_SealQuote",
+      "CFG_ApproveLicensedCall",
+      "RP_CloseReport"
+    ],
+    "observed_bad_argument_shapes": [
+      "workflow consumers receiving CFG-* tickets instead of workflow handles",
+      "pricing quote consumers receiving licensed|cust=... approval tickets instead of PRQ-* quote ids",
+      "reporting close calls receiving reservation ids instead of RPT-* report ids",
+      "config approval calls reusing ticket strings as nonce values"
+    ]
+  },
+  "trust_impact": "Package expansion is now comparable enough to trust the regression surface, but the current evidence-selection layer is not robust enough to preserve previously verified overlap paths under denser cross-DLL seeding.",
+  "allowed_next_actions": [
+    "investigate overlap regressions on workflow, pricing, config, and reporting only",
+    "tighten same-lineage and same-family evidence preference under expansion pressure",
+    "add bounded expansion-wave guards that preserve trusted overlap-path evidence unless stronger same-family evidence exists",
+    "rerun wave-2-batch-b only after a generic evidence-selection fix"
+  ],
+  "disallowed_next_actions": [
+    "run Batch C",
+    "promote a new architecture tranche from this Batch B result",
+    "patch Contoso-specific identifiers into pipeline core",
+    "treat the regressions as mere comparability noise"
+  ],
+  "exit_criteria": [
+    "wave-2-batch-b remains package_internal_truth_ready=true and overlap_baseline_comparable=true",
+    "the carried-forward 6-DLL overlap no longer shows unexplained regressions",
+    "trusted overlap-path working calls survive the denser 8-DLL package context"
+  ],
+  "next_move": "fix"
+}

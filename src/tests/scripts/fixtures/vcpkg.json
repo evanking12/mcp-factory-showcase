@@ -1,0 +1,8 @@
+{
+  "name": "mcp-factory-fixtures",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "zstd",
+    "sqlite3"
+  ]
+}

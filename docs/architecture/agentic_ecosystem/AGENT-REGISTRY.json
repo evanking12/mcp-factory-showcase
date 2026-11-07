@@ -1,0 +1,907 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at": "2026-04-28",
+  "purpose": "Canonical lifecycle and deployment registry for recurring agentic ecosystem roles in MCP Factory.",
+  "default_specialist_output_contract": {
+    "contract_path": "docs/architecture/agentic_ecosystem/role_contracts/GM-CONSUMABLE-SPECIALIST-OUTPUT.md",
+    "required": true,
+    "summary": "Every specialist role response starts with a compact GM-consumable YAML block before any role-specific detail."
+  },
+  "audit_suites": [
+    {
+      "name": "dynamic_campaign_default",
+      "applies_when": [
+        "delegation is authorized",
+        "the work is a governed dynamic campaign"
+      ],
+      "required_roles": [
+        "campaign-output-ledger"
+      ],
+      "conditional_roles": [
+        "campaign-reviewer",
+        "system-contract-tracer",
+        "verification_gate_bot",
+        "proving-authority-reviewer",
+        "roadblock_classifier"
+      ],
+      "acceptable_non_dispatch_reasons": [
+        "delegation authorization absent",
+        "role not decision-bearing this tranche",
+        "triggering event did not happen",
+        "tranche too small",
+        "critical path better kept local",
+        "known role failure mode matched current task",
+        "required role missing or too degraded for current risk"
+      ],
+      "required_writeback_surfaces": [
+        "dispatch accountability block in the live tranche artifact",
+        "campaign log",
+        "review surfaces when triggered",
+        "closeout or architect brief when the audit changed blocker ranking or workflow meaning"
+      ]
+    },
+    {
+      "name": "migration_transition_default",
+      "applies_when": [
+        "delegation is authorized",
+        "the work is migration-shaped, cutover-shaped, or compatibility-shaped"
+      ],
+      "required_roles": [
+        "use-case-specific migration planner when one exists",
+        "system-contract-tracer",
+        "verification_gate_bot"
+      ],
+      "conditional_roles": [
+        "campaign-output-ledger",
+        "artifact-root-integrity-auditor",
+        "code_review_bot"
+      ],
+      "acceptable_non_dispatch_reasons": [
+        "delegation authorization absent",
+        "work is too small to justify the suite",
+        "migration planner does not exist for this slice",
+        "root-integrity risk is not part of the proof surface",
+        "slice is planning-only and no code-bearing review is needed yet",
+        "required role missing or too degraded for current risk"
+      ],
+      "required_writeback_surfaces": [
+        "dispatch accountability block in the migration artifact",
+        "compatibility or rollback review surfaces",
+        "campaign log when campaign-governed",
+        "architect brief or closeout if the audit changed legality or rollback meaning"
+      ]
+    },
+    {
+      "name": "proving_default",
+      "applies_when": [
+        "delegation is authorized",
+        "a rerun, proving command, or regression-gate run can affect branch choice, blocker ranking, or next-prompt legality"
+      ],
+      "required_roles": [
+        "proving-authority-reviewer"
+      ],
+      "conditional_roles": [
+        "regression-governor",
+        "verification_gate_bot",
+        "run_auditor",
+        "ledger_compare_run_auditor",
+        "campaign-output-ledger"
+      ],
+      "acceptable_non_dispatch_reasons": [
+        "delegation authorization absent",
+        "no rerun or proving command occurred",
+        "result cannot affect branch choice or blocker ranking",
+        "required role missing or too degraded for current risk"
+      ],
+      "required_writeback_surfaces": [
+        "dispatch accountability block in the live tranche artifact",
+        "proving-authority review output when triggered",
+        "campaign log when campaign-governed",
+        "closeout or review summary if the proving audit changed next-branch legality"
+      ]
+    },
+    {
+      "name": "regression_governance_default",
+      "applies_when": [
+        "delegation is authorized",
+        "the work changes runtime, runners, pipeline behavior, stage behavior, compare logic, or regression-gate policy"
+      ],
+      "required_roles": [
+        "regression-governor"
+      ],
+      "conditional_roles": [
+        "proving-authority-reviewer",
+        "system-contract-tracer",
+        "campaign-output-ledger"
+      ],
+      "acceptable_non_dispatch_reasons": [
+        "delegation authorization absent",
+        "change is too small and Tier 0 already covers the claim",
+        "required role missing or too degraded for current risk",
+        "critical path better kept local for this bounded slice"
+      ],
+      "required_writeback_surfaces": [
+        "regression posture in the owning artifact",
+        "regression result in the owning artifact when a gate or rerun completed",
+        "campaign log when campaign-governed",
+        "closeout or architect brief when the regression audit changed claim legality"
+      ]
+    },
+    {
+      "name": "system_contract_refactor_default",
+      "applies_when": [
+        "delegation is authorized",
+        "the work is system-contract-shaped or high hidden-consumer-risk"
+      ],
+      "required_roles": [
+        "system-contract-tracer"
+      ],
+      "conditional_roles": [
+        "code_review_bot",
+        "verification_gate_bot",
+        "campaign-output-ledger"
+      ],
+      "acceptable_non_dispatch_reasons": [
+        "delegation authorization absent",
+        "owned seam already proven local",
+        "work is too small to justify dispatch",
+        "required role missing or too degraded for current risk"
+      ],
+      "required_writeback_surfaces": [
+        "dispatch accountability block in the live artifact",
+        "system review or blocker writeback when the trace changes system ownership",
+        "campaign log when campaign-governed"
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "name": "gm_orchestrator",
+      "family": "orchestration",
+      "current_form": "parent_thread_only",
+      "lifecycle_state": "provisional",
+      "owner_surfaces": [
+        "dynamic prompt chains",
+        "branch choice",
+        "stop gates",
+        "final synthesis",
+        "authoritative workflow-quality scoring",
+        "current-truth contract upkeep"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/GM-ORCHESTRATOR.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-12-GM-ORCHESTRATOR-EVAL-01.md"
+      ],
+      "recommended_model": "main-thread inherited",
+      "recommended_reasoning_effort": "high",
+      "recommended_sandbox_mode": "workspace-write",
+      "promotion_gate": "Remains parent-thread-only; do not externalize.",
+      "degradation_triggers": [
+        "stops at prompt-completion boundaries instead of program stop gates",
+        "delegates branch choice",
+        "loses synthesis coherence",
+        "continues while workflow-quality writeback is stale",
+        "lets context pressure hide branch-shaping facts in chat memory",
+        "fails to update current-truth contracts after current operating truth changes"
+      ],
+      "re_evaluation_triggers": [
+        "new ecosystem doctrine",
+        "prompt-chain continuation failure",
+        "workflow-quality doctrine changes",
+        "live writeback checkpoint failures"
+      ],
+      "merge_or_retirement_condition": "Never merge into a specialist role.",
+      "notes": "Acts as general manager of active truth. Remains parent-thread-only, but now requires authoritative per-tranche workflow scoring and current-truth contract upkeep. Default campaign posture is: Act as GM for this campaign. Delegation authorized for bounded reviewers only. Commit and push validated tranches. No merge. This authorizes bounded reviewers/auditors only; branch choice and product intent remain parent-thread/operator owned.",
+      "dispatch_trigger_mode": "advisory_fit",
+      "mandatory_event_triggers": [
+        "operator says Act as GM for this campaign",
+        "a governed dynamic campaign, bounded architecture tranche, or specialist-evaluated workflow is live"
+      ],
+      "blocking_mode": "non_blocking_default",
+      "skip_conditions": [
+        "ordinary trivial fix with no campaign, proof, role, or current-truth impact"
+      ]
+    },
+    {
+      "name": "code_review_bot",
+      "family": "review_gate",
+      "current_form": "custom_agent",
+      "lifecycle_state": "provisional",
+      "owner_surfaces": [
+        "diff review",
+        "correctness risk",
+        "regression risk",
+        "boundary violations",
+        "missing test signals",
+        "commit handoff contract integrity"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/CODE-REVIEW-BOT.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-CODE-REVIEW-BOT-EVAL-01.md",
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-CODE-REVIEW-BOT-EVAL-02.md"
+      ],
+      "recommended_model": "gpt-5.4",
+      "recommended_reasoning_effort": "high",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "migration_transition_default",
+        "system_contract_refactor_default"
+      ],
+      "promotion_gate": "One more high-signal real diff review on a runtime-bearing or cross-system change without major overclaim before stable use.",
+      "degradation_triggers": [
+        "style-only noise",
+        "missed real regressions",
+        "weak file/evidence citation",
+        "ignoring malformed commit handoff bodies"
+      ],
+      "re_evaluation_triggers": [
+        "major review doctrine change",
+        "new public boundary rules",
+        "commit handoff convention changes"
+      ],
+      "merge_or_retirement_condition": "Split only if correctness and boundary review diverge materially.",
+      "notes": "Wave 1 custom agent implemented. Two real evaluations completed; supervised use is justified, but the role still needs one more diverse diff review before stable use. Should validate commit handoff structure when commit metadata is available."
+    },
+    {
+      "name": "verification_gate_bot",
+      "family": "review_gate",
+      "current_form": "custom_agent",
+      "lifecycle_state": "provisional",
+      "owner_surfaces": [
+        "required checks",
+        "verification sufficiency",
+        "lane-sensitive restart and health obligations"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/VERIFICATION-GATE-BOT.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-VERIFICATION-GATE-BOT-EVAL-01.md",
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-VERIFICATION-GATE-BOT-EVAL-02.md"
+      ],
+      "recommended_model": "gpt-5.4-mini",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "dynamic_campaign_default",
+        "migration_transition_default",
+        "proving_default",
+        "system_contract_refactor_default"
+      ],
+      "promotion_gate": "One more real checkpoint evaluation with durable verification evidence attachment before stable use.",
+      "degradation_triggers": [
+        "checklist noise",
+        "pass verdicts without evidence",
+        "missed lane-sensitive checks"
+      ],
+      "re_evaluation_triggers": [
+        "AGENTS verification doctrine changes",
+        "new lane restart rules"
+      ],
+      "merge_or_retirement_condition": "Retire only if absorbed by a stronger generic gate with equal specificity.",
+      "dispatch_trigger_mode": "mandatory_event_bound",
+      "mandatory_event_triggers": [
+        "after harness, contract, readiness, or lane-trust work that precedes reopening a more expensive proving band"
+      ],
+      "blocking_mode": "blocking_after_event",
+      "skip_conditions": [
+        "delegation authorization absent",
+        "tranche too small to justify dispatch",
+        "no more expensive proving band is being reopened yet"
+      ],
+      "notes": "Wave 1 custom agent implemented. Two real evaluations completed; this role is ready for supervised recurring use but still needs stronger evidence attachment before stable use."
+    },
+    {
+      "name": "handoff_formatter_bot",
+      "family": "review_gate",
+      "current_form": "prompt_only",
+      "lifecycle_state": "calibrating",
+      "owner_surfaces": [
+        "checkpoint summaries",
+        "structured handoffs",
+        "review packets"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/HANDOFF-FORMATTER-BOT.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-HANDOFF-FORMATTER-BOT-EVAL-01.md"
+      ],
+      "recommended_model": "gpt-5.4-mini",
+      "recommended_reasoning_effort": "low",
+      "recommended_sandbox_mode": "read-only",
+      "promotion_gate": "2 clean handoff evaluations with evidence-confidence and test fields behaving well.",
+      "degradation_triggers": [
+        "broad inference",
+        "missing evidence fields",
+        "unclear test accounting"
+      ],
+      "re_evaluation_triggers": [
+        "new commit handoff format",
+        "new review checkpoint workflow"
+      ],
+      "merge_or_retirement_condition": "May merge into external PR tooling later if its structure becomes generic enough.",
+      "notes": "Keep prompt-only until one more live cycle proves it."
+    },
+    {
+      "name": "run_auditor",
+      "family": "run_evidence",
+      "current_form": "custom_agent",
+      "lifecycle_state": "provisional",
+      "owner_surfaces": [
+        "run trust",
+        "compare-to-ledger reconciliation",
+        "claim ceiling"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/RUN-AUDITOR.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-RUN-AUDITOR-EVAL-01.md",
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-RUN-AUDITOR-EVAL-02.md"
+      ],
+      "recommended_model": "gpt-5.4-mini",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "proving_default"
+      ],
+      "promotion_gate": "One more real run audit on a different cohort or claim surface before stable use.",
+      "degradation_triggers": [
+        "trust pass without ledger reconciliation",
+        "ignoring valid_run contradictions",
+        "role drift into compare truth"
+      ],
+      "re_evaluation_triggers": [
+        "ledger field changes",
+        "run-validity semantics changes",
+        "new trust fields added"
+      ],
+      "merge_or_retirement_condition": "Do not merge with compare-run auditor unless their boundaries become provably fake.",
+      "notes": "Wave 1 custom agent implemented. Two real evaluations completed; this role is now suitable for supervised recurring run-trust gating."
+    },
+    {
+      "name": "proving-authority-reviewer",
+      "family": "run_evidence",
+      "current_form": "custom_agent",
+      "lifecycle_state": "calibrating",
+      "owner_surfaces": [
+        "rerun authority review",
+        "regression-gate authority review",
+        "stale-lane review",
+        "stale-code review",
+        "capture integrity review",
+        "next-prompt legality from proving evidence"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/PROVING-AUTHORITY-REVIEWER.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-13-PROVING-AUTHORITY-REVIEWER-EVAL-01.md"
+      ],
+      "recommended_model": "gpt-5.4",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "dynamic_campaign_default",
+        "proving_default"
+      ],
+      "promotion_gate": "One more live proving-authority gate on a separate rerun or regression-gate family before provisional recurring use.",
+      "degradation_triggers": [
+        "lets stale-lane or stale-code packets steer branch choice",
+        "drifts into broader campaign workflow review",
+        "duplicates run_auditor or ledger-auditor without a clearer authority verdict"
+      ],
+      "re_evaluation_triggers": [
+        "rerun doctrine changes",
+        "lane freshness semantics change",
+        "new capture integrity requirements are added"
+      ],
+      "merge_or_retirement_condition": "Do not merge with run_auditor unless the narrower authority-versus-claim-ceiling distinction becomes provably fake.",
+      "dispatch_trigger_mode": "mandatory_event_bound",
+      "mandatory_event_triggers": [
+        "after any rerun, proving command, or regression-gate run whose result could affect branch choice"
+      ],
+      "blocking_mode": "blocking_after_event",
+      "skip_conditions": [
+        "delegation authorization absent",
+        "no rerun or proving command occurred",
+        "result cannot affect blocker ranking or next-prompt legality"
+      ],
+      "notes": "Default gate-bearing reviewer after reruns, proving commands, and regression-gate runs. The GM still owns blocker ranking and next-prompt choice."
+    },
+    {
+      "name": "ledger_compare_run_auditor",
+      "family": "run_evidence",
+      "current_form": "custom_agent",
+      "lifecycle_state": "provisional",
+      "owner_surfaces": [
+        "compare truth",
+        "cohort comparability",
+        "ledger completeness",
+        "attribution support"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/LEDGER-COMPARE-RUN-AUDITOR.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-LEDGER-COMPARE-RUN-AUDITOR-EVAL-01.md",
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-LEDGER-COMPARE-RUN-AUDITOR-EVAL-02.md"
+      ],
+      "recommended_model": "gpt-5.4",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "proving_default"
+      ],
+      "promotion_gate": "One more compare-backed claim audit on a separate cohort before stable use.",
+      "degradation_triggers": [
+        "green compare overclaim",
+        "ignoring seeding/profile mismatches",
+        "attribution inference without evidence"
+      ],
+      "re_evaluation_triggers": [
+        "compare artifact schema changes",
+        "campaign attribution semantics changes"
+      ],
+      "merge_or_retirement_condition": "May split later if campaign attribution becomes its own strong recurring role.",
+      "notes": "Wave 1 custom agent implemented. Two real evaluations completed; this role is now suitable for supervised recurring comparison-truth gating."
+    },
+    {
+      "name": "roadblock_classifier",
+      "family": "run_evidence",
+      "current_form": "custom_agent",
+      "lifecycle_state": "provisional",
+      "owner_surfaces": [
+        "roadblock records",
+        "primary blocker class",
+        "allowed/disallowed next actions",
+        "staleness state"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/ROADBLOCK-CLASSIFIER.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-ROADBLOCK-CLASSIFIER-EVAL-01.md",
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-ROADBLOCK-CLASSIFIER-EVAL-02.md"
+      ],
+      "recommended_model": "gpt-5.4",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "dynamic_campaign_default"
+      ],
+      "promotion_gate": "One more roadblock revalidation or fresh blocker record with correct anchor and staleness discipline before stable use.",
+      "degradation_triggers": [
+        "multiple blocker classes in one record",
+        "stale blocker steering",
+        "scope creep into planning"
+      ],
+      "re_evaluation_triggers": [
+        "roadblock schema changes",
+        "fruitfulness doctrine changes"
+      ],
+      "merge_or_retirement_condition": "Do not merge with run verification roles.",
+      "dispatch_trigger_mode": "mandatory_event_bound",
+      "mandatory_event_triggers": [
+        "after two bounded cycles fail to narrow the blocker"
+      ],
+      "blocking_mode": "blocking_after_event",
+      "skip_conditions": [
+        "delegation authorization absent",
+        "blocker already narrowed inside the owning seam",
+        "a stronger human-required gate fired first"
+      ],
+      "notes": "Wave 1 custom agent implemented. Two real evaluations completed; this role is now suitable for supervised recurring blocker classification."
+    },
+    {
+      "name": "ui_truth_auditor",
+      "family": "product_observability",
+      "current_form": "skill",
+      "lifecycle_state": "calibrating",
+      "owner_surfaces": [
+        "operator-visible truth alignment",
+        "native-vs-derived UI seams",
+        "operator risk if stale"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/UI-TRUTH-AUDITOR.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-UI-TRUTH-AUDITOR-EVAL-01.md"
+      ],
+      "recommended_model": "gpt-5.4-mini",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "promotion_gate": "Refine current ui-sync-auditor skill and pass 2 more UI truth audits.",
+      "degradation_triggers": [
+        "broad UI commentary",
+        "drift into coverage policy",
+        "drift into contract authorship"
+      ],
+      "re_evaluation_triggers": [
+        "dashboard operator contract changes",
+        "new native-vs-derived seams"
+      ],
+      "merge_or_retirement_condition": "Merge into ui-sync-auditor rather than creating a duplicate long-term skill.",
+      "notes": "Implement by refining existing ui-sync-auditor skill."
+    },
+    {
+      "name": "coverage_summarizer",
+      "family": "product_observability",
+      "current_form": "prompt_only",
+      "lifecycle_state": "calibrating",
+      "owner_surfaces": [
+        "coverage framing",
+        "capability-lens progress summaries",
+        "coverage claim strength"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/COVERAGE-SUMMARIZER.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-COVERAGE-SUMMARIZER-EVAL-01.md"
+      ],
+      "recommended_model": "gpt-5.4",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "promotion_gate": "2 more coverage-framing evals after UI surfaces mature further.",
+      "degradation_triggers": [
+        "single-percent overclaim",
+        "ignoring checkpoint nuance",
+        "pretending future UI framing is already visible"
+      ],
+      "re_evaluation_triggers": [
+        "new coverage surfaces added to dashboard",
+        "suite progress reporting changes"
+      ],
+      "merge_or_retirement_condition": "May promote to skill later if coverage framing becomes a routine closeout task.",
+      "notes": "Keep prompt-only until UI visibility catches up."
+    },
+    {
+      "name": "dashboard_contract_checker",
+      "family": "product_observability",
+      "current_form": "prompt_only",
+      "lifecycle_state": "calibrating",
+      "owner_surfaces": [
+        "dashboard README-to-implementation integrity",
+        "route contract matrix",
+        "placeholder-vs-native honesty"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/DASHBOARD-CONTRACT-CHECKER.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-10-DASHBOARD-CONTRACT-CHECKER-EVAL-01.md"
+      ],
+      "recommended_model": "gpt-5.4-mini",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "promotion_gate": "Add dedicated skill and pass 2 more contract-integrity audits.",
+      "degradation_triggers": [
+        "flags future work as bugs",
+        "drifts into generic UI critique",
+        "misses route/README mismatch"
+      ],
+      "re_evaluation_triggers": [
+        "dashboard/README.md changes",
+        "dashboard route changes",
+        "dashboard.js endpoint consumption changes"
+      ],
+      "merge_or_retirement_condition": "May merge with ui_truth_auditor only if README-to-implementation integrity and operator truth drift prove inseparable in practice.",
+      "notes": "Best implemented as a repo-local skill."
+    },
+    {
+      "name": "regression-governor",
+      "family": "governance",
+      "current_form": "skill",
+      "lifecycle_state": "candidate",
+      "owner_surfaces": [
+        "regression posture",
+        "required gate tier selection",
+        "baseline applicability",
+        "claim ceiling legality",
+        "fail-closed progress classification"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/REGRESSION-GOVERNOR.md",
+      "evaluation_artifact_paths": [],
+      "recommended_model": "repo-local skill",
+      "recommended_reasoning_effort": "parent-thread inherited",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "regression_governance_default"
+      ],
+      "promotion_gate": "First real evaluation showing that the role chooses the correct tier and claim ceiling on a live runtime- or pipeline-bearing change without drifting into implementation review.",
+      "degradation_triggers": [
+        "inflates implementation progress into non-regression",
+        "requires heavier tiers than policy justifies",
+        "ignores active pinned-baseline registry entries"
+      ],
+      "re_evaluation_triggers": [
+        "regression ladder changes",
+        "baseline registry schema changes",
+        "new heavier suite families are added",
+        "CI policy begins consuming regression doctrine"
+      ],
+      "merge_or_retirement_condition": "Retire or merge only if regression posture becomes a built-in default branch-law and no longer needs a distinct governance role.",
+      "dispatch_trigger_mode": "conditional_policy_bound",
+      "mandatory_event_triggers": [
+        "before strong claims on runtime- or pipeline-bearing changes when regression posture is not already explicit"
+      ],
+      "blocking_mode": "non_blocking_default",
+      "skip_conditions": [
+        "delegation authorization absent",
+        "tiny docs-only change",
+        "Tier 0 clearly covers the change with no proving impact"
+      ],
+      "notes": "Candidate governance role for making regression posture explicit before claims, pushes, or next-prompt steering."
+    },
+    {
+      "name": "system-contract-tracer",
+      "family": "architecture_traceability",
+      "current_form": "custom_agent",
+      "lifecycle_state": "calibrating",
+      "owner_surfaces": [
+        "system traceability review",
+        "code-to-artifact lineage checks",
+        "status and checkpoint truth",
+        "operator-surface truth alignment",
+        "test-path traceability",
+        "regression-system traceability"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/SYSTEM-CONTRACT-TRACER.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-12-SYSTEM-CONTRACT-TRACER-EVAL-01.md"
+      ],
+      "recommended_model": "gpt-5.4",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "dynamic_campaign_default",
+        "migration_transition_default",
+        "system_contract_refactor_default"
+      ],
+      "promotion_gate": "One more real system trace on a separate proving, operator-truth, or regression-system surface with a clean non-blocking sidecar outcome before provisional recurring use.",
+      "degradation_triggers": [
+        "generic code review drift",
+        "overclassification of local defects as missing systems",
+        "blocking the parent thread without a gating reason",
+        "weak artifact or test-path evidence"
+      ],
+      "re_evaluation_triggers": [
+        "new mapping systems",
+        "new operator truth contracts",
+        "new proving family onboarding",
+        "major route or artifact schema changes"
+      ],
+      "merge_or_retirement_condition": "May merge later with stronger mapping or architecture-review systems only if end-to-end traceability remains equally explicit and reusable.",
+      "dispatch_trigger_mode": "mandatory_event_bound",
+      "mandatory_event_triggers": [
+        "after any material code / artifact / status / operator-truth divergence when the blocker is system-shaped"
+      ],
+      "blocking_mode": "non_blocking_default",
+      "skip_conditions": [
+        "delegation authorization absent",
+        "tranche too small",
+        "owned seam already proven local"
+      ],
+      "notes": "High-priority sidecar reviewer for system-shaped work. The GM owns the queue and should not wait on this role reflexively."
+    },
+    {
+      "name": "campaign-output-ledger",
+      "family": "campaign_governance",
+      "current_form": "custom_agent",
+      "lifecycle_state": "calibrating",
+      "owner_surfaces": [
+        "dynamic campaign tranche memory",
+        "incremental output deltas",
+        "workflow friction capture",
+        "workflow-quality signal capture",
+        "context-pressure signal capture",
+        "delegation signal capture",
+        "operator reviewability signal capture",
+        "role and system candidate capture",
+        "campaign closeout deltas"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/CAMPAIGN-OUTPUT-LEDGER.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-12-CAMPAIGN-OUTPUT-LEDGER-EVAL-01.md"
+      ],
+      "recommended_model": "gpt-5.4-mini",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "dynamic_campaign_default",
+        "migration_transition_default",
+        "proving_default",
+        "system_contract_refactor_default"
+      ],
+      "promotion_gate": "One live dynamic campaign using the role end to end with clear continuation and operator-readability gains before provisional recurring use.",
+      "degradation_triggers": [
+        "duplicate run-ledger behavior",
+        "generic narration instead of structured deltas",
+        "blocking the parent thread without output-coherence necessity",
+        "noise-heavy candidate signals",
+        "self-scoring GM workflow quality"
+      ],
+      "re_evaluation_triggers": [
+        "dynamic campaign schema changes",
+        "new campaign output homes",
+        "output automation changes",
+        "operator reviewability doctrine changes",
+        "workflow-quality rubric changes"
+      ],
+      "merge_or_retirement_condition": "May merge later with stronger campaign automation only if incremental campaign memory remains equally explicit, reviewable, and GM-supervised.",
+      "dispatch_trigger_mode": "mandatory_event_bound",
+      "mandatory_event_triggers": [
+        "for every governed dynamic-campaign tranche from prompt start through prompt close when delegation is authorized"
+      ],
+      "blocking_mode": "non_blocking_default",
+      "skip_conditions": [
+        "delegation authorization absent",
+        "work is not a governed dynamic campaign",
+        "campaign output coherence is already the active gate and the GM is intentionally keeping the tranche local"
+      ],
+      "notes": "High-priority non-blocking sidecar for dynamic campaigns. The GM remains the authoritative writer of repo-tracked campaign artifacts, the authoritative workflow scorer, and the authoritative dispatch-accountability recorder."
+    },
+    {
+      "name": "campaign-reviewer",
+      "family": "campaign_governance",
+      "current_form": "custom_agent",
+      "lifecycle_state": "calibrating",
+      "owner_surfaces": [
+        "prompt-close review",
+        "campaign review summary",
+        "morning principles review",
+        "workflow quality pressure review",
+        "dispatch-discipline review"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/CAMPAIGN-REVIEWER.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-13-CAMPAIGN-REVIEWER-EVAL-01.md"
+      ],
+      "recommended_model": "gpt-5.4",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "dynamic_campaign_default"
+      ],
+      "promotion_gate": "One more live overnight or multi-prompt campaign showing useful prompt-close and morning review output without ceremony before provisional recurring use.",
+      "degradation_triggers": [
+        "tries to choose the next branch",
+        "duplicates campaign-output-ledger raw memory capture",
+        "turns prompt-close review into generic narration",
+        "blocks ordinary prompt closes without a pause or handoff reason"
+      ],
+      "re_evaluation_triggers": [
+        "dynamic campaign review schema changes",
+        "morning principles doctrine changes",
+        "review output homes change",
+        "campaign-workflow doctrine changes"
+      ],
+      "merge_or_retirement_condition": "May split later only if prompt-close review and morning-principles review prove to have different triggers or outputs.",
+      "notes": "Default parallel reviewer for dynamic campaigns. Owns reviewer artifacts only and stays distinct from proving-authority-reviewer."
+    },
+    {
+      "name": "stage-split-migration-planner",
+      "family": "migration_governance",
+      "current_form": "prompt_only",
+      "lifecycle_state": "candidate",
+      "owner_surfaces": [
+        "stage-boundary mapping",
+        "handoff contract migration",
+        "temporary compatibility matrix",
+        "staged cutover order",
+        "rollback boundary",
+        "migration done/not-done line"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/STAGE-SPLIT-MIGRATION-PLANNER.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-14-STAGE-SPLIT-MIGRATION-PLANNER-EVAL-01.md"
+      ],
+      "recommended_model": "gpt-5.4",
+      "recommended_reasoning_effort": "high",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "migration_transition_default"
+      ],
+      "promotion_gate": "One real stage-split cutover planning task with a useful compatibility matrix, staged rollout order, and rollback boundary before promotion to calibrating.",
+      "degradation_triggers": [
+        "generic architecture commentary instead of cutover planning",
+        "missing backward-compatibility accounting",
+        "migration plans that do not change the next branch decision"
+      ],
+      "re_evaluation_triggers": [
+        "stage model changes",
+        "handoff contract schema changes",
+        "new artifact consumers or checkpoint owners appear"
+      ],
+      "merge_or_retirement_condition": "Retire or merge only if stage migration planning proves inseparable from a stronger contract-migration role in practice.",
+      "notes": "New transition-owned role candidate. Needed because current roles do not cleanly own old-to-new stage mapping, temporary compatibility, and cutover sequencing."
+    },
+    {
+      "name": "artifact-root-integrity-auditor",
+      "family": "evidence_integrity",
+      "current_form": "prompt_only",
+      "lifecycle_state": "candidate",
+      "owner_surfaces": [
+        "unique run roots",
+        "job/session consistency",
+        "mixed-root contamination",
+        "stale artifact reuse",
+        "inherited artifact honesty",
+        "packet claim ceiling from root integrity"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/ARTIFACT-ROOT-INTEGRITY-AUDITOR.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-14-ARTIFACT-ROOT-INTEGRITY-AUDITOR-EVAL-01.md"
+      ],
+      "recommended_model": "gpt-5.4",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "migration_transition_default"
+      ],
+      "promotion_gate": "One real proving-packet integrity audit that correctly separates clean-root, mixed-root, stale-root, and inherited-artifact cases before promotion to calibrating.",
+      "degradation_triggers": [
+        "semantic debugging drift",
+        "packet trust claims without root-evidence citation",
+        "collapsing inherited-artifact ambiguity into generic failure language"
+      ],
+      "re_evaluation_triggers": [
+        "capture or save-session contract changes",
+        "proving root layout changes",
+        "new inherited-artifact policies"
+      ],
+      "merge_or_retirement_condition": "Retire or merge only if run_auditor or proving-authority-reviewer can prove equal specificity on artifact-root integrity without losing the narrower contamination question.",
+      "notes": "New evidence-integrity role candidate. Needed because stale root reuse has already poisoned proving trust and is not fully owned by lane-trust or run-authority roles."
+    },
+    {
+      "name": "baseline-breakage-map-auditor",
+      "family": "migration_governance",
+      "current_form": "prompt_only",
+      "lifecycle_state": "candidate",
+      "owner_surfaces": [
+        "baseline-relative breakage map",
+        "changed-surface classification",
+        "expected drift versus regression",
+        "owner attribution",
+        "blocker-family attribution",
+        "claim ceiling from breakage evidence"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/BASELINE-BREAKAGE-MAP-AUDITOR.md",
+      "evaluation_artifact_paths": [],
+      "recommended_model": "gpt-5.4",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "default_audit_suite_memberships": [
+        "dynamic_campaign_default",
+        "migration_transition_default",
+        "regression_governance_default"
+      ],
+      "promotion_gate": "One real migration tranche where the role improves BASELINE-BREAKAGE-MAP.md accuracy without choosing the next branch before promotion to calibrating.",
+      "degradation_triggers": [
+        "generic campaign review drift",
+        "claim-ceiling decisions that duplicate regression-governor without added breakage-map value",
+        "owner attribution without stage TRACE or FAMILY-BLOCKERS evidence",
+        "treating expected drift as durable-contract regression without evidence"
+      ],
+      "re_evaluation_triggers": [
+        "baseline breakage map schema changes",
+        "stage TRACE marker doctrine changes",
+        "FAMILY-BLOCKERS.md category changes",
+        "migration campaign closeout schema changes"
+      ],
+      "merge_or_retirement_condition": "Merge into regression-governor or campaign-reviewer if repeated use proves the breakage-map audit is not distinct from claim-ceiling or closeout review.",
+      "notes": "First breakage-map-specific candidate role. Keep prompt-only until live migration evidence proves it improves owner attribution and next bounded fix selection."
+    },
+    {
+      "name": "campaign-workflow-auditor",
+      "family": "campaign_governance",
+      "current_form": "custom_agent",
+      "lifecycle_state": "merged",
+      "owner_surfaces": [
+        "historical dynamic campaign workflow pressure tests"
+      ],
+      "role_contract_path": "docs/architecture/agentic_ecosystem/role_contracts/CAMPAIGN-WORKFLOW-AUDITOR.md",
+      "evaluation_artifact_paths": [
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-12-CAMPAIGN-WORKFLOW-AUDITOR-EVAL-01.md",
+        "docs/architecture/agentic_ecosystem/agent_evals/2026-04-13-CAMPAIGN-WORKFLOW-AUDITOR-MERGE-01.md"
+      ],
+      "recommended_model": "gpt-5.4-mini",
+      "recommended_reasoning_effort": "medium",
+      "recommended_sandbox_mode": "read-only",
+      "promotion_gate": "Merged into campaign-reviewer; no further promotion path while the merge stands.",
+      "degradation_triggers": [
+        "n/a while merged"
+      ],
+      "re_evaluation_triggers": [
+        "only if future evidence justifies splitting workflow review away from campaign-reviewer again"
+      ],
+      "merge_or_retirement_condition": "Already merged into campaign-reviewer; retain only as historical governance memory.",
+      "notes": "Historical role retained so older campaign artifacts and evals remain interpretable. Do not dispatch for new work."
+    }
+  ]
+}

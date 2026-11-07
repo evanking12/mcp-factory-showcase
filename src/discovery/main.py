@@ -1,0 +1,1272 @@
+#!/usr/bin/env python3
+"""
+main.py - CLI entry point and pipeline orchestration.
+
+Parses arguments, runs the analysis pipeline, and writes outputs.
+"""
+
+import argparse
+import importlib
+import json
+import logging
+import os
+import sys
+import time
+import traceback
+from pathlib import Path
+from typing import Callable, List, Optional
+
+logger = logging.getLogger(__name__)
+RUNTIME_DIAGNOSTIC_NAME = "discovery-child-runtime.json"
+_RUNTIME_PHASE_HISTORY: list[dict] = []
+
+from classify import classify_file, FileType, extract_signature, get_architecture
+from headers_scan import scan_headers, scan_docs_for_exports
+from exports import demangle_with_undname, deduplicate_exports, resolve_forwarders
+from pe_parse import read_pe_exports
+from schema import ExportedFunc, Invocable, MatchInfo, write_csv, write_json, write_markdown, write_tier_summary, write_invocables_json, exports_to_invocables
+from utils import Spinner, format_verbose_header, format_verbose_result
+from import_analyzer import analyze_imports, format_capabilities_summary
+from rpc_analyzer import analyze_rpc, rpc_to_invocables, format_rpc_summary
+
+# Windows-only analyzers -- imported conditionally so the pipeline runs on Linux
+try:
+    from dotnet_analyzer import get_dotnet_methods, get_dotnet_metadata
+    _DOTNET_AVAILABLE = True
+except Exception:
+    _DOTNET_AVAILABLE = False
+    def get_dotnet_methods(*a, **kw): return []
+    def get_dotnet_metadata(*a, **kw): return {}
+
+# Active analyzers define the compiled-binary product path. Quarantined
+# analyzers remain available behind exploratory profiles, but must stay out of compiled-first and required CI paths.
+ANALYZER_REGISTRY = {
+    'pe_dll':   {'name': 'PE DLL Analyzer', 'enabled': True, 'state': 'active', 'profiles': ('strict_dll', 'greybox_dll', 'full_surface')},
+    'pe_exe':   {'name': 'PE EXE Analyzer', 'enabled': True, 'state': 'active', 'profiles': ('strict_dll', 'greybox_dll', 'full_surface')},
+    'dotnet':   {'name': '.NET Assembly Analyzer', 'enabled': True, 'state': 'active', 'profiles': ('strict_dll', 'greybox_dll', 'full_surface')},
+    'com':      {'name': 'COM Registry Analyzer', 'enabled': True, 'state': 'quarantined', 'profiles': ('full_surface',)},
+    'cli':      {'name': 'CLI Tool Analyzer', 'enabled': True, 'state': 'quarantined', 'profiles': ('greybox_dll', 'full_surface')},
+    'gui':      {'name': 'GUI App Analyzer (pywinauto)', 'enabled': True, 'state': 'quarantined', 'profiles': ('full_surface',)},
+    'script':   {'name': 'Script Analyzer', 'enabled': True, 'state': 'quarantined', 'profiles': ('full_surface',)},
+    'sql':      {'name': 'SQL Analyzer', 'enabled': True, 'state': 'quarantined', 'profiles': ('full_surface',)},
+    'js':       {'name': 'JavaScript Analyzer', 'enabled': True, 'state': 'quarantined', 'profiles': ('full_surface',)},
+    'openapi':  {'name': 'OpenAPI/JSON-RPC Analyzer', 'enabled': True, 'state': 'quarantined', 'profiles': ('full_surface',)},
+    'wsdl':     {'name': 'SOAP/WSDL Analyzer', 'enabled': True, 'state': 'quarantined', 'profiles': ('full_surface',)},
+    'idl':      {'name': 'CORBA IDL Analyzer', 'enabled': True, 'state': 'quarantined', 'profiles': ('full_surface',)},
+    'jndi':     {'name': 'JNDI Config Analyzer', 'enabled': True, 'state': 'quarantined', 'profiles': ('full_surface',)},
+    'pdb':      {'name': 'PDB Symbol Analyzer', 'enabled': True, 'state': 'quarantined', 'profiles': ('full_surface',)},
+    'registry': {'name': 'Windows Registry Analyzer (Section 1.c)', 'enabled': True, 'state': 'quarantined', 'profiles': ('full_surface',)},
+}
+
+
+def _normalize_analysis_profile(profile: str | None) -> str:
+    normalized = str(profile or "strict_dll").strip().lower()
+    if normalized not in {"strict_dll", "greybox_dll", "full_surface"}:
+        return "strict_dll"
+    return normalized
+
+
+def _profile_allows_analyzer(profile: str, analyzer_key: str) -> bool:
+    metadata = ANALYZER_REGISTRY.get(analyzer_key) or {}
+    if not metadata.get("enabled", False):
+        return False
+    return _normalize_analysis_profile(profile) in tuple(metadata.get("profiles") or ())
+
+
+def _profile_supports_file_type(profile: str, file_type: FileType) -> bool:
+    normalized = _normalize_analysis_profile(profile)
+    if file_type in _SCRIPT_DISPATCH:
+        return normalized == "full_surface"
+    return True
+
+
+def _should_run_com_analysis(file_type: FileType, profile: str) -> bool:
+    if not _profile_allows_analyzer(profile, "com"):
+        return False
+    return file_type in {FileType.COM_OBJECT, FileType.PE_DLL, FileType.PE_EXE}
+
+
+def _load_optional_callable(module_name: str, attr_name: str, fallback: Callable):
+    try:
+        module = importlib.import_module(module_name)
+        return getattr(module, attr_name)
+    except Exception:
+        return fallback
+
+
+def _load_cli_analyzer() -> Callable:
+    return _load_optional_callable("cli_analyzer", "analyze_cli", lambda *_a, **_kw: [])
+
+
+def _load_com_tools() -> tuple[Callable, Callable]:
+    scan = _load_optional_callable("com_scan", "scan_com_registry", lambda *_a, **_kw: [])
+    to_invocables = _load_optional_callable("com_scan", "com_objects_to_invocables", lambda *_a, **_kw: [])
+    return scan, to_invocables
+
+
+def _load_gui_tools() -> tuple[Callable, bool]:
+    try:
+        module = importlib.import_module("gui_analyzer")
+        return getattr(module, "analyze_gui"), bool(getattr(module, "PYWINAUTO_AVAILABLE", False))
+    except Exception:
+        return (lambda *_a, **_kw: []), False
+
+
+def _load_registry_analyzer() -> Callable | None:
+    try:
+        module = importlib.import_module("registry_analyzer")
+        return getattr(module, "analyze_registry")
+    except Exception:
+        return None
+
+
+def _load_scripting_analyzer(module_name: str, attr_name: str) -> Callable:
+    return _load_optional_callable(module_name, attr_name, lambda *_a, **_kw: [])
+
+
+def _output_dir_from_argv(argv: list[str]) -> Path | None:
+    """Best-effort output directory lookup for last-chance interrupt diagnostics."""
+    for index, arg in enumerate(argv):
+        if arg == "--out" and index + 1 < len(argv):
+            return Path(argv[index + 1])
+        if arg.startswith("--out="):
+            return Path(arg.split("=", 1)[1])
+    return None
+
+
+def _nested_interrupt_source_hint(traceback_text: str) -> str:
+    text = traceback_text.lower()
+    if "exports.py" in text or "demangle_with_undname" in text or "undname" in text:
+        return "nested_undname_wait_interrupt"
+    if "pe_parse.py" in text or "dumpbin" in text:
+        return "nested_dumpbin_wait_interrupt"
+    if "import_analyzer.py" in text or "analyze_imports" in text:
+        return "nested_import_analysis_wait_interrupt"
+    if "subprocess.py" in text and "_communicate" in text:
+        return "unknown_child_nested_subprocess_interrupt"
+    return "child_top_level_keyboard_interrupt"
+
+
+def _write_child_interrupt_diagnostic(exc: BaseException, argv: list[str] | None = None) -> None:
+    """Write a compact child-side packet before the discovery process exits."""
+    current_argv = list(argv or sys.argv)
+    out_dir = _output_dir_from_argv(current_argv)
+    if out_dir is None:
+        return
+    try:
+        out_dir.mkdir(parents=True, exist_ok=True)
+        traceback_text = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+        frames = traceback.extract_tb(exc.__traceback__)
+        payload = {
+            "schema_version": "1.0.0",
+            "reason_code": "child_keyboard_interrupt",
+            "source_hint": _nested_interrupt_source_hint(traceback_text),
+            "pid": os.getpid(),
+            "cwd": os.getcwd(),
+            "argv": current_argv,
+            "traceback_tail": traceback_text[-2000:],
+            "stack_frames": [
+                {
+                    "file": frame.filename,
+                    "line": frame.lineno,
+                    "function": frame.name,
+                    "text": frame.line,
+                }
+                for frame in frames[-12:]
+            ],
+            "created_at": time.time(),
+        }
+        (out_dir / "discovery-child-interrupt.json").write_text(
+            json.dumps(payload, indent=2),
+            encoding="utf-8",
+        )
+    except Exception:
+        # Last-chance diagnostics must never mask the original interrupt.
+        return
+
+
+def _write_child_runtime_phase(
+    out_dir: Path | None,
+    phase: str,
+    *,
+    argv: list[str] | None = None,
+    details: dict | None = None,
+) -> None:
+    """Persist the child-owned runtime phase without affecting analysis."""
+    global _RUNTIME_PHASE_HISTORY
+    if out_dir is None:
+        return
+    try:
+        if phase == "main_args_parsed":
+            _RUNTIME_PHASE_HISTORY = []
+        out_dir.mkdir(parents=True, exist_ok=True)
+        path = out_dir / RUNTIME_DIAGNOSTIC_NAME
+        _RUNTIME_PHASE_HISTORY.append({"phase": phase, "observed_at": time.time()})
+        payload = {
+            "schema_version": "1.0.0",
+            "source": "discovery_child_main",
+            "pid": os.getpid(),
+            "parent_pid": os.getppid(),
+            "cwd": os.getcwd(),
+            "argv": list(argv or sys.argv),
+            "phase": phase,
+            "phase_history": _RUNTIME_PHASE_HISTORY[-40:],
+            "last_observation": dict(details or {}),
+            "updated_at": time.time(),
+        }
+        path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    except BaseException:
+        return
+
+
+def score_confidence(export: Invocable, matches: dict, is_signed: bool, forwarded_resolved: bool, is_system_dll: bool = False) -> tuple:
+    """Score confidence in export invocability.
+
+    Factors are derived from actual extracted data first; the label is
+    then derived from those factors. This keeps the label honest and
+    consistent with what an LLM downstream will actually find usable.
+    """
+    reasons = ['exported from DLL']
+
+    # Step 1: measure what we actually extracted for this export
+    match = matches.get(export.name) if isinstance(matches, dict) else None
+    has_signature   = bool(match and getattr(match, 'prototype', None))
+    has_return_type = bool(match and getattr(match, 'return_type', None))
+    _params = (getattr(match, 'parameters', '') or '').strip().lower() if match else ''
+    has_parameters  = bool(_params and _params not in ('', 'void'))
+    has_doc         = bool(getattr(export, 'doc_comment', None))
+
+    # Step 2: label derived from factors (never set label before measuring data)
+    if has_signature and has_parameters and has_return_type:
+        confidence = 'guaranteed'
+        reasons.append('complete signature from header file')
+    elif has_signature and (has_parameters or has_return_type):
+        confidence = 'high'
+        reasons.append('partial signature from header file')
+    elif hasattr(export, 'demangled') and export.demangled:
+        confidence = 'medium'
+        reasons.append('demangled C++ name available')
+    elif is_signed and is_system_dll:
+        confidence = 'medium'
+        reasons.append('well-known signed system API (no header match)')
+    elif is_signed:
+        confidence = 'medium'
+        reasons.append('digitally signed binary')
+    elif is_system_dll:
+        confidence = 'medium'
+        reasons.append('well-known system API (no header match)')
+    else:
+        # Step 3: name-pattern heuristics as last resort
+        confidence = 'low'
+        name = export.name
+        if '_' in name:
+            prefix = name.split('_')[0]
+            if len(prefix) >= 3 and (prefix.isupper() or prefix.islower()):
+                confidence = 'medium'
+                reasons.append(f'library prefix pattern ({prefix}_*)')
+        elif any(name.startswith(p) for p in [
+            'Create', 'Get', 'Set', 'Open', 'Close', 'Read', 'Write',
+            'Initialize', 'Finalize', 'Register', 'Unregister',
+            'Allocate', 'Free', 'Query', 'Release',
+            'init', 'destroy', 'alloc', 'dealloc', 'malloc', 'calloc',
+            'compress', 'decompress', 'encode', 'decode', 'encrypt', 'decrypt',
+            'load', 'save', 'bind', 'connect', 'send', 'recv', 'shutdown'
+        ]):
+            confidence = 'medium'
+            reasons.append('common API pattern')
+
+    # Step 3: append any additional evidence (does not change tier)
+    if forwarded_resolved:
+        reasons.append('forwarded reference resolved')
+    if has_doc:
+        reasons.append('has documentation')
+
+    return confidence, reasons
+
+
+def get_default_output_dir() -> Path:
+    """Get default output directory for analysis results."""
+    return Path.cwd() / "mcp_dumpbin_out"
+
+
+def analyze_dotnet_assembly(dll_path: Path, out_dir: Path, base_name: str, args) -> int:
+    """.NET assembly analysis pipeline."""
+    logger.info(f"Analyzing .NET assembly: {dll_path}")
+    
+    # Extract .NET methods
+    invocables = get_dotnet_methods(dll_path)
+    
+    if not invocables:
+        logger.warning("No public .NET methods found")
+        # Try to get metadata at least
+        metadata = get_dotnet_metadata(dll_path)
+        if metadata:
+            logger.info(f"Assembly: {metadata.get('AssemblyName')}, Version: {metadata.get('Version')}")
+    else:
+        logger.info(f"Found {len(invocables)} .NET methods")
+    
+    # Populate MCP-specific fields for .NET invocables
+    for inv in invocables:
+        inv.assembly_path = str(dll_path)
+        if not inv.confidence:
+            inv.confidence = "high"  # .NET reflection provides high confidence
+    
+    # Write outputs
+    tier4_md = out_dir / f"{base_name}_dotnet_methods.md"
+    with open(tier4_md, 'w', encoding='utf-8') as f:
+        f.write(f"# .NET Assembly Analysis: {dll_path.name}\\n\\n")
+        f.write(f"Total methods: {len(invocables)}\\n\\n")
+        
+        # Group by namespace
+        from collections import defaultdict
+        by_namespace = defaultdict(list)
+        for inv in invocables:
+            namespace = inv.name.split('.')[0] if '.' in inv.name else 'Global'
+            by_namespace[namespace].append(inv)
+        
+        for namespace in sorted(by_namespace.keys()):
+            f.write(f"## {namespace}\\n\\n")
+            for inv in sorted(by_namespace[namespace], key=lambda x: x.name):
+                f.write(f"- `{inv.signature}`\\n")
+                if inv.doc_comment:
+                    f.write(f"  - {inv.doc_comment}\\n")
+            f.write("\\n")
+    
+    # Write MCP-compatible JSON output
+    tier4_json_mcp = out_dir / f"{base_name}_dotnet_methods_mcp.json"
+    write_invocables_json(
+        tier4_json_mcp,
+        invocables,
+        dll_path=dll_path,
+        tier=4,
+        schema_version="2.0.0"
+    )
+    
+    logger.info(f"Results written to {out_dir}")
+    print(f"\\n.NET Analysis Complete")
+    print(f"Methods found: {len(invocables)}")
+    print(f"Markdown: {tier4_md}")
+    print(f"MCP JSON: {tier4_json_mcp}")
+    
+    return 0
+
+
+def analyze_com_object(dll_path: Path, out_dir: Path, base_name: str, args) -> int:
+    """COM object analysis pipeline."""
+    logger.info(f"Analyzing COM object: {dll_path}")
+
+    scan_com_registry, com_objects_to_invocables = _load_com_tools()
+
+    # Scan registry for related COM objects
+    com_objects = scan_com_registry(dll_path.name)
+    
+    # Even if no registry objects found, the DLL might contain a Type Library
+    if not com_objects:
+        logger.info(f"No COM objects found in registry for {dll_path.name}, checking for embedded Type Library...")
+    else:
+        logger.info(f"Found {len(com_objects)} COM objects in registry")
+    
+    # Convert COM objects / TLB to Invocables
+    invocables = com_objects_to_invocables(com_objects, dll_path)
+    
+    if not invocables:
+        logger.warning(f"No COM objects or Type Library found for {dll_path.name}")
+        print(f"\nNo COM objects registered or embedded for {dll_path.name}")
+        
+        # Suppress empty report generation to reduce noise
+        return 0
+    
+    # Populate MCP-specific fields
+    for inv in invocables:
+        inv.dll_path = str(dll_path)
+        if not inv.confidence:
+            inv.confidence = "medium"  # Default fallback
+    
+    # Write Markdown output
+    tier4_md = out_dir / f"{base_name}_com_objects.md"
+    with open(tier4_md, 'w', encoding='utf-8') as f:
+        f.write(f"# COM Object Analysis: {dll_path.name}\n\n")
+        f.write(f"Total COM objects: {len(invocables)}\n\n")
+        
+        for inv in invocables:
+            f.write(f"## {inv.name}\n\n")
+            if inv.clsid:
+                f.write(f"**CLSID:** `{inv.clsid}`\n\n")
+            if inv.signature:
+                f.write(f"**ProgID:** {inv.signature}\n\n")
+            f.write("\n")
+    
+    # Write MCP-compatible JSON output
+    tier4_json = out_dir / f"{base_name}_com_objects_mcp.json"
+    write_invocables_json(
+        tier4_json,
+        invocables,
+        dll_path=dll_path,
+        tier=4,
+        schema_version="2.0.0"
+    )
+    
+    logger.info(f"Results written to {out_dir}")
+    print(f"\nCOM Analysis Complete")
+    print(f"COM objects found: {len(invocables)}")
+    print(f"Markdown: {tier4_md}")
+    print(f"MCP JSON: {tier4_json}")
+
+    return 0
+
+
+# -------------------------------------------------------------------------
+# JIT / scripting language pipeline  (Python, PS1, Batch, VBS, Shell,
+#                                     SQL, JavaScript, TypeScript)
+# -------------------------------------------------------------------------
+
+# Map FileType -> (human label, analyzer loader, source_type tag)
+_SCRIPT_DISPATCH = {
+    FileType.PYTHON_SCRIPT:      ('Python script',       'script_analyzer',  'analyze_script',  'python_function'),
+    FileType.POWERSHELL_SCRIPT:  ('PowerShell script',   'script_analyzer',  'analyze_script',  'powershell_function'),
+    FileType.BATCH_SCRIPT:       ('Batch script',        'script_analyzer',  'analyze_script',  'batch_label'),
+    FileType.VBSCRIPT:           ('VBScript',            'script_analyzer',  'analyze_script',  'vbscript_function'),
+    FileType.SHELL_SCRIPT:       ('Shell script',        'script_analyzer',  'analyze_script',  'shell_function'),
+    FileType.JAVASCRIPT:         ('JavaScript module',   'js_analyzer',      'analyze_js',      'js_function'),
+    FileType.TYPESCRIPT:         ('TypeScript module',   'js_analyzer',      'analyze_js',      'ts_method'),
+    FileType.RUBY_SCRIPT:        ('Ruby script',         'script_analyzer',  'analyze_script',  'ruby_function'),
+    FileType.PHP_SCRIPT:         ('PHP script',          'script_analyzer',  'analyze_script',  'php_function'),
+    FileType.SQL_FILE:           ('SQL source file',     'sql_analyzer',     'analyze_sql',     'sql_procedure'),
+    FileType.OPENAPI_SPEC:       ('OpenAPI spec',        'openapi_analyzer', 'analyze_openapi', 'openapi_operation'),
+    FileType.JSONRPC_SPEC:       ('JSON-RPC descriptor', 'openapi_analyzer', 'analyze_openapi', 'jsonrpc_method'),
+    FileType.WSDL_FILE:          ('WSDL service desc.',  'wsdl_analyzer',    'analyze_wsdl',    'soap_operation'),
+    FileType.CORBA_IDL:          ('CORBA IDL file',      'idl_analyzer',     'analyze_idl',     'corba_method'),
+    FileType.JNDI_CONFIG:        ('JNDI config file',    'jndi_analyzer',    'analyze_jndi',    'jndi_lookup'),
+    FileType.PDB_FILE:           ('PDB symbols file',    'pdb_analyzer',     'analyze_pdb',     'pdb_symbol'),
+}
+
+
+# -------------------------------------------------------------------------
+# Extensions for which classify_file() returns something other than UNKNOWN.
+# Used to filter rglob results when the --target is a directory.
+RECOGNIZED_EXTENSIONS: frozenset = frozenset({
+    # PE binaries / type libraries
+    '.dll', '.exe', '.tlb', '.olb',
+    # JIT / scripting languages
+    '.py', '.ps1', '.bat', '.cmd', '.vbs',
+    '.sh', '.bash', '.zsh',
+    '.js', '.mjs', '.cjs', '.ts', '.tsx', '.mts',
+    '.rb', '.php', '.sql',
+    # Protocol / spec descriptors
+    '.yaml', '.yml', '.wsdl', '.idl', '.jndi', '.properties', '.pdb',
+    # Content-sniffed types - classify_file() peeks inside these
+    '.json', '.xml',
+})
+
+
+def analyze_directory(dir_path: Path, out_dir: Path, args) -> int:
+    """Walk *dir_path*, analyze every recognized file, and write an aggregate
+    ``<dir>_scan_mcp.json`` that merges all discovered invocables.
+
+    Each file is analyzed in its own sub-directory under *out_dir* so
+    individual artifacts are preserved.  The combined output lets
+    ``select_invocables.py`` work on the entire directory at once.
+
+    Section 2.a compliance - "Users must be able to provide the system a copy of
+    the target file **or an installed instance**."  This function handles
+    the installed-instance (directory) case.
+    """
+    import json as _json
+    from datetime import datetime as _dt
+
+    logger.info("Directory scan: %s", dir_path)
+    print(f"\n{'='*60}")
+    print(f"  Directory Scan: {dir_path}")
+    print(f"{'='*60}\n")
+
+    # Collect recognized files
+    candidates: list = []
+    for f in sorted(dir_path.rglob('*')):
+        if not f.is_file():
+            continue
+        if f.suffix.lower() not in RECOGNIZED_EXTENSIONS:
+            continue
+        ft = classify_file(f)
+        if ft == FileType.UNKNOWN:
+            continue
+        candidates.append((f, ft))
+
+    if not candidates:
+        print(f"  No recognized files found in {dir_path}")
+        return 0
+
+    print(f"  Found {len(candidates)} recognized file(s):\n")
+    for fp, ft in candidates:
+        print(f"    {fp.name}  [{ft.value}]")
+    print()
+
+    dir_base = dir_path.name   # e.g. "scripts" or "AppD"
+    all_invocables: list = []
+    source_files: list = []
+
+    # Per-file sub-analysis
+    for file_path, file_type in candidates:
+        # Unique sub-dir per file; use stem to keep names readable
+        sub_out = out_dir / file_path.stem
+        sub_out.mkdir(parents=True, exist_ok=True)
+
+        try:
+            rel = file_path.relative_to(dir_path)
+        except ValueError:
+            rel = Path(file_path.name)
+        print(f"  \u27a4 {rel}  ({file_type.value})")
+
+        # Re-invoke main() with sys.argv targeting this individual file
+        saved_argv = sys.argv[:]
+        try:
+            sys.argv = [
+                "main.py",
+                "--target", str(file_path),
+                "--out",    str(sub_out),
+                "--analysis-profile", str(getattr(args, "analysis_profile", "strict_dll")),
+            ]
+            main()
+        except SystemExit:
+            pass
+        except Exception as exc:
+            logger.warning("Analysis failed for %s: %s", file_path.name, exc)
+            print(f"    [WARN] {exc}")
+        finally:
+            sys.argv = saved_argv
+
+        # Harvest all *_mcp.json written in sub_out
+        file_invocables: list = []
+        for mcp_json in sorted(sub_out.glob('*_mcp.json')):
+            try:
+                with open(mcp_json, encoding='utf-8') as fh:
+                    data = _json.load(fh)
+                file_invocables.extend(data.get('invocables', []))
+            except Exception:
+                pass
+
+        all_invocables.extend(file_invocables)
+        source_files.append({
+            'file':          str(file_path.name),
+            'relative_path': str(rel),
+            'type':          file_type.value,
+            'count':         len(file_invocables),
+        })
+
+    # Write aggregate MCP JSON
+    agg_path = out_dir / f"{dir_base}_scan_mcp.json"
+    agg_payload = {
+        "metadata": {
+            "target_name":   dir_path.name,
+            "target_path":   str(dir_path),
+            "analysis_type": "directory_scan",
+            "generated_at":  _dt.utcnow().isoformat() + "Z",
+            "file_count":    len(candidates),
+            "source_files":  source_files,
+        },
+        "invocables": all_invocables,
+        "summary": {
+            "total_invocables":      len(all_invocables),
+            "files_analyzed":        len(candidates),
+            "files_with_invocables": sum(1 for s in source_files if s['count'] > 0),
+            "confidence_breakdown":  {
+                level: sum(
+                    1 for inv in all_invocables
+                    if inv.get('confidence') == level
+                )
+                for level in ('guaranteed', 'high', 'medium', 'low')
+            },
+        },
+    }
+    with open(agg_path, 'w', encoding='utf-8') as fh:
+        _json.dump(agg_payload, fh, indent=2, ensure_ascii=False)
+
+    print(f"\n  Directory Scan Complete")
+    print(f"  Files analysed:      {len(candidates)}")
+    print(f"  Total invocables:    {len(all_invocables)}")
+    print(f"  Aggregate MCP JSON:  {agg_path}")
+    return 0
+
+
+def analyze_scripting_language(target: Path, out_dir: Path, base_name: str,
+                               file_type: FileType) -> int:
+    """Shared pipeline for all JIT / scripting / query file types.
+
+    Calls the appropriate sub-analyzer, writes Markdown + MCP JSON output,
+    and prints a summary.  Returns 0 on success, 1 on failure.
+    """
+    label, module_name, attr_name, _ = _SCRIPT_DISPATCH[file_type]
+    analyzer_fn = _load_scripting_analyzer(module_name, attr_name)
+    logger.info("Analyzing %s: %s", label, target.name)
+
+    with Spinner(f"Analyzing {label} capabilities"):
+        invocables = analyzer_fn(target)
+
+    if not invocables:
+        logger.warning("No invocables detected in %s", target.name)
+        print(f"\nNo invocables found in {target.name}")
+        return 0
+
+    # --- Markdown report ---
+    md_path = out_dir / f"{base_name}_{file_type.value.lower()}.md"
+    with open(md_path, 'w', encoding='utf-8') as f:
+        f.write(f"# {label} Analysis: {target.name}\n\n")
+        f.write(f"Total invocables detected: {len(invocables)}\n\n")
+        # Confidence breakdown
+        by_conf: dict = {}
+        for inv in invocables:
+            by_conf.setdefault(inv.confidence, []).append(inv)
+        for lvl in ('guaranteed', 'high', 'medium', 'low'):
+            if lvl in by_conf:
+                f.write(f"| Confidence | Count |\n|---|---|\n")
+                break
+        for lvl in ('guaranteed', 'high', 'medium', 'low'):
+            if lvl in by_conf:
+                f.write(f"| {lvl.capitalize()} | {len(by_conf[lvl])} |\n")
+        f.write("\n")
+
+        # Invocable detail
+        for inv in invocables:
+            f.write(f"## {inv.name}\n\n")
+            f.write(f"**Signature:** `{inv.signature}`\n\n")
+            if inv.doc_comment:
+                f.write(f"**Description:** {inv.doc_comment}\n\n")
+            if inv.parameters:
+                f.write(f"**Parameters:** `{inv.parameters}`\n\n")
+            if inv.return_type:
+                f.write(f"**Returns:** `{inv.return_type}`\n\n")
+            f.write(f"**Confidence:** {inv.confidence}\n\n")
+
+    # --- MCP JSON ---
+    mcp_path = out_dir / f"{base_name}_{file_type.value.lower()}_mcp.json"
+    write_invocables_json(
+        mcp_path,
+        invocables,
+        dll_path=target,
+        tier=4,
+        schema_version="2.0.0",
+    )
+
+    logger.info("Results written to %s", out_dir)
+    print(f"\n{label} Analysis Complete")
+    print(f"Invocables found: {len(invocables)}")
+    print(f"Markdown: {md_path}")
+    print(f"MCP JSON: {mcp_path}")
+    return 0
+
+
+def analyze_cli_tool(exe_path: Path, out_dir: Path, base_name: str, args) -> int:
+    """CLI + GUI tool analysis pipeline.
+
+    Runs CLI help-flag scraping first, then (when pywinauto is available)
+    launches the EXE to walk its menu bar and collect GUI invocables.
+    Both result sets are written to separate MCP JSON artifacts and a
+    combined Markdown summary.
+    """
+    # Phase 1: CLI help output
+    analyze_cli = _load_cli_analyzer()
+    analyze_gui, pywinauto_available = _load_gui_tools()
+
+    with Spinner("Analyzing CLI capabilities"):
+        logger.info(f"Analyzing CLI tool: {exe_path}")
+        cli_invocables = analyze_cli(exe_path)
+
+    if not cli_invocables:
+        logger.warning(f"No CLI capabilities detected for {exe_path.name}")
+        print(f"\nNo CLI help output detected (likely a GUI-only application)")
+    else:
+        logger.info(f"Found {len(cli_invocables)} CLI interactions")
+
+    # Phase 2: GUI menu walk (pywinauto)
+    gui_invocables = []
+    if pywinauto_available:
+        with Spinner("Analyzing GUI capabilities (pywinauto)"):
+            gui_invocables = analyze_gui(exe_path)
+        if gui_invocables:
+            logger.info(f"Found {len(gui_invocables)} GUI actions in {exe_path.name}")
+            # Write dedicated GUI MCP JSON
+            gui_json = out_dir / f"{base_name}_gui_mcp.json"
+            write_invocables_json(
+                gui_json,
+                gui_invocables,
+                dll_path=exe_path,
+                tier=4,
+                schema_version="2.0.0",
+            )
+            print(f"GUI MCP JSON: {gui_json}")
+        else:
+            logger.info("No GUI actions found (non-Win32 or UWP app?)")
+    else:
+        print("\n[gui_analyzer] pywinauto not installed -- skipping GUI analysis.")
+        print("  Install with:  pip install pywinauto")
+
+    # Combined Markdown output
+    all_invocables = cli_invocables + gui_invocables
+    tier4_md = out_dir / f"{base_name}_cli_help.md"
+    with open(tier4_md, 'w', encoding='utf-8') as f:
+        f.write(f"# CLI/GUI Analysis: {exe_path.name}\n\n")
+        f.write(f"CLI commands detected: {len(cli_invocables)}\n")
+        f.write(f"GUI actions detected:  {len(gui_invocables)}\n\n")
+
+        if cli_invocables:
+            f.write("## CLI Capabilities\n\n")
+            for inv in cli_invocables:
+                f.write(f"### {inv.name}\n\n")
+                f.write(f"**Usage:** `{inv.signature}`\n\n")
+                if inv.doc_comment:
+                    f.write(f"**Description:**\n\n{inv.doc_comment}\n\n")
+                if inv.parameters:
+                    f.write(f"**Parameters detected:**\n\n{inv.parameters}\n\n")
+
+        if gui_invocables:
+            f.write("## GUI Capabilities\n\n")
+            for inv in gui_invocables:
+                f.write(f"### {inv.name}\n\n")
+                f.write(f"**Action:** `{inv.signature}`\n\n")
+                if inv.doc_comment:
+                    f.write(f"**Description:** {inv.doc_comment}\n\n")
+
+    # CLI MCP JSON (CLI invocables only, keeps original naming convention)
+    tier4_json = out_dir / f"{base_name}_cli_mcp.json"
+    write_invocables_json(
+        tier4_json,
+        cli_invocables,
+        dll_path=exe_path,
+        tier=4,
+        schema_version="2.0.0",
+    )
+
+    logger.info(f"Results written to {out_dir}")
+    print(f"\nCLI/GUI Analysis Complete")
+    print(f"CLI commands: {len(cli_invocables)}  |  GUI actions: {len(gui_invocables)}")
+    print(f"Markdown:     {tier4_md}")
+    print(f"CLI MCP JSON: {tier4_json}")
+
+    return 0
+
+
+# Section 1.c Registry scan helper
+
+def _run_registry_scan(out_dir: Path, base_name: str, hints: str = "") -> None:
+    """Run analyze_registry and persist the result as *base_name*_registry_mcp.json."""
+    import json as _json
+
+    analyze_registry_fn = _load_registry_analyzer()
+    if analyze_registry_fn is None:
+        logger.warning("Registry scan requested but winreg is not available (non-Windows).")
+        return
+
+    logger.info("Section 1.c: Scanning Windows Registry...")
+    invocables = analyze_registry_fn(hints)
+
+    if not invocables:
+        logger.info("Registry scan: no invocables found.")
+        return
+
+    out_path = out_dir / f"{base_name}_registry_mcp.json"
+    out_path.write_text(
+        _json.dumps({"invocables": invocables, "source": "windows_registry"}, indent=2),
+        encoding="utf-8",
+    )
+    logger.info(f"Registry scan: {len(invocables)} invocables -> {out_path}")
+    print(f"\n[Section 1.c Registry] {len(invocables)} invocables found -> {out_path.name}")
+
+
+def main():
+    """Main entry point."""
+    import platform as _platform
+    logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+    parser = argparse.ArgumentParser(
+        description=(
+            "MCP Factory - Binary/Executable/Script Analyzer. "
+            "Accepts DLLs, EXEs, .NET assemblies, COM objects, SQL files, "
+            "Python, PowerShell, JavaScript, TypeScript, Batch, VBScript, "
+            "Shell scripts, and more."
+        )
+    )
+
+    # Required arguments (one of)
+    input_group = parser.add_mutually_exclusive_group(required=True)
+    input_group.add_argument(
+        "--dll", "--target",
+        dest="dll",
+        type=Path,
+        metavar="TARGET",
+        help="Path to any target file to analyze (DLL, EXE, .py, .ps1, .sql, .js, .ts, etc.)",
+    )
+    input_group.add_argument(
+        "--exports-raw",
+        type=Path,
+        help="Path to existing dumpbin /exports output (skip dumpbin run)",
+    )
+
+    # Optional arguments
+    parser.add_argument(
+        "--headers",
+        type=Path,
+        help="Root directory to search for header files (.h, .hpp, etc.)",
+    )
+    parser.add_argument(
+        "--docs", type=Path, help="Root directory to search for documentation files"
+    )
+    parser.add_argument(
+        "--out",
+        type=Path,
+        default=None,
+        help=f"Output directory (default: {get_default_output_dir()})",
+    )
+    parser.add_argument(
+        "--tag", type=str, default="", help="Tag to append to output filenames"
+    )
+    parser.add_argument(
+        "--dumpbin",
+        type=str,
+        default="dumpbin",
+        help="Path to dumpbin.exe or name on PATH",
+    )
+    parser.add_argument(
+        "--undname",
+        type=str,
+        default="undname",
+        help="Path to undname.exe or name on PATH",
+    )
+    parser.add_argument(
+        "--no-demangle",
+        action="store_true",
+        help="Skip C++ name demangling step",
+    )
+    parser.add_argument(
+        "--max-doc-hits",
+        type=int,
+        default=2,
+        help="Maximum documentation file hits per export",
+    )
+    parser.add_argument(
+        "--verbose", "-v",
+        action="store_true",
+        help="Show detailed pipeline steps with spinner animation",
+    )
+    parser.add_argument(
+        "--registry",
+        action="store_true",
+        help="Section 1.c: Also scan the Windows Registry (App Paths, installed apps, COM classes)",
+    )
+
+    parser.add_argument(
+        "--analysis-profile",
+        type=str,
+        default="strict_dll",
+        choices=["strict_dll", "greybox_dll", "full_surface"],
+        help="Discovery contract profile. strict_dll is compiled-first; full_surface opts into quarantined analyzers.",
+    )
+
+    args = parser.parse_args()
+    args.analysis_profile = _normalize_analysis_profile(getattr(args, "analysis_profile", "strict_dll"))
+
+    # Configure verbose mode for Spinner
+    Spinner.enabled = args.verbose
+    
+    if args.verbose:
+        print("\n" + "=" * 60)
+        print("MCP FACTORY - ADVANCED BINARY ANALYZER")
+        print("=" * 60 + "\n")
+
+    # Resolve output directory
+    out_dir = args.out or get_default_output_dir()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    _write_child_runtime_phase(
+        out_dir,
+        "main_args_parsed",
+        details={"analysis_profile": args.analysis_profile},
+    )
+
+    # Build base filename from DLL or use generic name
+    if args.dll:
+        base_name = args.dll.stem
+        dll_path = args.dll
+    else:
+        base_name = "analysis"
+        dll_path = None
+
+    if args.tag:
+        base_name = f"{base_name}_{args.tag}"
+
+    # Section 2.a: Accept installed directory (c:\\Program Files\\AppD\\)
+    if dll_path and dll_path.is_dir():
+        return analyze_directory(dll_path, out_dir, args)
+    # -------------------------------------------------------------------------
+
+    # Section 1.c: Optional Windows Registry scan
+    if getattr(args, "registry", False) and _profile_allows_analyzer(args.analysis_profile, "registry"):
+        _run_registry_scan(out_dir, base_name, getattr(args, "description", ""))
+    # -------------------------------------------------------------------------
+
+    # Detect file type and route to appropriate analyzer
+    file_type = None
+    if dll_path and dll_path.exists():
+        _write_child_runtime_phase(
+            out_dir,
+            "main_classify_start",
+            details={"dll_path": str(dll_path)},
+        )
+        file_type = classify_file(dll_path)
+        _write_child_runtime_phase(
+            out_dir,
+            "main_classify_done",
+            details={"dll_path": str(dll_path), "file_type": file_type.value},
+        )
+        logger.info(f"Detected file type: {file_type.value}")
+        
+        # Route based on file type
+        if not _profile_supports_file_type(args.analysis_profile, file_type):
+            logger.error(
+                "Analysis profile %s does not support non-compiled target type %s",
+                args.analysis_profile,
+                file_type.value,
+            )
+            return 1
+
+        if file_type == FileType.DOTNET_ASSEMBLY:
+            logger.info("Analyzing .NET assembly...")
+            return analyze_dotnet_assembly(dll_path, out_dir, base_name, args)
+        elif file_type == FileType.COM_OBJECT:
+            if _should_run_com_analysis(file_type, args.analysis_profile):
+                logger.info("Analyzing COM object...")
+                # Run COM analysis but don't return - fall through to native analysis
+                # because many COM DLLs (shell32, oleaut32) also have standard exports
+                analyze_com_object(dll_path, out_dir, base_name, args)
+            elif dll_path.suffix.lower() in {".tlb", ".olb"}:
+                logger.error(
+                    "Analysis profile %s does not support COM-only type library inputs",
+                    args.analysis_profile,
+                )
+                return 1
+            else:
+                logger.info(
+                    "Skipping COM registry analysis for compiled-first profile %s",
+                    args.analysis_profile,
+                )
+        elif file_type == FileType.PE_EXE:
+            if _platform.system() == "Windows":
+                if _profile_allows_analyzer(args.analysis_profile, "cli"):
+                    # On Windows (local dev), run CLI + GUI analysis directly.
+                    logger.info("Analyzing PE executable (try CLI)...")
+                    analyze_cli_tool(dll_path, out_dir, base_name, args)
+                else:
+                    logger.info(
+                        "PE EXE under profile %s - skipping quarantined CLI/GUI analyzers",
+                        args.analysis_profile,
+                    )
+                    stub_path = out_dir / f"{base_name}_cli_mcp.json"
+                    write_invocables_json(
+                        stub_path,
+                        [],
+                        dll_path=dll_path,
+                        tier=4,
+                        schema_version="2.0.0",
+                    )
+            else:
+                # On Linux (ACA container) the EXE cannot be executed --
+                # CLI, GUI, COM, and registry analysis are all delegated to
+                # the Windows GUI bridge.  Skip here to avoid 20-60s of
+                # blocked subprocess.run attempts that always time out.
+                logger.info(
+                    "PE EXE on Linux -- skipping CLI/GUI execution "
+                    "(handled by Windows GUI bridge)."
+                )
+                # Write a stub MCP JSON so _run_discovery finds a valid output
+                # file and proceeds to call the GUI bridge.  Without this, EXEs
+                # with no exports (e.g. calc.exe) produce zero *_mcp.json files,
+                # causing _run_discovery to raise RuntimeError and skip the bridge
+                # entirely -- which is exactly the bug we are fixing here.
+                stub_path = out_dir / f"{base_name}_cli_mcp.json"
+                write_invocables_json(
+                    stub_path,
+                    [],
+                    dll_path=dll_path,
+                    tier=4,
+                    schema_version="2.0.0",
+                )
+                return 0
+        elif file_type in _SCRIPT_DISPATCH:
+            # JIT / scripting / query file - route to language-specific analyzer
+            logger.info("Routing to scripting language analyzer: %s", file_type.value)
+            return analyze_scripting_language(dll_path, out_dir, base_name, file_type)
+
+        # For PE files (DLL or EXE) that weren't classified as COM_OBJECT,
+        # still check if they are registered as COM servers (InProc or LocalServer).
+        # Registry checks only make sense on Windows - skip on Linux ACA container.
+        if (
+            file_type in [FileType.PE_DLL, FileType.PE_EXE]
+            and _platform.system() == "Windows"
+            and _should_run_com_analysis(file_type, args.analysis_profile)
+        ):
+             # analyze_com_object is safe to call, it checks registry
+             logger.info("Checking for associated COM objects (Registry)...")
+             analyze_com_object(dll_path, out_dir, base_name, args)
+
+        # Otherwise fall through to native DLL analysis
+
+    # Phase 1: Get raw exports
+    exports: List[ExportedFunc] = []
+    
+    # If it's a pure EXE or unknown, dumpbin exports might be empty.
+    # We should be graceful.
+    allow_no_exports = (file_type == FileType.PE_EXE) or (file_type == FileType.PE_DLL)
+
+    if args.exports_raw:
+        # Read from existing raw file
+        try:
+            _write_child_runtime_phase(
+                out_dir,
+                "main_pe_exports_start",
+                details={"source": "exports_raw", "path": str(args.exports_raw)},
+            )
+            raw_text = args.exports_raw.read_text(encoding="utf-8")
+            from pe_parse import parse_dumpbin_exports
+            exports = parse_dumpbin_exports(raw_text)
+            _write_child_runtime_phase(
+                out_dir,
+                "main_pe_exports_done",
+                details={"source": "exports_raw", "export_count": len(exports)},
+            )
+        except Exception as e:
+            logger.error(f"Error reading exports-raw file: {e}")
+            return 1
+    elif args.dll:
+        # Use pefile to extract exports (Primary Method)
+        logger.info(f"Extracting exports from {args.dll} (using pefile)...")
+        _write_child_runtime_phase(
+            out_dir,
+            "main_pe_exports_start",
+            details={"source": "pefile", "path": str(args.dll)},
+        )
+        exports, success = read_pe_exports(args.dll)
+        _write_child_runtime_phase(
+            out_dir,
+            "main_pe_exports_done",
+            details={"source": "pefile", "success": bool(success), "export_count": len(exports)},
+        )
+        
+        # Log result
+        if exports:
+            logger.info(f"Found {len(exports)} exports")
+        else:
+            if not allow_no_exports:
+                logger.warning(f"No exports found in {args.dll} (and file is classified as PE_DLL)")
+                # We can try legacy dumpbin if pefile yields 0 but that probably means 0 exports.
+            else:
+                logger.info("No exports found (expected for EXE/Internal DLL)")
+
+
+
+    if not exports:
+        logger.warning("No exports found")
+        if not allow_no_exports:
+            return 1
+
+    # Phase 2: Deduplicate and demangle, resolve forwarders
+    exports = deduplicate_exports(exports)
+
+    if not args.no_demangle:
+        demangle_with_undname(exports, args.undname)
+    
+    # Extract digital signature
+    is_signed, publisher = False, None
+    if dll_path:
+        is_signed, publisher = extract_signature(dll_path)
+    
+    # Resolve forwarder chains
+    forwarding_chain = resolve_forwarders(exports)
+
+    # Phase 3: Match to headers and documentation
+    matches: dict = {}
+    doc_hits: dict = {}
+
+    if args.headers:
+        matches = scan_headers(args.headers, exports)
+
+    if args.docs:
+        doc_hits = scan_docs_for_exports(args.docs, exports, args.max_doc_hits)
+
+    # Phase 4: Write tiered outputs
+    tier_entries = []
+    _write_child_runtime_phase(
+        out_dir,
+        "main_output_write_start",
+        details={"export_count": len(exports), "base_name": base_name},
+    )
+
+    # Tier 1: Exports + headers + docs
+    if args.headers and args.docs and matches:
+        tier1_csv = out_dir / f"{base_name}_tier1_api.csv"
+        tier1_md = out_dir / f"{base_name}_tier1_api.md"
+        write_csv(tier1_csv, exports, matches, doc_hits, is_signed, publisher)
+        write_markdown(tier1_md, dll_path or args.dll or Path(base_name), exports, matches, doc_hits)
+        tier_entries.append("Tier 1: Exports + headers + docs")
+
+    # Tier 2: Exports + headers
+    if args.headers and matches:
+        tier2_csv = out_dir / f"{base_name}_tier2_api.csv"
+        tier2_md = out_dir / f"{base_name}_tier2_api.md"
+        write_csv(tier2_csv, exports, matches, {}, is_signed, publisher)
+        write_markdown(tier2_md, dll_path or args.dll or Path(base_name), exports, matches, {})
+        tier_entries.append("Tier 2: Exports + headers")
+
+    # Tier 3: Exports + demangle
+    if any(e.demangled for e in exports):
+        tier3_csv = out_dir / f"{base_name}_tier3_api.csv"
+        tier3_md = out_dir / f"{base_name}_tier3_api.md"
+        write_csv(tier3_csv, exports, {}, {}, is_signed, publisher)
+        write_markdown(tier3_md, dll_path or args.dll or Path(base_name), exports, {}, {})
+        tier_entries.append("Tier 3: Exports + demangled names")
+
+    # Tier 4: Exports only (always generated)
+    tier4_csv = out_dir / f"{base_name}_tier4_api.csv"
+    tier4_md = out_dir / f"{base_name}_tier4_api.md"
+    write_csv(tier4_csv, exports, {}, {}, is_signed, publisher)
+    write_markdown(tier4_md, dll_path or args.dll or Path(base_name), exports, {}, {})
+    tier_entries.append("Tier 4: Exports only")
+    
+    # Import Analysis (detect capabilities: RPC, COM, networking, etc.)
+    logger.info("Analyzing import table for capabilities...")
+    _write_child_runtime_phase(
+        out_dir,
+        "main_import_analysis_start",
+        details={"dll_path": str(dll_path or args.dll or Path(base_name))},
+    )
+    import_analysis = analyze_imports(dll_path or args.dll or Path(base_name), args.dumpbin)
+    
+    # RPC Analysis (if RPC capabilities detected)
+    rpc_analysis = None
+    rpc_invocables = []
+    if import_analysis['summary'].get('has_rpc'):
+        logger.info("RPC capabilities detected - analyzing RPC interfaces...")
+        rpc_analysis = analyze_rpc(
+            dll_path or args.dll or Path(base_name),
+            import_analysis['imports']
+        )
+        rpc_invocables = rpc_to_invocables(rpc_analysis, dll_path or args.dll or Path(base_name))
+    _write_child_runtime_phase(
+        out_dir,
+        "main_import_analysis_done",
+        details={
+            "import_count": len(import_analysis.get("imports", [])) if isinstance(import_analysis, dict) else 0,
+            "has_rpc": bool(rpc_analysis.get("has_rpc")) if isinstance(rpc_analysis, dict) else False,
+        },
+    )
+    
+    # Convert exports to Invocables and write MCP JSON
+    invocables = exports_to_invocables(
+        exports,
+        dll_path or args.dll or Path(base_name),
+        matches,
+        is_signed,
+        publisher
+    )
+    
+    # Merge RPC invocables if found
+    if rpc_invocables:
+        logger.info(f"Adding {len(rpc_invocables)} RPC invocables")
+        invocables.extend(rpc_invocables)
+    
+    if invocables:
+        mcp_json_path = out_dir / f"{base_name}_exports_mcp.json"
+        write_invocables_json(
+            mcp_json_path,
+            invocables,
+            dll_path=dll_path or args.dll or Path(base_name),
+            tier=4,
+            schema_version="2.0.0"
+        )
+    else:
+        logger.info(f"No invocables found (exports or RPC), skipping {base_name}_exports_mcp.json")
+    
+    # Write capabilities summary
+    capabilities_md = out_dir / f"{base_name}_capabilities.md"
+    with open(capabilities_md, 'w', encoding='utf-8') as f:
+        f.write(f"# DLL Capabilities Analysis: {base_name}\n\n")
+        f.write("## Summary\n\n")
+        f.write(f"Total DLLs imported: {import_analysis['summary']['total_dlls']}\n")
+        f.write(f"Total functions imported: {import_analysis['summary']['total_functions']}\n\n")
+        
+        f.write("## Detected Capabilities\n\n")
+        caps = import_analysis['capabilities']
+        if caps:
+            for cap, info in sorted(caps.items()):
+                f.write(f"### {cap.upper()}\n")
+                f.write(f"- **DLLs**: {', '.join(info['dlls'])}\n")
+                if 'functions' in info and info['functions']:
+                    f.write(f"- **Functions detected**: {len(info['functions'])}\n")
+                    f.write("  ```\n")
+                    for func in info['functions'][:10]:
+                        f.write(f"  {func}\n")
+                    if len(info['functions']) > 10:
+                        f.write(f"  ... and {len(info['functions']) - 10} more\n")
+                    f.write("  ```\n")
+                if cap == 'networking' and 'protocols' in info:
+                    f.write(f"- **Protocols**: {', '.join(info['protocols'])}\n")
+                f.write("\n")
+        else:
+            f.write("No special capabilities detected (standard Win32 API usage)\n\n")
+        
+        # RPC section
+        if rpc_analysis and rpc_analysis.get('has_rpc'):
+            f.write("## RPC Interfaces\n\n")
+            if rpc_analysis['summary'].get('is_server'):
+                f.write("**Mode**: RPC Server\n\n")
+            if rpc_analysis['summary'].get('is_client'):
+                f.write("**Mode**: RPC Client\n\n")
+            
+            interfaces = rpc_analysis.get('interfaces', [])
+            if interfaces:
+                f.write(f"**Interfaces found**: {len(interfaces)}\n\n")
+                for iface in interfaces[:5]:
+                    f.write(f"- `{iface.uuid}` (v{iface.version})\n")
+                if len(interfaces) > 5:
+                    f.write(f"- ... and {len(interfaces) - 5} more\n")
+                f.write("\n")
+            
+            pipes = rpc_analysis.get('named_pipes', [])
+            if pipes:
+                f.write(f"**Named Pipes**: {len(pipes)}\n\n")
+                for pipe in pipes[:10]:
+                    f.write(f"- `{pipe}`\n")
+                f.write("\n")
+
+    # Tier 5: Metadata
+    tier5_md = out_dir / f"{base_name}_tier5_metadata.md"
+    with open(tier5_md, 'w', encoding='utf-8') as f:
+        f.write(f"# DLL Metadata: {base_name}\n\n")
+        f.write(f"Total exports: {len(exports)}\n")
+        if dll_path and dll_path.exists():
+            f.write(f"File size: {dll_path.stat().st_size} bytes\n")
+        demangled_count = sum(1 for e in exports if e.demangled)
+        f.write(f"Demangled: {demangled_count}\n")
+        matched_count = sum(1 for e in exports if e.name in matches)
+        f.write(f"Header matched: {matched_count}\n")
+        f.write(f"\nDate generated: {__import__('datetime').datetime.now().isoformat()}\n")
+    tier_entries.append("Tier 5: Metadata only")
+
+    # Tier summary
+    summary_md = out_dir / f"{base_name}_tiers.md"
+    write_tier_summary(summary_md, tier_entries)
+
+    logger.info(f"Analysis complete. Results in: {out_dir}")
+    logger.info(f"Exports found: {len(exports)}")
+    logger.info(f"Matched to headers: {sum(1 for e in exports if e.name in matches)}")
+    logger.info(f"Demangled: {sum(1 for e in exports if e.demangled)}")
+    _write_child_runtime_phase(
+        out_dir,
+        "main_output_write_done",
+        details={"export_count": len(exports), "invocable_count": len(invocables)},
+    )
+
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt as exc:
+        _write_child_interrupt_diagnostic(exc)
+        raise

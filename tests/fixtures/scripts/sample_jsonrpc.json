@@ -1,0 +1,53 @@
+{
+  "jsonrpc": "2.0",
+  "service": "ContosoCalculatorService",
+  "description": "JSON-RPC 2.0 calculation and unit-conversion service for the Contoso platform.",
+  "version": "1.0.0",
+  "methods": [
+    {
+      "name": "add",
+      "description": "Add two numbers and return their sum.",
+      "params": [
+        {"name": "a", "type": "number", "description": "First operand"},
+        {"name": "b", "type": "number", "description": "Second operand"}
+      ],
+      "returns": {"type": "number", "description": "Sum of a and b"}
+    },
+    {
+      "name": "subtract",
+      "description": "Subtract b from a.",
+      "params": [
+        {"name": "a", "type": "number", "description": "Minuend"},
+        {"name": "b", "type": "number", "description": "Subtrahend"}
+      ],
+      "returns": {"type": "number", "description": "Difference a - b"}
+    },
+    {
+      "name": "convertCurrency",
+      "description": "Convert an amount from one ISO 4217 currency to another.",
+      "params": [
+        {"name": "amount",   "type": "number",  "description": "Monetary amount to convert"},
+        {"name": "fromCode", "type": "string",  "description": "Source currency code (e.g. USD)"},
+        {"name": "toCode",   "type": "string",  "description": "Target currency code (e.g. EUR)"}
+      ],
+      "returns": {"type": "number", "description": "Converted amount in target currency"}
+    },
+    {
+      "name": "applyDiscount",
+      "description": "Apply a percentage discount to a price and return the discounted price.",
+      "params": [
+        {"name": "price",      "type": "number",  "description": "Original price"},
+        {"name": "discountPct","type": "number",  "description": "Discount percentage (0-100)"}
+      ],
+      "returns": {"type": "number", "description": "Price after discount"}
+    },
+    {
+      "name": "batchCalculate",
+      "description": "Execute a list of arithmetic operations in a single round-trip.",
+      "params": [
+        {"name": "operations", "type": "array",  "description": "Array of {op, a, b} objects"}
+      ],
+      "returns": {"type": "array", "description": "Array of results in the same order"}
+    }
+  ]
+}

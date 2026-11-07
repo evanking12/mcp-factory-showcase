@@ -1,0 +1,45 @@
+{
+  "artifact_type": "northstar-expected-observed-report.json",
+  "contract_version": "1.0.0",
+  "deferred": [],
+  "expected_blockers": [
+    "bootstrap_family_blocker"
+  ],
+  "expected_consumers": [
+    "billing.authorize_charge",
+    "inventory.reserve_item"
+  ],
+  "expected_family_groups": [
+    "bootstrap_family_blocker"
+  ],
+  "expected_accepted_branches": [],
+  "expected_confirmation_sites": [],
+  "expected_lineage_branches": [],
+  "expected_producers": [
+    "session.bootstrap_session"
+  ],
+  "expected_shared_state": [
+    "session_token"
+  ],
+  "mismatches": [],
+  "misgroups": [],
+  "module_family": [
+    "billing",
+    "inventory",
+    "session"
+  ],
+  "notes": [
+    "expected_authored_from_source_truth"
+  ],
+  "observed_blockers": [],
+  "observed_consumers": [],
+  "observed_family_groups": [],
+  "observed_accepted_branches": [],
+  "observed_confirmation_sites": [],
+  "observed_lineage_branches": [],
+  "observed_producers": [],
+  "observed_shared_state": [],
+  "overclaims": [],
+  "slice_id": "northstar:first_slice",
+  "underclaims": []
+}

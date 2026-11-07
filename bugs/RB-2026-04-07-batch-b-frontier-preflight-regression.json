@@ -1,0 +1,26 @@
+{
+  "id": "RB-2026-04-07-batch-b-frontier-preflight-regression",
+  "title": "Structured prerequisite replay no longer preserves promoted lineage into reserved preflight",
+  "class": "state",
+  "layer": "api/pipeline/s02_probe/probe_loop.py",
+  "symptom": "Full harness fails on workflow, config, pricing, and blob-token structured preflight tests because reserved fresh-lineage preflight reuses placeholder values, duplicates init prereqs, and drops materialization_missing_families tracing.",
+  "smallest_reproducer": "python -m pytest tests/test_structured_argument_scaffolder.py::test_config_prereq_retries_after_live_ticket_promotion tests/test_structured_argument_scaffolder.py::test_pricing_init_prereq_executes_before_same_run_quote_rehydrate -q",
+  "trust_impact": "A live reduced Batch B frontier run would depend on the same s02 prerequisite replay and fresh-lineage preflight seams, so package-scale floor-to-ceiling evidence would not be trustworthy.",
+  "allowed_next_actions": [
+    "Inspect _run_reserved_prerequisite_replay ordering and retry behavior",
+    "Inspect _current_lineage_hints promotion flow for fresh-lineage consumers",
+    "Restore the structured preflight trace fields required by blob-token materialization tests",
+    "Rerun only the failing structured_argument_scaffolder tests before any live campaign run"
+  ],
+  "disallowed_next_actions": [
+    "Launch a reduced or full Batch B live campaign",
+    "Treat the new planner artifact as sufficient proof that package mode is safe",
+    "Spend package-scale runtime budget before the structured preflight seam is green"
+  ],
+  "exit_criteria": [
+    "The currently failing structured_argument_scaffolder tests pass",
+    "python scripts/harness.py test -- tests/ -v --tb=short --ignore=tests/test_mcp_stdio.py passes again",
+    "The config and pricing fresh-lineage preflight seams preserve promoted runtime values instead of placeholder TEST values"
+  ],
+  "next_move": "fix"
+}

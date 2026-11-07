@@ -1,0 +1,127 @@
+// sample.idl  —  Contoso Customer Service CORBA IDL fixture
+// Used by MCP Factory idl_analyzer.py demo.
+
+#ifndef CONTOSO_CUSTOMER_IDL
+#define CONTOSO_CUSTOMER_IDL
+
+module Contoso {
+
+  // ── Shared value types ──────────────────────────────────────────────────
+
+  struct Address {
+    string street;
+    string city;
+    string postalCode;
+    string countryCode;
+  };
+
+  struct Customer {
+    long   customerId;
+    string name;
+    string email;
+    string phone;
+    string tier;           // "standard" | "premium" | "enterprise"
+    Address shippingAddress;
+  };
+
+  struct OrderItem {
+    string productSku;
+    long   quantity;
+    double unitPrice;
+  };
+
+  typedef sequence<Customer>  CustomerList;
+  typedef sequence<OrderItem> OrderItemList;
+
+  exception CustomerNotFound  { long customerId; };
+  exception DuplicateEmail    { string email; };
+  exception OrderNotFound     { long orderId; };
+
+  // ── CustomerService interface ────────────────────────────────────────────
+
+  interface CustomerService {
+
+    // Retrieve a customer record by unique ID.
+    // Raises CustomerNotFound if the ID does not exist.
+    Customer getCustomer(in long customerId)
+        raises (CustomerNotFound);
+
+    // Create a new customer account.
+    // Returns the assigned customer ID; raises DuplicateEmail if the
+    // email address is already registered.
+    long createCustomer(in string name,
+                        in string email,
+                        in string tier)
+        raises (DuplicateEmail);
+
+    // Update mutable fields of an existing customer record.
+    // Raises CustomerNotFound if the ID does not exist.
+    boolean updateCustomer(in long   customerId,
+                           in string name,
+                           in string email,
+                           in string phone)
+        raises (CustomerNotFound);
+
+    // Permanently remove a customer record.
+    // Raises CustomerNotFound if the ID does not exist.
+    boolean deleteCustomer(in long customerId)
+        raises (CustomerNotFound);
+
+    // Return all customers in the given tier (empty string = all tiers).
+    CustomerList listCustomersByTier(in string tier);
+
+  }; // interface CustomerService
+
+
+  // ── OrderService interface ───────────────────────────────────────────────
+
+  interface OrderService {
+
+    // Place a new order for a customer.
+    // Returns the assigned order ID.
+    long placeOrder(in long          customerId,
+                    in OrderItemList items,
+                    in string        couponCode)
+        raises (CustomerNotFound);
+
+    // Cancel a pending order.  Raises OrderNotFound if the order does not
+    // exist or is already shipped.
+    boolean cancelOrder(in long orderId)
+        raises (OrderNotFound);
+
+    // Get the fulfilment status string for an order.
+    // Raises OrderNotFound if the order ID is invalid.
+    string getOrderStatus(in long orderId)
+        raises (OrderNotFound);
+
+    // Return estimated delivery date as an ISO 8601 string.
+    string getEstimatedDelivery(in long orderId)
+        raises (OrderNotFound);
+
+  }; // interface OrderService
+
+
+  // ── SupportService interface ─────────────────────────────────────────────
+
+  interface SupportService {
+
+    // Submit a new support ticket.
+    // Returns the assigned ticket ID.
+    long submitTicket(in long   customerId,
+                      in string subject,
+                      in string body,
+                      in string priority)
+        raises (CustomerNotFound);
+
+    // Retrieve the status of an open ticket.
+    string getTicketStatus(in long ticketId);
+
+    // Close a resolved support ticket.
+    boolean closeTicket(in long   ticketId,
+                        in string resolutionNote);
+
+  }; // interface SupportService
+
+}; // module Contoso
+
+#endif // CONTOSO_CUSTOMER_IDL

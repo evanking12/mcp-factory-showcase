@@ -1,0 +1,80 @@
+{
+  "artifact_type": "spectrum-observer-summary.json",
+  "schema_version": "1.0.0",
+  "case_id": "hard-02",
+  "observer_results": [
+    {
+      "observer_name": "split_quality",
+      "subject_ids": [
+        "attestation_stage.emit_release_attestation",
+        "settlement_reconcile.invalidate_stale_attested_release",
+        "audit_trace.record_stale_attestation_invalidation"
+      ],
+      "focus": "freshness_evidence_grouping_vs_false_clarity",
+      "expected_outputs": [
+        "split_verdict",
+        "preserved_primary_blocker",
+        "false_clarity_risk",
+        "next_action"
+      ],
+      "example_output": {
+        "split_verdict": "warn",
+        "preserved_primary_blocker": true,
+        "false_clarity_risk": "high",
+        "next_action": "keep_attestation_freshness_evidence_attached_to_late_stale_state_validation"
+      }
+    },
+    {
+      "observer_name": "lineage_preservation",
+      "subject_ids": [
+        "attestation_stage.emit_release_attestation",
+        "invoice_sync.stage_release_invoice",
+        "entitlement_sync.stage_customer_entitlement_update",
+        "settlement_reconcile.invalidate_stale_attested_release"
+      ],
+      "focus": "attestation_freshness_and_nonce_survival",
+      "expected_outputs": [
+        "lineage_verdict",
+        "missing_lineage_edges",
+        "trusted_artifact_family",
+        "next_action"
+      ],
+      "example_output": {
+        "lineage_verdict": "stale",
+        "missing_lineage_edges": [
+          "session_bootstrap.open_operator_session -> settlement_reconcile.invalidate_stale_attested_release::session_nonce_freshness"
+        ],
+        "trusted_artifact_family": "attestation_packet",
+        "next_action": "add_freshness-aware_lineage_evidence_before_accepting_local_packet_reuse_as_global_truth"
+      }
+    },
+    {
+      "observer_name": "false_green",
+      "subject_ids": [
+        "invoice_sync.stage_release_invoice",
+        "entitlement_sync.stage_customer_entitlement_update",
+        "settlement_reconcile.invalidate_stale_attested_release"
+      ],
+      "focus": "local_packet_reuse_vs_late_stale_invalidation",
+      "expected_outputs": [
+        "false_green_verdict",
+        "affected_paths",
+        "late_truth_conflict",
+        "next_action"
+      ],
+      "example_output": {
+        "false_green_verdict": "present",
+        "affected_paths": [
+          "invoice_sync.stage_release_invoice",
+          "entitlement_sync.stage_customer_entitlement_update"
+        ],
+        "late_truth_conflict": "both consumers can accept a packet whose freshness window already expired before global reconciliation",
+        "next_action": "treat_attestation_reuse_as_local_only_until_stale_state_validation_clears"
+      }
+    }
+  ],
+  "notes": [
+    "authored_from_spectrum_split_contract",
+    "hard_02_observers_model_stale_but_plausible_state"
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "version": "1.0",
+  "gate_id": "regression_gate_v1_lane_easy01_medium01_medium02_hard01",
+  "baseline_registry_path": "configs/regression/baseline_registry.json",
+  "lane_trust": {
+    "validator_script_path": "runtime/validate-local-lane.ps1",
+    "contract_sources": [
+      "runtime/local-runtime-contract.json",
+      "runtime/README.md",
+      "docs/architecture/runtime/LOCAL-RUNTIME-OWNERSHIP-REGISTRY.md"
+    ],
+    "required_packets": [
+      "lane-identity.json",
+      "lane-readiness.json",
+      "analyze-only-canary.json",
+      "bridge-execution-canary.json",
+      "lane-trust-packet.json"
+    ],
+    "pass_verdict": "passed"
+  },
+  "suites": [
+    {
+      "suite_id": "spectrum_transaction_release_settlement_suite",
+      "case_id": "easy-01",
+      "runner_id": "easy01_product",
+      "baseline_registry_surface_id": "easy01",
+      "compare_mode": "compiled_ingest_report",
+      "accepted_additive_invocables": false,
+      "summary_case_id": "easy-01-product-route",
+      "report_case_id": "easy-01",
+      "required_summary_fields": {
+        "green_contract_level": "product_green",
+        "product_green_eligible": true,
+        "route_authority_present": true,
+        "safe_to_compare": true,
+        "semantic_proof_satisfied": true,
+        "authoritative_proving": true,
+        "blocking_signal": ""
+      },
+      "required_report_fields": {
+        "green_contract_level": "product_green",
+        "product_green_eligible": true,
+        "route_authority_present": true,
+        "safe_to_compare": true,
+        "semantic_proof_satisfied": true,
+        "authoritative_proving": true,
+        "blocking_signal": ""
+      }
+    },
+    {
+      "suite_id": "spectrum_transaction_release_settlement_suite",
+      "case_id": "medium-01",
+      "runner_id": "medium01_product",
+      "baseline_registry_surface_id": "medium01",
+      "compare_mode": "compiled_ingest_report",
+      "accepted_additive_invocables": false,
+      "summary_case_id": "medium-01-product-route",
+      "report_case_id": "medium-01-product-route",
+      "required_summary_fields": {
+        "green_contract_level": "product_green",
+        "product_green_eligible": true,
+        "route_authority_present": true,
+        "safe_to_compare": true,
+        "semantic_proof_satisfied": true,
+        "authoritative_proving": true,
+        "blocking_signal": ""
+      },
+      "required_report_fields": {
+        "green_contract_level": "product_green",
+        "product_green_eligible": true,
+        "route_authority_present": true,
+        "safe_to_compare": true,
+        "semantic_proof_satisfied": true,
+        "authoritative_proving": true,
+        "blocking_signal": ""
+      }
+    },
+    {
+      "suite_id": "spectrum_transaction_release_settlement_suite",
+      "case_id": "medium-02",
+      "runner_id": "medium02_product",
+      "baseline_registry_surface_id": "medium02",
+      "compare_mode": "compiled_ingest_report",
+      "accepted_additive_invocables": false,
+      "summary_case_id": "medium-02-product-route",
+      "report_case_id": "medium-02-product-route",
+      "required_summary_fields": {
+        "green_contract_level": "product_green",
+        "product_green_eligible": true,
+        "route_authority_present": true,
+        "safe_to_compare": true,
+        "semantic_proof_satisfied": true,
+        "authoritative_proving": true,
+        "blocking_signal": ""
+      },
+      "required_report_fields": {
+        "green_contract_level": "product_green",
+        "product_green_eligible": true,
+        "route_authority_present": true,
+        "safe_to_compare": true,
+        "semantic_proof_satisfied": true,
+        "authoritative_proving": true,
+        "blocking_signal": ""
+      }
+    },
+    {
+      "suite_id": "spectrum_transaction_release_settlement_suite",
+      "case_id": "hard-01",
+      "runner_id": "hard01_product",
+      "baseline_registry_surface_id": "hard01",
+      "compare_mode": "compiled_ingest_report",
+      "accepted_additive_invocables": false,
+      "summary_case_id": "hard-01-product-route",
+      "report_case_id": "hard-01-product-route",
+      "required_summary_fields": {
+        "green_contract_level": "product_green",
+        "product_green_eligible": true,
+        "route_authority_present": true,
+        "safe_to_compare": true,
+        "semantic_proof_satisfied": true,
+        "authoritative_proving": true,
+        "blocking_signal": ""
+      },
+      "required_report_fields": {
+        "green_contract_level": "product_green",
+        "product_green_eligible": true,
+        "route_authority_present": true,
+        "safe_to_compare": true,
+        "semantic_proof_satisfied": true,
+        "authoritative_proving": true,
+        "blocking_signal": ""
+      }
+    }
+  ]
+}

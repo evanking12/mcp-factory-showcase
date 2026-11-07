@@ -1,0 +1,30 @@
+{
+  "trace_id": "creator-batch-b",
+  "spans": [
+    {
+      "span_id": "package_admission",
+      "name": "Package admission",
+      "stage": "Floor 0",
+      "duration_sec": 0,
+      "status": "pass",
+      "message": "Package metadata preserves bundled binary roles before runtime probing."
+    },
+    {
+      "span_id": "target_selection",
+      "name": "Runtime target selection",
+      "stage": "Floor 1",
+      "duration_sec": 0,
+      "status": "pass",
+      "message": "8 runtime targets selected from 10 bundled binaries."
+    },
+    {
+      "span_id": "blocker_harvest",
+      "name": "Package-scale blocker harvest",
+      "stage": "Floor 2",
+      "duration_sec": 0,
+      "status": "diagnostic",
+      "message": "This card shows package realism and target planning, not Spectrum product-green proof."
+    }
+  ],
+  "claim_ceiling": "telemetry is diagnostic evidence only"
+}

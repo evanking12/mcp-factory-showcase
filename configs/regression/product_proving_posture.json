@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-04-29",
+  "principle": "authoritative_contract_compression",
+  "canonical_sources": {
+    "active_defended_baselines": "configs/regression/baseline_registry.json",
+    "product_gate_membership": "configs/regression/gate_v1.json",
+    "path_risk_routing": "configs/regression/check_registry.json",
+    "hard_family_signal_keys": "docs/architecture/testing_strategy/HARD-FAMILY-FAILURE-SIGNAL-MAP.md"
+  },
+  "local_proving_anchor": {
+    "surface_id": "medium02",
+    "source": "configs/regression/baseline_registry.json",
+    "role": "current local king-of-hill proving ground"
+  },
+  "active_pressure_target": {
+    "surface_id": "hard03",
+    "source": "configs/regression/baseline_registry.json",
+    "role": "current hard-family standing-baseline pressure target; not a promoted baseline"
+  },
+  "active_blocker": {
+    "signal_key": "hard03_confirmation_reopen_gate_after_api_analyze_route_event_queue_repair",
+    "parent_signal_key": "hard03_confirmation_rerun_governance",
+    "diagnostic_signal_key": "reservation_stage_analyze_api_read_timeout_before_runtime_entry",
+    "family": "Hard03 confirmation rerun governance",
+    "signal_source": "docs/architecture/testing_strategy/HARD-FAMILY-FAILURE-SIGNAL-MAP.md",
+    "claim_ceiling": "Prompt 41 bounded API analyze route diagnostic event queue repair and focused tests only; enough to steer a fresh reopen gate, not enough to authorize another full Hard03 attempt without Prompt42 gate evidence, compare safety, product-green, baseline, Gate V1, tier lift, or downstream quarantine semantics",
+    "target": "hard03",
+    "observed_reason": "Prompt 40 spent the tenth authorized attempt and reproduced reservation_stage_analyze_api_read_timeout_before_runtime_entry with complete analyzer-runtime authority. Proving review kept the blocker at that boundary and required bounded route-step proof before any further full spend. Prompt 41 routes upload-investigation diagnostic event writes through a single bounded queue and serializes the shared JSON-list append helper inside the API process so observability cannot block /api/analyze before job-id return, cannot overlap diagnostic read-modify-write appends, and cannot spawn one thread per event. The active branch is now a fresh reopen gate before any eleventh full Hard03 spend."
+  },
+  "required_external_check": {
+    "name": "Required Regression Gates / Product Baseline Gate",
+    "workflow": ".github/workflows/required-regression-gates.yml",
+    "gate_config": "configs/regression/gate_v1.json"
+  },
+  "local_proof_policy": {
+    "default_anchor": "medium02",
+    "hard01_allowed_without_easy01_medium01_e2e": true,
+    "easy01_medium01_e2e_required_only_for_red_zone_changes": true,
+    "preferred_downstream_repair_proof": "checkpoint replay or target-local proof before full E2E confirmation"
+  }
+}

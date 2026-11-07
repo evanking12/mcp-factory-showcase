@@ -1,0 +1,17 @@
+{
+  "api": {
+    "url": "http://127.0.0.1:8201",
+    "key": "set-me"
+  },
+  "bridge": {
+    "url": "http://127.0.0.1:8090",
+    "key": "set-me"
+  },
+  "execution": {
+    "snapshot_profile": "full"
+  },
+  "explore_defaults": {
+    "analysis_profile": "strict_dll",
+    "model": "gpt-4o"
+  }
+}

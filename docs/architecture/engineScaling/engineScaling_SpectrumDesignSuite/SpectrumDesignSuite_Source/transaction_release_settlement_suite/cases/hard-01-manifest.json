@@ -1,0 +1,37 @@
+{
+  "case_id": "hard-01",
+  "case_name": "branching_replay_settlement",
+  "band": "hard",
+  "primary_blocker_family": "interwoven_lineage_ambiguity",
+  "active_modules": [
+    "session_bootstrap",
+    "reservation_stage",
+    "attestation_stage",
+    "release_commit",
+    "replay_branch",
+    "settlement_reconcile",
+    "audit_trace"
+  ],
+  "entry_surface": "session_bootstrap.open_operator_session",
+  "execution_flow": [
+    "session_bootstrap.open_operator_session",
+    "reservation_stage.issue_release_hold",
+    "attestation_stage.emit_release_attestation",
+    "release_commit.commit_release",
+    "replay_branch.replay_release_branch",
+    "settlement_reconcile.select_trusted_branch",
+    "audit_trace.invalidate_untrusted_branch"
+  ],
+  "shared_state": [
+    "reservation_handle",
+    "hold_token",
+    "attestation_packet",
+    "replay_attestation_packet"
+  ],
+  "wrong_split": "treat replay branches as independent clean lifecycle outputs",
+  "right_split": "keep competing branches grouped with late branch-truth selection and audit invalidation",
+  "expected_current_failure_mode": "locally plausible replay artifacts outrank late branch-truth too early",
+  "missing_system_candidate": "branch-trust observer and replay provenance evidence",
+  "product_lesson_if_green": "hard can stay honest under ambiguity even before strong unlock counts",
+  "product_lesson_if_red": "the next missing system is branch-trust, replay provenance, or split-quality evaluation"
+}

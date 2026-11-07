@@ -1,0 +1,21 @@
+{
+  "artifact_type": "successor-suite-first-slice.json",
+  "schema_version": "1.0.0",
+  "suite_name": "Atlas Reconciliation Suite",
+  "first_harder_pressure_family": "mutual_pressure_blocker",
+  "active_modules": [
+    "batch",
+    "identity",
+    "ledger",
+    "reconcile"
+  ],
+  "deferred_modules": [
+    "settlement",
+    "notifications"
+  ],
+  "execution_inputs_present": true,
+  "expected_observed_contract_present": true,
+  "inherits_reusable_campaign_seam": true,
+  "compare_ready": false,
+  "promotion_ready": false
+}

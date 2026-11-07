@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCP Factory Pipeline</title>
+  <link rel="stylesheet" href="/static/simple-dashboard.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="brand">Pipeline</div>
+      <div id="job-subtitle" class="subtitle">Select a job</div>
+    </div>
+    <nav class="top-actions">
+      <a class="link-button" href="/">Full Cockpit</a>
+      <button id="test-run" class="button">Start Test Run</button>
+      <button id="refresh" class="button secondary">Refresh</button>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <aside class="rail">
+      <div class="rail-head">
+        <h1>Jobs</h1>
+        <span id="job-count" class="muted">0</span>
+      </div>
+      <input id="job-filter" class="input" type="text" placeholder="Filter jobs" />
+      <div id="jobs" class="job-list"></div>
+    </aside>
+
+    <section class="main">
+      <section class="summary">
+        <div>
+          <div class="label">Current Job</div>
+          <div id="job-title" class="job-title">No job selected</div>
+        </div>
+        <div class="summary-grid">
+          <div class="metric">
+            <span>Status</span>
+            <strong id="job-status">n/a</strong>
+          </div>
+          <div class="metric">
+            <span>Stage</span>
+            <strong id="job-stage">n/a</strong>
+          </div>
+          <div class="metric">
+            <span>Progress</span>
+            <strong id="job-progress">n/a</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="pipeline-wrap">
+        <div class="section-head">
+          <h2>Stages</h2>
+          <span id="pipeline-state" class="state-pill">idle</span>
+        </div>
+        <div id="pipeline" class="pipeline"></div>
+      </section>
+
+      <section class="details">
+        <div class="log-panel">
+          <div class="section-head">
+            <h2 id="log-title">Pipeline Log</h2>
+            <span id="event-count" class="muted">0 events</span>
+          </div>
+          <pre id="log" class="log">Select a job or stage.</pre>
+        </div>
+        <aside class="stage-panel">
+          <h2>Stage Details</h2>
+          <div id="stage-details" class="stage-details"></div>
+        </aside>
+      </section>
+    </section>
+  </main>
+
+  <script src="/static/simple-dashboard.js"></script>
+</body>
+</html>
